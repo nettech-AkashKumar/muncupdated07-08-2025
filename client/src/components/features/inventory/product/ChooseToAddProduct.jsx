@@ -3,6 +3,10 @@ import add1 from '../../../../assets/img/add1.png';
 import add2 from '../../../../assets/img/add2.png';
 import add3 from '../../../../assets/img/add3.png';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import BASE_URL from '../../../../pages/config/config';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ChooseToAddProduct() {
   const [selectedOption, setSelectedOption] = useState('');
@@ -20,10 +24,27 @@ function ChooseToAddProduct() {
     inputRef.current.click(); 
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async(e) => {
     const file = e.target.files[0];
     if (file) {
       setFileName(file.name);
+      setSelectedFile(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      try {
+        const response = await axios.post(`${BASE_URL}/api/products/import`, formData, {
+          headers:{
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        toast.success('CSV imported successfully')
+        alert('CSV imported successfully')
+        console.log('CSV import response:', response.data);
+      }catch(error) {
+        toast.error('Failed to import CSV')
+        console.error('Upload error', error)
+      }
     }
   };
 

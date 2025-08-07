@@ -2,6 +2,7 @@
 
 const Product = require("../models/productModels");
 const cloudinary = require("../utils/cloudinary/cloudinary");
+const xlsx = require("xlsx")
 
 
 exports.createProduct = async (req, res) => {
@@ -250,6 +251,45 @@ exports.importProducts = async (req, res) => {
     const workbook = xlsx.readFile(req.file.path);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const data = xlsx.utils.sheet_to_json(sheet);
+
+    const requiredFields = [
+      productName,
+        slug,
+        sku,
+        brand, // Make sure this is an ObjectId if using ref
+        category,
+        subcategory,
+        supplier,
+        itemBarcode,
+        store,
+        warehouse,
+        purchasePrice,
+        sellingPrice,
+        wholesalePrice,
+        retailPrice,
+        quantity,
+        unit,
+        taxType,
+        tax,
+        discountType,
+        discountValue,
+        quantityAlert,
+        description,
+        seoTitle,
+        seoDescription,
+        variants,
+        itemType,
+        isAdvanced,
+        trackType,
+        isReturnable,
+        leadTime,
+        reorderLevel,
+        initialStock,
+        serialNumber,
+        batchNumber,
+        returnable,
+        expirationDate,
+    ]
 
     const importedProducts = [];
 
