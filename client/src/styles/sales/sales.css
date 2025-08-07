@@ -1,0 +1,7 @@
+.modal .modal-dialog.add-centered {
+    display: flex;
+    align-items: center;
+    -webkit-box-align: center;
+    justify-content: center;
+    max-width: 1192px;
+}
