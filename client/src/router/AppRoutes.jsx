@@ -13,6 +13,7 @@ import PrivateRoute from "../utils/PrivateRoute";
 //------------------------------- invetory------------------------------//
 
 import Product from "../components/features/inventory/product/Product";
+import ChooseToAddProduct from "../components/features/inventory/product/ChooseToAddProduct.jsx";
 import ProductCreate from "../components/features/inventory/product/ProductCreate";
 import ExpriedProduct from "../components/features/inventory/product/ExpriedProduct";
 import Category from "../components/features/category/Category";
@@ -100,6 +101,7 @@ const AppRoutes = () => {
         <Route path="/general-settings" element={<Setting />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/choose-adproduct" element={<ChooseToAddProduct/>}/>
         <Route path="/add-product" element={<ProductCreate />} />
         <Route path="/expired-products" element={<ExpriedProduct />} />
         <Route path="/category-list" element={<Category />} />

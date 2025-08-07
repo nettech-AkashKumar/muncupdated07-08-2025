@@ -150,7 +150,7 @@ export const getMenuData = () => {
       key: "inventory",
       items: [
         { label: t("product"), path: "/product", icon: <GoPackage className="icons" /> },
-        { label: t("createProduct"), path: "/add-product", icon: <TbTablePlus className="icons" /> },
+        { label: t("createProduct"), path: "/choose-adproduct", icon: <TbTablePlus className="icons" /> },
         { label: t("expiredProducts"), path: "/expired-products", icon: <PiWarningDiamond className="icons" /> },
         { label: t("lowStocks"), path: "/low-stocks", icon: <HiArrowTrendingUp className="icons" /> },
         { label: t("category"), path: "/category-list", icon: <TbListDetails className="icons" /> },

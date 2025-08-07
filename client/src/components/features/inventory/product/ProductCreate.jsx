@@ -392,6 +392,25 @@ const ProductForm = () => {
     }
   };
 
+  // to generate sku i.e, stock keeping unit based on category
+  const generateSKU = () => {
+    const category = formData.category || "GEN";
+    const name = formData.name || "PRD";
+    const randomNum = Math.floor(Math.random() * 9000) + 1000;
+    const sku = `${category.toUpperCase().slice(0,3)}-${name.toUpperCase().slice(0,3)}-${randomNum}`
+    setFormData((prevProduct) => ({
+      ...prevProduct,
+      sku,
+    }))
+  }
+
+  // to auto change sku based on changes in product name or category
+  useEffect(() => {
+    if(formData.productName || formData.category) {
+      generateSKU();
+    }
+  },[formData.productName, formData.category]);
+
   return (
     <div className="page-wrapper mt-4">
       <div className="content">
@@ -563,10 +582,10 @@ const ProductForm = () => {
                           name="sku"
                           className="form-control"
                           value={formData.sku}
-                          onChange={handleChange}
+                          onChange={(e) => setFormData({...formData, sku:e.target.value})}
                           placeholder={t("enterSKU")}
                         />
-                        <button type="submit" className="btn btn-primaryadd">
+                        <button type="submit"  onClick={generateSKU} className="btn btn-primaryadd">
                           {t("generate")}
                         </button>
                       </div>
