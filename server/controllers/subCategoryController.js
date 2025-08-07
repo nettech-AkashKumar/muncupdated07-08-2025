@@ -147,10 +147,12 @@ exports.deleteSubcategory = async (req, res) => {
   };
 
   exports.getSubcategoriesByCategory = async (req, res) => {
+    const {categoryId} = req.params;
     try {
-      const subcategories = await Subcategory.find({ category: req.params.categoryId });
+      const subcategories = await Subcategory.find({ category: categoryId });
       res.status(200).json(subcategories);
     } catch (error) {
+      console.error("Failed to fetch subcategories", error);
       res.status(500).json({ message: "Failed to fetch subcategories" });
     }
   };

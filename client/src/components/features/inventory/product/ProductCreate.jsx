@@ -189,6 +189,7 @@ const ProductForm = () => {
       }));
 
       setCategories(options);
+      console.log('ferere categories', data)
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -208,6 +209,7 @@ const ProductForm = () => {
   };
 
   useEffect(() => {
+     console.log("Selected Category:", selectedCategory);
     if (selectedCategory) {
       fetchSubcategoriesByCategory(selectedCategory.value);
     } else {
@@ -217,24 +219,37 @@ const ProductForm = () => {
 
   const fetchSubcategoriesByCategory = async (categoryId) => {
     try {
-      const res = await fetch(
-        `${BASE_URL}/api/subcategory/by-category/${categoryId}`
-      );
+       console.log("Fetching subcategories for category ID:", categoryId);
+      // const res = await fetch(`${BASE_URL}/api/category/by-category/${categoryId}`);
+     const res = await fetch(`${BASE_URL}/api/subcategory/by-category/${categoryId}`);
+        if (!res.ok) {
+      throw new Error(`Server error: ${res.status}`);
+    }
+
+
       const data = await res.json();
+       console.log("Subcategory API raw response:", data);
 
       const options = data.map((subcat) => ({
         value: subcat._id,
         label: subcat.subCategoryName,
       }));
       setSubcategories(options);
+      console.log('ferere subcategories', data)
     } catch (error) {
       console.error("Error fetching subcategories:", error);
     }
   };
   const fetchBrands = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/brands/active-brands`);
+       const token = localStorage.getItem("token");
+      const res = await fetch(`${BASE_URL}/api/brands/active-brands`, {
+        headers: {
+          Authorization:`Bearer ${token}`
+        }
+      });
       const data = await res.json();
+      console.log('fetchbrand', data)
 
       const options = data.brands.map((brand) => ({
         value: brand._id,
@@ -242,6 +257,7 @@ const ProductForm = () => {
       }));
 
       setBrandOptions(options);
+      console.log('ferere brand', data)
     } catch (error) {
       console.error("Failed to load active brands:", error);
     }
