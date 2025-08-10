@@ -1,4 +1,5 @@
 const Message = require('../models/Message');
+const Notification = require('../models/notificationModel');
 
 exports.saveMessage = async (req, res) => {
   try {
@@ -37,6 +38,22 @@ exports.saveMessage = async (req, res) => {
     };
 
     await conversation.save();
+
+    // Create notification for the recipient
+    try {
+      const notification = new Notification({
+        recipient: to,
+        sender: from,
+        message: message.length > 50 ? message.substring(0, 50) + '...' : message,
+        type: 'message',
+        conversationId: conversation._id
+      });
+      await notification.save();
+      console.log('📧 Notification created for user:', to);
+    } catch (notificationError) {
+      console.error('❌ Error creating notification:', notificationError);
+      // Don't fail the message save if notification fails
+    }
 
     res.status(201).json(newMessage);
   } catch (err) {
@@ -92,21 +109,21 @@ exports.markAsRead = async (req, res) => {
 };
 
 // New function to get all conversations for a user
-exports.getConversations = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    
-    const conversations = await Message.find({
-      participants: userId
-    }).populate('participants', 'username email profilePicture')
-      .populate('lastMessage.from', 'username')
-      .sort({ 'lastMessage.timestamp': -1 });
-    
-    res.json(conversations);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
+// exports.getConversations = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+//     
+//     const conversations = await Message.find({
+//       participants: userId
+//     }).populate('participants', 'username email profilePicture')
+//       .populate('lastMessage.from', 'username')
+//       .sort({ 'lastMessage.timestamp': -1 });
+//     
+//     res.json(conversations);
+//   } catch (err) {
+//     res.status(500).json({ message: 'Server error', error: err.message });
+//   }
+// };
 
 // Function to clear all messages in a conversation
 exports.clearMessages = async (req, res) => {
@@ -253,16 +270,19 @@ exports.deleteSelectedMessages = async (req, res) => {
 exports.getConversations = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log("Fetching conversations for user ID:", userId);
 
     const conversations = await Message.find({
-      participants: userId,
+      participants: { $in: [userId] }
     })
-      .populate("participants", "_id name email profileImage") // populate selected fields
-      .populate("messages"); // optional: or limit recent messages
+      .populate("participants", "_id firstName lastName email profileImage") // Fixed field names
+      .populate("messages.from", "_id firstName lastName email profileImage") // Also populate message sender details
+      .sort({ 'lastMessage.timestamp': -1 }); // Sort by most recent first
 
+    console.log("Found conversations:", conversations.length);
     res.status(200).json(conversations);
   } catch (err) {
     console.error("❌ Error fetching conversations:", err.message);
     res.status(500).json({ message: "Failed to fetch conversations" });
   }
-};
+}; 

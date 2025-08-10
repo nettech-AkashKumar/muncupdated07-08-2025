@@ -182,3 +182,31 @@ exports.getActiveUsers = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+// SEARCH USERS BY EMAIL
+exports.searchUsersByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email || email.trim().length === 0) {
+      return res.status(400).json({ message: "Email query parameter is required" });
+    }
+
+    const users = await User.find({
+      email: { $regex: email, $options: "i" },
+      status: "Active"
+    })
+    .select('firstName lastName email profileImage _id')
+    .limit(10)
+    .sort({ firstName: 1 });
+
+    res.status(200).json({
+      message: "Users found successfully",
+      total: users.length,
+      users: users,
+    });
+  } catch (error) {
+    console.error("Search Users Error:", error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};

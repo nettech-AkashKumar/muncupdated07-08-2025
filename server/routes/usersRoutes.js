@@ -9,6 +9,7 @@ const {
   deleteUser,
   getActiveUsers,
   userData,
+  searchUsersByEmail,
 } = require("../controllers/usersController");
 
 // Create user (with image upload)
@@ -16,6 +17,9 @@ router.post("/add", upload.array("profileImage"), createUser);
 
 // Get all users
 router.get("/getuser", getAllUsers);
+
+// Search users by email
+router.get("/search", searchUsersByEmail);
 
 // Get a specific user
 router.get("/user/:id", getUserById);

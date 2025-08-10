@@ -31,6 +31,7 @@ const VarientRoutes = require('./routes/variantRoutes');
 const WarrantyRoutes = require('./routes/warrantyRoutes');
 const debitNoteRoutes = require('./routes/debitNoteRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -88,6 +89,7 @@ app.use("/api/customers", customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use("/api/conversations", conversations);
 app.use("/api/messages", messages);
+app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/purchases", purchaseRoutes);
 app.use("/api/stock-history", stockHistoryRoutes);
@@ -123,21 +125,42 @@ io.on("connection", (socket) => {
   console.log("🟢 Socket connected:", socket.id);
 
   socket.on("add-user", (userId) => {
+    console.log("👤 User added to online list:", userId, "Type:", typeof userId);
     onlineUsers.set(userId, socket.id);
+    console.log("👤 Current online users:", Array.from(onlineUsers.keys()));
+    // Emit the updated online users list to all connected clients
+    io.emit("online-users", Array.from(onlineUsers.keys()));
   });
 
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-receive", data);
+      // Emit notification to the recipient
+      socket.to(sendUserSocket).emit("new-notification", {
+        type: 'message',
+        sender: data.from,
+        message: data.message,
+        timestamp: new Date()
+      });
     }
   });
 
   socket.on("disconnect", () => {
     console.log("🔴 Socket disconnected:", socket.id);
+    let disconnectedUserId = null;
     [...onlineUsers.entries()].forEach(([uid, sid]) => {
-      if (sid === socket.id) onlineUsers.delete(uid);
+      if (sid === socket.id) {
+        onlineUsers.delete(uid);
+        disconnectedUserId = uid;
+      }
     });
+    // Emit the updated online users list to all connected clients
+    if (disconnectedUserId) {
+      console.log("👤 User removed from online list:", disconnectedUserId);
+      console.log("👤 Remaining online users:", Array.from(onlineUsers.keys()));
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    }
   });
 });
 

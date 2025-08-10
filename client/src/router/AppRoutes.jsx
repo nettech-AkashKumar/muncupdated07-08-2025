@@ -36,6 +36,9 @@ import Coupons from "../components/features/Promo/Coupons.jsx";
 import GiftCard from "../components/features/Promo/GiftCard.jsx"
 import "../i18n.js"; // Import here
 import Chat from "../components/features/Chat/Chat.jsx";
+import Activities from "../components/layouts/Navbar/activities.jsx";
+import ViewAllNotifications from "../components/layouts/Navbar/ViewAllNotifications.jsx";
+import Barcode from "../components/features/inventory/barcode/Barcode.jsx";
 // import Mail from "../components/features/Mail/mail.jsx"
 
 // ------------------ Mail Components ------------------ //
@@ -127,9 +130,10 @@ const AppRoutes = () => {
         <Route path="/language" element={<LanguageSwitcher />} />
         <Route path="/debit-note" element={<DebitNote />} />
         <Route path="/credit-note" element={<CreditNote />} />
-
-
-
+        <Route path="/activities" element={<Activities />} />
+        <Route path="/ViewAllNotifications" element={<ViewAllNotifications />} />
+        <Route path="/barcode" element={<Barcode />} />
+        
         {/* purchase */}
         <Route path="/purchase-list" element={<Purchase />} />
         <Route path="/purchase-order" element={<PurchaseOrder />} />

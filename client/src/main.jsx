@@ -16,7 +16,7 @@ import { Provider } from "react-redux";
 import store from './components/Redux/store';
 import { ViewProvider } from "./Context/ViewContax/viewType.jsx";
 import { SettingsProvider } from "./Context/purchase/PurchaseContext.jsx";
-
+import { SocketProvider } from './Context/SocketContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -25,7 +25,9 @@ createRoot(document.getElementById('root')).render(
       <Provider store={store}> {/* ✅ Wrap your App inside Provider */}
         <SettingsProvider>
           <ViewProvider>
-            <App />
+            <SocketProvider>
+              <App />
+            </SocketProvider>
           </ViewProvider>
         </SettingsProvider>
       </Provider>
