@@ -34,17 +34,17 @@ const sendEmail = async (req, res) => {
     console.log("CC joined:", validCC && validCC.join(","));
 
     // Check for recipient existence
-    const allRecipients = [...to, ...validCC, ...validBCC];
-    const existingRecipients = await EmailModal.findOne({
-      type: "sent",   // Only consider recipient from sent emails
-      $or: [
-        { to: { $in: to } },
-        { cc: { $in: to } },
-        { bcc: { $in: to } }
-      ]
-    });
+    // const allRecipients = [...to, ...validCC, ...validBCC];
+    // const existingRecipients = await EmailModal.findOne({
+    //   type: "sent",   // Only consider recipient from sent emails
+    //   $or: [
+    //     { to: { $in: to } },
+    //     { cc: { $in: to } },
+    //     { bcc: { $in: to } }
+    //   ]
+    // });
 
-    const mailType = existingRecipients ? "sent" : "inbox";
+    // const mailType = existingRecipients ? "sent" : "inbox";
 
     const email = new EmailModal({
       to,
@@ -59,7 +59,7 @@ const sendEmail = async (req, res) => {
       name,
       starred,
       bin,
-      type: mailType,
+      type
     });
 
     const savedEmail = await email.save();
