@@ -148,7 +148,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<Users />} />
         <Route path="/roles-permissions" element={<Role />} />
         {/* <Route path="/permissions/:roleId" element={<RolePermissionEditor />} /> */}
-        <Route path="/permissions" element={<RolePermissionEditor />} />
+        <Route path="/permissions/:roleId" element={<RolePermissionEditor />} />
         <Route path="/warranty" element={<Warranty />} />
         <Route path="/countries" element={<Country />} />
         <Route path="/states" element={<State />} />
