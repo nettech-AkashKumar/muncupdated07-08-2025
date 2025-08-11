@@ -573,6 +573,11 @@ export const getMenuData = () => {
           path: "/overdue-report",
           icon: <TbReportMoney className="icons" />,
         },
+         {
+          label: "Expense Report",
+          path: "/expense-report",
+          icon: <TbReportMoney className="icons" />,
+        },
         {
           label: "Trial Balance",
           path: "/trial-balance",

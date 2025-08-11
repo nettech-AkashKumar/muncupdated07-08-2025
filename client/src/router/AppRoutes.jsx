@@ -98,6 +98,10 @@ import BalanceSheet from "../pages/finance&accounts/balance_sheet/BalanceSheet.j
 import ProfitLoss from "../pages/finance&accounts/profit_loss/ProfitLoss.jsx";
 import ProfitLossDateChoose from "../pages/finance&accounts/profit_loss/ProfitLossDateChoose.jsx";
 import ProfitLossSelectDate from "../pages/finance&accounts/profit_loss/ProfitLossSelectDate.jsx";
+import OverdueReport from "../pages/finance&accounts/overdue_report/OverdueReport.jsx";
+import ExpenseReport from "../pages/finance&accounts/expense_report/ExpenseReport.jsx";
+import ExpenseForm from "../pages/finance&accounts/expense_report/ExpenseForm.jsx";
+import ExpenseFormEdit from "../pages/finance&accounts/expense_report/ExpenseFromEdit.jsx";
 
 const AppRoutes = () => {
   return (
@@ -219,7 +223,10 @@ const AppRoutes = () => {
         <Route path="/profit&loss" element={<ProfitLoss/>}/>
         <Route path="/profit_lossdate_choose" element={<ProfitLossDateChoose/>}/>
         <Route path="/profit_lossselect_date" element={<ProfitLossSelectDate/>}/>
-        <Route path="/overdue-report" element={<ProfitLossSelectDate/>}/>
+        <Route path="/overdue-report" element={<OverdueReport/>}/>
+        <Route path="/expense-report" element={<ExpenseReport/>}/>
+        <Route path="/add_expenses" element={<ExpenseForm/>}/>
+        <Route path="/expenseformedit" element={<ExpenseFormEdit/>}/>
       </Route>
 
        
