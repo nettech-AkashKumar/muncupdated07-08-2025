@@ -1,0 +1,23 @@
+.mainsetting {
+  height: calc(100vh - 60px);
+  padding-top: 60px;
+}
+.genersettingdropdown:hover {
+  background-color: #81bdff;
+  color: #007aff;
+}
+.genersettingdropdown {
+  transition: 0.5s;
+}
+
+/* Scrollbar container */
+.left-setting-sidebar::-webkit-scrollbar {
+  width: 7px; /* Vertical scrollbar width */
+  height: 8px; /* Horizontal scrollbar height (optional) */
+}
+
+/* Thumb (scrollable element) */
+.left-setting-sidebar::-webkit-scrollbar-thumb {
+  background-color: #c0bcbc73;
+  border-radius: 10px;
+}

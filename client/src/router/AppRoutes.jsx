@@ -14,6 +14,7 @@ import PrivateRoute from "../utils/PrivateRoute";
 
 import Product from "../components/features/inventory/product/Product";
 import ChooseToAddProduct from "../components/features/inventory/product/ChooseToAddProduct.jsx";
+import ScanToAddProduct from "../components/features/inventory/product/ScanToAddProduct.jsx";
 import ProductCreate from "../components/features/inventory/product/ProductCreate";
 import ExpriedProduct from "../components/features/inventory/product/ExpriedProduct";
 import Category from "../components/features/category/Category";
@@ -56,6 +57,7 @@ import Deleted from "../components/features/Mail/EmailLayout/Deleted.jsx";
 import EmailMessages from "../components/features/Mail/EmailMessages/EmailMessages.jsx";
 
 
+
 import ManageStock from "../components/features/stock/manageStock/ManageStock";
 import StockAdujestment from "../components/features/stock/stockAdujestment/StockAdujestment";
 import StockTransfer from "../components/features/stock/stockTransfer/StockTransfer";
@@ -77,6 +79,21 @@ import CreditNote from "../components/features/creditDebit/creditNote/CreditNote
 import Sales from "../components/features/sales/Sales.jsx";
 import AllCustomer from "../components/features/customers/AllCustomers.jsx";
 import AllSuppliers from "../components/features/suppliers/AllSuppliers.jsx";
+
+import Settings from "../pages/setting28-07-2025/Settings.jsx";
+import UserProfiles from "../components/componentsetting28-07-2025/profile/Profile.jsx";
+import Security from "../components/componentsetting28-07-2025/security/Security.jsx";
+import Notification from "../components/componentsetting28-07-2025/notification/Notification.jsx";
+import ConnectedApps from "../components/componentsetting28-07-2025/connectedApps/ConnectedApps.jsx";
+import SystemSettings from "../components/componentsetting28-07-2025/systemsettings/SystemSettings.jsx";
+import Companysettings from "../components/componentsetting28-07-2025/companySettings/Companysettings.jsx";
+import Localization from "../components/componentsetting28-07-2025/localization/Localization.jsx";
+import Prefixes from "../components/componentsetting28-07-2025/prefixes/Prefixes.jsx";
+import Preferance from "../components/componentsetting28-07-2025/prefrance/Preferance.jsx";
+import Appearance from "../components/componentsetting28-07-2025/appearance/Appearance.jsx";
+import SocialAuthentications from "../components/componentsetting28-07-2025/socialAuthentication/SocialAuthentication.jsx";
+import Language from "../components/componentsetting28-07-2025/language/Language.jsx";
+import OtpVerification from "../components/auth/OtpVerification.jsx";
 
 const AppRoutes = () => {
   return (
@@ -101,10 +118,26 @@ const AppRoutes = () => {
       >
         <Route path="/home" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/general-settings" element={<Setting />} />
+        {/* <Route path="/general-settings" element={<Setting />} /> */}
+         <Route path="/" element={<Settings />}>
+          <Route path="profile/:id" element={<UserProfiles />} />
+          <Route path="security-settings" element={<Security />} />
+          <Route path="notification" element={<Notification />} />
+          <Route path="connectedapps" element={<ConnectedApps />} />
+          <Route path="system-settings" element={<SystemSettings />} />
+          <Route path="company-settings" element={<Companysettings />} />
+          <Route path="language-settings" element={<Localization />} />
+          <Route path="prefixes" element={<Prefixes />} />
+          <Route path="preferance" element={<Preferance />} />
+          <Route path="appearance" element={<Appearance />} />
+          <Route path="socialauth" element={<SocialAuthentications />} />
+          <Route path="language" element={<Language />} />
+        </Route>
+
         <Route path="/profile" element={<Profile />} />
         <Route path="/product" element={<Product />} />
         <Route path="/choose-adproduct" element={<ChooseToAddProduct/>}/>
+        <Route path="/scan-product" element={<ScanToAddProduct />} />
         <Route path="/add-product" element={<ProductCreate />} />
         <Route path="/expired-products" element={<ExpriedProduct />} />
         <Route path="/category-list" element={<Category />} />

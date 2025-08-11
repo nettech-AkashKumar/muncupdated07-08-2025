@@ -86,6 +86,7 @@ import {
   TbReceiptRefund,
   TbFileDescription,
 } from "react-icons/tb";
+import { useAuth } from "../../auth/AuthContext";
 
 export const getMenuData = () => {
   const { t } = useTranslation();

@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
 import { TbEdit, TbEye, TbSearch, TbTrash } from "react-icons/tb";
 import BASE_URL from "../../../pages/config/config";
@@ -11,7 +11,25 @@ import { toast } from "react-toastify";
 const Users = () => {
   const [activeRoles, setActiveRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
-   
+  const [searchTerm, setSearchTerm] = useState("  ")
+  const [selectedStatus, setSelectedStatus] = useState("")  //for active , inactive
+  const addFileInputRef = useRef(null);
+  const editFileInputRef = useRef(null);
+  const addHandleIconClick = () => {
+    if (addFileInputRef.current) {
+      addFileInputRef.current.click();
+    } else {
+      console.warn('addFileInputRef is null');
+    }
+  };
+   const editHandleIconClick = () => {
+    if (editFileInputRef.current) {
+      editFileInputRef.current.click();
+    } else {
+      console.warn('editFileInputRef is null');
+    }
+  };
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,8 +44,8 @@ const Users = () => {
   console.log(users);
   console.log("Uploaded image:", profileImage?.[0]?.url);
 
-    const [editUserId, setEditUserdId] = useState(null);
-  
+  const [editUserId, setEditUserdId] = useState(null);
+
   const [editUserData, setEditUserData] = useState({
     firstName: '',
     lastName: '',
@@ -39,8 +57,8 @@ const Users = () => {
     status: true,
     profileImage: null,
   });
-  
-  
+
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token"); // ⬅️ Get token from localStorage
@@ -62,9 +80,38 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  
+  const filteredUsers = useMemo(() => {
+    if(!searchTerm || !users.length || !activeRoles.length) return users;
+    return users.filter((user) => {
+    let roleName = "";
 
-  
-  
+    // Case 1: user.role is a populated object with roleName
+    if (typeof user.role === "object" && user.role?.roleName) {
+      roleName = user.role.roleName;
+    }
+
+    // Case 2: user.role is an ID, look it up from activeRoles
+    else if (typeof user.role === "string") {
+      const matchedRole = activeRoles.find((r) => String(r.value) === String(user.role));
+      roleName = matchedRole?.label || "";
+    }
+
+else if (typeof user.role === "object" && user.role?._id) {
+  const matchedRole = activeRoles.find((r) => String(r.value) === String(user.role._id));
+  roleName = matchedRole?.label || "";
+
+}
+
+const matchesSearch = roleName.toLowerCase().includes(searchTerm.trim().toLowerCase())
+const matchesStatus = selectedStatus ? user.status === selectedStatus : true
+
+    return matchesSearch && matchesStatus;
+  });
+  }, [searchTerm, selectedStatus, users, activeRoles])
+
+
+
   const handleAddUser = async (e) => {
     e.preventDefault();
 
@@ -82,7 +129,7 @@ const Users = () => {
     formData.append("role", selectedRole.value); // Role ID
     formData.append("status", status ? "Active" : "Inactive");
 
-    // ✅ Append image if provided (multiple format, even if only one)
+    //  Append image if provided (multiple format, even if only one)
     if (selectedImages.length > 0) {
       selectedImages.forEach((file) => {
         formData.append("profileImage", file); // match backend's `upload.array("profileImage")`
@@ -152,61 +199,71 @@ const Users = () => {
 
 
 
-const handleUpdate = async (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-  
+
     try {
       const formData = new FormData();
       formData.append('firstName', editUserData.firstName);
       formData.append('lastName', editUserData.lastName);
       formData.append('email', editUserData.email);
       formData.append('phone', editUserData.phone);
-  
+
       // Role handling
       if (editUserData.role?.value) {
         formData.append('role', editUserData.role.value);
       } else if (typeof editUserData.role === 'string') {
         formData.append('role', editUserData.role);
       }
-  
+
       formData.append('status', editUserData.status ? "Active" : "Inactive");
-  
-      if (editUserData.profileImage) {
+
+      if (editUserData.profileImage && typeof editUserData.profileImage !== 'string') {
         formData.append('profileImage', editUserData.profileImage);
       }
-  
+
       await axios.put(`${BASE_URL}/api/user/update/${editUserId}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-  
+
       toast.success('User updated successfully');
       fetchUsers();
       window.$(`#edit-user`).modal("hide");
-  
+
     } catch (error) {
       toast.error('Failed to update user');
       console.error(error);
     }
   };
-  
 
-const handleOpenEditModal = (user) => {
+
+  const handleOpenEditModal = (user) => {
+    const getMatchingRole = (roleId) => {
+      return activeRoles.find((role) => role.value === roleId)
+    }
+    const roleId = typeof user.role === "string" ? user.role : user.role?._id || user.role?.value;
+    const selectedRole = getMatchingRole(roleId)
+
     setEditUserdId(user._id);
-  
-    // Find the selected role from activeRoles
-    const selectedRole = activeRoles.find(role => role.value === user.role);
-  
+
+    // // Find the selected role from activeRoles
+    // const selectedRole = activeRoles.find(role => role.value === user.role);
+
     setEditUserData({
       firstName: user.firstName || '',
       lastName: user.lastName || '',
       email: user.email || '',
       phone: user.phone || '',
-      role: selectedRole || { label: user.role, value: user.role }, // fallback
+      role: selectedRole || { label: 'Unknown Role', value: user.role }, // fallback
       status: user.status ?? true,
-      profileImage: null, // only updated if changed
+      // profileImage: null, // only updated if changed
+      profileImage: typeof user.profileImage === "string"
+      ? user.profileImage
+      : user.profileImage?.url || null
+
     });
   };
-  
+
   return (
     <div className="page-wrapper">
       <div className="content">
@@ -245,47 +302,80 @@ const handleOpenEditModal = (user) => {
         <div className="card">
           <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
             <div className="search-set">
-              <div className="search-input">
-                <span className="btn-searchset position-relative">
+              <div className="search-input" style={{position:'relative'}}>
+                <span className="btn-searchset position-relative" style={{display:'flex', justifyContent:'space-between'}}>
+                  {/* {searchTerm === '' && (
+                    <TbSearch
+                      className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
+                      size={20}
+                      style={{position:'absolute', left:'10px', top:'50%', transform:'translateY(-50%)', pointerEvents:'none'}}
+                    />
+                  )} */}
                   <input
                     type="text"
                     placeholder="Search roles..."
                     className="form-control ps-5"
-                    // value={searchTerm}
-                    // onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <TbSearch
-                    className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"
-                    size={20}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{paddingLeft:'20px'}}
                   />
                 </span>
               </div>
             </div>
-            <div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+            <div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3" style={{gap:'10px', alignItems:'center'}}>
               <div className="dropdown">
-                <a
-                  href="javascript:void(0);"
+                <button
                   className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
                   data-bs-toggle="dropdown"
+                  style={{backgroundColor:'#fff',
+                    border:'1px solid #ccc',
+                    color:'#333',
+                    padding:'8px 12px',
+                    borderRadius:'6px',
+                    fontSize:'14px'
+                  }}
                 >
-                  Status
-                </a>
-                <ul className="dropdown-menu  dropdown-menu-end p-3">
+                  {selectedStatus || 'Status'}
+                </button>
+                <ul className="dropdown-menu  dropdown-menu-end p-3" style={{minWidth:'150px'}}>
                   <li>
-                    <a
-                      href="javascript:void(0);"
+                    <button
                       className="dropdown-item rounded-1"
+                      onClick={() => setSelectedStatus("Active")}
+                      style={{
+                        color:'#333',
+                        padding:'6px 10px',
+                        backgroundColor:selectedStatus === 'Active' ? '#fofofo' :'transparent'
+                      }}
                     >
                       Active
-                    </a>
+                    </button>
                   </li>
                   <li>
-                    <a
-                      href="javascript:void(0);"
+                    <button
                       className="dropdown-item rounded-1"
+                      onClick={() => setSelectedStatus("Inactive")}
+                      style={{
+                        color:'#333',
+                        padding:'6px 10px',
+                        backgroundColor:selectedStatus === 'Active' ? '#fofofo' :'transparent'
+                      }}
                     >
                       Inactive
-                    </a>
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item rounded-1"
+                      onClick={() => setSelectedStatus("")}
+                      style={{
+                        color:'#333',
+                        padding:'6px 10px',
+                        backgroundColor:selectedStatus === 'Active' ? '#fofofo' :'transparent'
+                      }}
+                    >
+                      Clear Filter
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -311,8 +401,8 @@ const handleOpenEditModal = (user) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.length > 0 ? (
-                    users.map((user) => (
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
                       <tr>
                         <td>
                           <label className="checkboxs">
@@ -326,11 +416,12 @@ const handleOpenEditModal = (user) => {
                               href="javascript:void(0);"
                               className="avatar avatar-md me-2"
                             >
-                            
+
+                              
                               {user.profileImage &&
-                              user.profileImage.length > 0 ? (
+                                user.profileImage.url ? (
                                 <img
-                                  src={user.profileImage[0].url}
+                                  src={user.profileImage.url}
                                   alt="Profile"
                                   style={{
                                     width: "50px",
@@ -363,11 +454,10 @@ const handleOpenEditModal = (user) => {
                         <td>{user.role?.roleName}</td>
                         <td>
                           <span
-                            className={`badge table-badge fw-medium fs-10 ${
-                              user.status === "Active"
-                                ? "bg-success"
-                                : "bg-danger"
-                            }`}
+                            className={`badge table-badge fw-medium fs-10 ${user.status === "Active"
+                              ? "bg-success"
+                              : "bg-danger"
+                              }`}
                           >
                             {user.status}
                           </span>
@@ -411,9 +501,9 @@ const handleOpenEditModal = (user) => {
         {/* /product list */}
 
         {/* Add User */}
-        <div className="modal fade" id="add-user">
+        <div className="modal " id="add-user">
           <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
+            <div className="modal-content" style={{width:'500px'}}>
               <div className="page-wrapper-new p-0">
                 <div className="content">
                   <div className="modal-header">
@@ -450,7 +540,7 @@ const handleOpenEditModal = (user) => {
                                         selectedImages[0]
                                       )}
                                       alt="Preview"
-                                      height="60"
+                                      style={{height:'120px', width:'120px', borderRadius:'13px'}}
                                     />
                                   ) : (
                                     <>
@@ -465,6 +555,8 @@ const handleOpenEditModal = (user) => {
                                   <input
                                     type="file"
                                     accept="image/*"
+                                    ref={addFileInputRef}
+                                    style={{ display: 'none' }}
                                     onChange={(e) =>
                                       setSelectedImages(
                                         Array.from(e.target.files)
@@ -473,7 +565,7 @@ const handleOpenEditModal = (user) => {
                                   />
 
                                   <div className="image-uploads">
-                                    <h4>Upload Image</h4>
+                                    <h4 style={{cursor:'pointer'}} onClick={addHandleIconClick}>Upload Image</h4>
                                   </div>
                                 </div>
                                 <p className="fs-13 mt-2">
@@ -638,209 +730,215 @@ const handleOpenEditModal = (user) => {
       /> */}
 
         {/* Edit User */}
-        <div className="modal fade" id="edit-user">
-      <div className="modal-dialog modal-dialog-centered">
-        <div className="modal-content">
-          <div className="page-wrapper-new p-0">
-            <div className="content">
-              <div className="modal-header">
-                <div className="page-title">
-                  <h4>Edit User</h4>
-                </div>
-                <button
-                  type="button"
-                  className="close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                  id="edit-user-close-btn"
-                >
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <form onSubmit={handleUpdate}>
-                <div className="modal-body">
-                  <div className="row">
-                    <div className="col-lg-12">
-                      <div className="new-employee-field">
-                        <div className="profile-pic-upload image-field">
-                          <div className="profile-pic p-2">
-                            <img
-                              src={
-                                editUserData.profileImage
-                                  ? URL.createObjectURL(editUserData.profileImage)
-                                  : 'assets/img/users/user-49.png'
-                              }
-                              className="object-fit-cover h-100 rounded-1"
-                              alt="user"
-                            />
-                          </div>
-                          <div className="mb-3">
-                            <div className="image-upload mb-0">
-                              <input
-                                type="file"
-                                onChange={(e) =>
-                                  setEditUserData({
-                                    ...editUserData,
-                                    profileImage: e.target.files[0],
-                                  })
-                                }
-                              />
-                              <div className="image-uploads">
-                                <h4>Change Image</h4>
+        <div className="modal" id="edit-user">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content" style={{width:'500px'}}>
+              <div className="page-wrapper-new p-0">
+                <div className="content">
+                  <div className="modal-header">
+                    <div className="page-title">
+                      <h4>Edit User</h4>
+                    </div>
+                    <button
+                      type="button"
+                      className="close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                      id="edit-user-close-btn"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                  <form onSubmit={handleUpdate}>
+                    <div className="modal-body">
+                      <div className="row">
+                        <div className="col-lg-12">
+                          <div className="new-employee-field">
+                            <div className="profile-pic-upload image-field">
+                              <div className="profile-pic p-2">
+                                <img
+                                  src={
+                                    typeof editUserData.profileImage === "string"
+                                      ? editUserData.profileImage
+                                      : editUserData.profileImage
+                                        ? URL.createObjectURL(editUserData.profileImage)  //newly selected file
+                                        : 'assets/img/users/user-49.png'
+                                  }
+                                  className="object-fit-cover h-100 rounded-1"
+                                  alt="user"
+                                  style={{height:'120px', width:'120px', borderRadius:'13px'}}
+                                />
+                              </div>
+                              <div className="mb-3">
+                                <div className="image-upload mb-0">
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    ref={editFileInputRef}
+                                    onChange={(e) =>
+                                      setEditUserData({
+                                        ...editUserData,
+                                        profileImage: e.target.files[0],
+                                      })
+                                    }
+                                  />
+                                  <div className="image-uploads">
+                                    <h4 style={{cursor:'pointer'}} onClick={editHandleIconClick}>Change Image</h4>
+                                  </div>
+                                </div>
+                                <p className="mt-2">JPEG, PNG up to 2 MB</p>
                               </div>
                             </div>
-                            <p className="mt-2">JPEG, PNG up to 2 MB</p>
+                          </div>
+                        </div>
+
+                        {/* First Name */}
+                        <div className="col-lg-6">
+                          <div className="mb-3">
+                            <label className="form-label">First Name *</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={editUserData.firstName}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, firstName: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Last Name */}
+                        <div className="col-lg-6">
+                          <div className="mb-3">
+                            <label className="form-label">Last Name *</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={editUserData.lastName}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, lastName: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Role */}
+                        <div className="col-lg-12">
+                          <div className="mb-3">
+                            <label className="form-label">
+                              Role<span className="text-danger ms-1">*</span>
+                            </label>
+                            <Select
+                              options={activeRoles}
+                              value={editUserData.role}
+                              isDisabled={editUserData.role.label === "Unknown Role"}
+                              onChange={(selectedOption) => {
+                                
+                                setEditUserData({ ...editUserData, role: selectedOption });
+                              }}
+                              placeholder="Search or select a role..."
+                              isSearchable
+                            />
+                          </div>
+                        </div>
+
+                        {/* Email */}
+                        <div className="col-lg-12">
+                          <div className="mb-3">
+                            <label className="form-label">Email *</label>
+                            <input
+                              type="email"
+                              className="form-control"
+                              value={editUserData.email}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, email: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Phone */}
+                        <div className="col-lg-12">
+                          <div className="mb-3">
+                            <label className="form-label">Phone *</label>
+                            <input
+                              type="tel"
+                              className="form-control"
+                              value={editUserData.phone}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, phone: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Password */}
+                        <div className="col-lg-6">
+                          <div className="mb-3">
+                            <label className="form-label">Password *</label>
+                            <input
+                              type="password"
+                              className="form-control"
+                              value={editUserData.password}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, password: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Confirm Password */}
+                        <div className="col-lg-6">
+                          <div className="mb-3">
+                            <label className="form-label">Confirm Password *</label>
+                            <input
+                              type="password"
+                              className="form-control"
+                              value={editUserData.confirmPassword}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, confirmPassword: e.target.value })
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        {/* Status */}
+                        <div className="col-lg-12">
+                          <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
+                            <span className="status-label">Status</span>
+                            <input
+                              type="checkbox"
+                              id="user-status"
+                              className="check"
+                              checked={editUserData.status}
+                              onChange={(e) =>
+                                setEditUserData({ ...editUserData, status: e.target.checked })
+                              }
+                            />
+                            <label htmlFor="user-status" className="checktoggle" />
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* First Name */}
-                    <div className="col-lg-6">
-                      <div className="mb-3">
-                        <label className="form-label">First Name *</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editUserData.firstName}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, firstName: e.target.value })
-                          }
-                        />
-                      </div>
+                    <div className="modal-footer">
+                      <button
+                        type="button"
+                        className="btn me-2 btn-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Cancel
+                      </button>
+                      <button type="submit" className="btn btn-primary">
+                        Save Changes
+                      </button>
                     </div>
-
-                    {/* Last Name */}
-                    <div className="col-lg-6">
-                      <div className="mb-3">
-                        <label className="form-label">Last Name *</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={editUserData.lastName}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, lastName: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Role */}
-<div className="col-lg-12">
-  <div className="mb-3">
-    <label className="form-label">
-      Role<span className="text-danger ms-1">*</span>
-    </label>
-    <Select
-      options={activeRoles}
-      value={selectedRole}
-      onChange={(selectedOption) => {
-        setSelectedRole(selectedOption);
-        setEditUserData({ ...editUserData, role: selectedOption?.value });
-      }}
-      placeholder="Search or select a role..."
-      isSearchable
-    />
-  </div>
-</div>
-
-                    {/* Email */}
-                    <div className="col-lg-12">
-                      <div className="mb-3">
-                        <label className="form-label">Email *</label>
-                        <input
-                          type="email"
-                          className="form-control"
-                          value={editUserData.email}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, email: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Phone */}
-                    <div className="col-lg-12">
-                      <div className="mb-3">
-                        <label className="form-label">Phone *</label>
-                        <input
-                          type="tel"
-                          className="form-control"
-                          value={editUserData.phone}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, phone: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Password */}
-                    <div className="col-lg-6">
-                      <div className="mb-3">
-                        <label className="form-label">Password *</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          value={editUserData.password}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, password: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Confirm Password */}
-                    <div className="col-lg-6">
-                      <div className="mb-3">
-                        <label className="form-label">Confirm Password *</label>
-                        <input
-                          type="password"
-                          className="form-control"
-                          value={editUserData.confirmPassword}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, confirmPassword: e.target.value })
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    {/* Status */}
-                    <div className="col-lg-12">
-                      <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-                        <span className="status-label">Status</span>
-                        <input
-                          type="checkbox"
-                          id="user-status"
-                          className="check"
-                          checked={editUserData.status}
-                          onChange={(e) =>
-                            setEditUserData({ ...editUserData, status: e.target.checked })
-                          }
-                        />
-                        <label htmlFor="user-status" className="checktoggle" />
-                      </div>
-                    </div>
-                  </div>
+                  </form>
                 </div>
-
-                <div className="modal-footer">
-                  <button
-                    type="button"
-                    className="btn me-2 btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Save Changes
-                  </button>
-                </div>
-              </form>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
       </div>
     </div>
   );

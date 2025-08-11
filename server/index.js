@@ -32,8 +32,17 @@ const WarrantyRoutes = require('./routes/warrantyRoutes');
 const debitNoteRoutes = require('./routes/debitNoteRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const userProfileRoutes = require("./routes/profileRoutes");
+
+const emailverifyroute = require("./routes/settings/EmailVerificationroute.js");
+const authrouter = require("./routes/settings/authroutes.js");
+const mobileverifyrouter = require("./routes/settings/mobileverifyroute.js");
+const devicemanagementrouter = require("./routes/settings/devicemanagementroute.js");
+const companysettingrouter = require("./routes/settings/companysettingroute.js");
+const localizationrouter = require("./routes/settings/Localizationroute.js");
 
 const http = require('http');
+const emailrouter = require('./routes/emailroutes.js');
 const { Server } = require('socket.io');
 
 // Load env variables
@@ -99,6 +108,28 @@ app.use("/api/warehouse", warehouseRoutes);
 app.use("/api/variant-attributes", VarientRoutes);
 app.use("/api/warranty", WarrantyRoutes);
 app.use('/api/debit-notes', debitNoteRoutes);
+app.use("/api/profile", userProfileRoutes);
+
+// api for mail 
+app.use("/api/email/mail", emailrouter)
+// email verify via otp api security
+app.use("/api/email", emailverifyroute);
+// google auth api
+app.use("/api/auth", authrouter);
+// mobile verify via sms
+app.use("/api/mobile", mobileverifyrouter);
+
+// device management api
+app.use("/api/devices", devicemanagementrouter);
+
+app.use('/uploads', express.static('uploads'));
+
+// company setting
+// register companyprofile api
+app.use("/api/companyprofile", companysettingrouter);
+
+// Localization api
+app.use("/api/localizationsetting", localizationrouter);
 
 
 

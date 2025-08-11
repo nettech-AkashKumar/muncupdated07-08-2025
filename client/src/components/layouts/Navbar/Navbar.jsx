@@ -16,13 +16,22 @@ import { LanguageContext } from '../../../Context/Language/LanguageContext';
 import { useTranslation } from "react-i18next";
 import Activities from './activities';
 import { useSocket } from '../../../Context/SocketContext';
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { io } from 'socket.io-client';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 function Navbar() {
+    // state for company logo
+  const [companyImages, setCompanyImages] = useState(null)
+  const [isDarkMode, setIsDarkMode] = useState(false)
   // const { language, switchLanguage } = useContext(LanguageContext);
   const mobileBtnRef = useRef(null);
   const fullscreenBtnRef = useRef(null);
   const toggleBtnRef = useRef(null);
   const { mobileOpen, handleMobileToggle } = useSidebar();
+   const { users } = useAuth();
+    const id = users?._id;
 
   // user profile
   const [user, setUser] = useState(null);
@@ -202,13 +211,48 @@ function Navbar() {
     setNotificationCount(0);
   };
 
+   // fetch company details
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/companyprofile/get`)
+        if (res.status === 200) {
+          setCompanyImages(res.data.data)
+          console.log("res.data", res.data.data)
+        }
+      } catch (error) {
+        toast.error("Unable to find company details", {
+          position: 'top-center'
+        })
+      }
+    }
+    fetchCompanyDetails();
+  }, []);
+
+    useEffect(() => {
+    if (companyImages?.companyFavicon) {
+      let favicon = document.querySelector("link[rel*='icon']");
+      if (!favicon) {
+        favicon = document.createElement("link")
+        favicon.rel = "icon";
+        document.head.appendChild(favicon)
+      }
+      favicon.type = "image/png";
+      favicon.href = companyImages.companyFavicon
+    }
+  }, [companyImages])
+
+
+
   return (
     <div className="header">
       <div className="main-header">
+        {companyImages ? (
+          <>
         {/* Logo */}
         <div className="header-left active">
           <Link to="/home" className="logo logo-normal">
-            <img src={Logo} alt="Logo" />
+           <img style={{ height: "35px", width: "35px" }} src={isDarkMode ? companyImages.companyDarkLogo : companyImages.companyLogo} alt="company logo" />
           </Link>
           <Link to="/home" className="logo logo-white">
             <img src="/assets/img/logo-white.svg" alt="Logo" />
@@ -545,9 +589,11 @@ function Navbar() {
               </div>
             </li>
           )}
-
         </ul>
-
+        </>
+        ) : (
+          <p>No Company Logo Image</p>
+        )}
         {/* Mobile Menu (3 dots) */}
         <div className="dropdown mobile-user-menu">
           <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">

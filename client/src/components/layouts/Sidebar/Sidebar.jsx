@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Link } from "react-router-dom";
 import "../../../styles/sidebar.css";
 import Logo from "../../../assets/img/logo/munclogotm.png";
@@ -6,16 +6,43 @@ import IconLogo from "../../../assets/img/logo/MuncSmall.svg";
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from "react-icons/ai";
 import { getMenuData } from "./MenuData.jsx";
 import { useSidebar } from "../../../Context/sidetoggle/SidebarContext";
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import axios from 'axios';
+import BASE_URL from '../../../pages/config/config';
 
 const Sidebar = () => {
   const { openMenus, toggleMenu, mobileOpen, handleMobileToggle, handleLinkClick } = useSidebar();
+  const [companyImages, setCompanyImages] = useState(null)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   const menuData = getMenuData();
+   // fetch company details
+    useEffect(() => {
+      const fetchCompanyDetails = async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/companyprofile/get`)
+          if (res.status === 200) {
+            setCompanyImages(res.data.data)
+            console.log("res.data", res.data.data)
+          }
+        } catch (error) {
+          toast.error("Unable to find company details", {
+            position: 'top-center'
+          })
+        }
+      }
+      fetchCompanyDetails();
+    }, []);
+
+
   return (
     <>
       {mobileOpen && <div className="sidebar-overlay" onClick={handleMobileToggle}></div>}
 
       <div className={`sidebar ${mobileOpen ? "open" : "collapsed "}`}>
+        {companyImages ? (
+          <>
         <div className="sidebar-logo">
           <Link to="/home"><img src={IconLogo} className="compact-logo" alt="Logo" /></Link>
           <Link to="/home"><img src={Logo} className="full-logo" alt="Full Logo" /></Link>
@@ -98,10 +125,12 @@ const Sidebar = () => {
           </div>
         </div>
         <div class="sidebar-bottom">
-          <Link to="/"> <img src={IconLogo} class="compact-logo" alt="Compact Footer Logo" /></Link>
-          <Link to="/"> <img src={Logo} class="full-logo" alt="Full Footer Logo" /></Link>
+          <Link to="/"> <img src={companyImages.companyIcon} class="compact-logo" alt="Compact Footer Logo" /></Link>
+          <Link to="/"> <img src={isDarkMode ? companyImages.companyDarkLogo : companyImages.companyLogo} class="full-logo" alt="Full Footer Logo" /></Link>
 
         </div>
+        </>
+        ):(<p>No Icon</p>)}
       </div>
     </>
   );

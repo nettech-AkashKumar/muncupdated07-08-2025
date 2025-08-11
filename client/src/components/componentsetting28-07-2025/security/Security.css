@@ -1,0 +1,6 @@
+.security-changepass-btn:hover{
+    background-color: aquamarine !important;
+}
+.security-changepass-btn{
+    transition: 0.5s;
+}

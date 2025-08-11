@@ -1,0 +1,12 @@
+.setting-imgupload-btn {
+  transition: 0.5s;
+}
+.setting-imgupload-btn:hover {
+  background-color: #026ee1 !important;
+}
+.settingbtn {
+  transition: 0.5s;
+}
+.settingbtn:hover {
+  background-color: #026ee1 !important;
+}

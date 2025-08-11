@@ -1,0 +1,6 @@
+.localization-container{
+    height: calc(100vh - 100px);
+}
+.localization-container::-webkit-scrollbar{
+    display: none;
+}
