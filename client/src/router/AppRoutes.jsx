@@ -94,6 +94,10 @@ import Appearance from "../components/componentsetting28-07-2025/appearance/Appe
 import SocialAuthentications from "../components/componentsetting28-07-2025/socialAuthentication/SocialAuthentication.jsx";
 import Language from "../components/componentsetting28-07-2025/language/Language.jsx";
 import OtpVerification from "../components/auth/OtpVerification.jsx";
+import BalanceSheet from "../pages/finance&accounts/balance_sheet/BalanceSheet.jsx";
+import ProfitLoss from "../pages/finance&accounts/profit_loss/ProfitLoss.jsx";
+import ProfitLossDateChoose from "../pages/finance&accounts/profit_loss/ProfitLossDateChoose.jsx";
+import ProfitLossSelectDate from "../pages/finance&accounts/profit_loss/ProfitLossSelectDate.jsx";
 
 const AppRoutes = () => {
   return (
@@ -207,7 +211,18 @@ const AppRoutes = () => {
           <Route path="spam" element={<Spam />} />
           <Route path="deleted" element={<Deleted />} />
         </Route>
+
+
+        {/* ------------------ Finance & Accounts ------------------ */}
+        <Route path="/balance-sheet" element={<BalanceSheet/>}/>
+        <Route path="/profit&loss" element={<ProfitLoss/>}/>
+        <Route path="/profit_lossdate_choose" element={<ProfitLossDateChoose/>}/>
+        <Route path="/profit_lossselect_date" element={<ProfitLossSelectDate/>}/>
+        <Route path="/overdue-report" element={<ProfitLossSelectDate/>}/>
       </Route>
+
+       
+
 
     </Routes>
   );
