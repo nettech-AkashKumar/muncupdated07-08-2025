@@ -106,6 +106,7 @@ const AppRoutes = () => {
       {/* Auth & 404 remain outside layout */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/otp" element={<OtpVerification />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -151,7 +152,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<Users />} />
         <Route path="/roles-permissions" element={<Role />} />
         {/* <Route path="/permissions/:roleId" element={<RolePermissionEditor />} /> */}
-        <Route path="/permissions" element={<RolePermissionEditor />} />
+        <Route path="/permissions/:roleId" element={<RolePermissionEditor />} />
         <Route path="/warranty" element={<Warranty />} />
         <Route path="/countries" element={<Country />} />
         <Route path="/states" element={<State />} />

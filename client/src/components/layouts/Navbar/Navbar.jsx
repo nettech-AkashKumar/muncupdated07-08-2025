@@ -25,6 +25,7 @@ function Navbar() {
     // state for company logo
   const [companyImages, setCompanyImages] = useState(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
+  const userData = JSON.parse(localStorage.getItem("user"));
   // const { language, switchLanguage } = useContext(LanguageContext);
   const mobileBtnRef = useRef(null);
   const fullscreenBtnRef = useRef(null);
@@ -440,18 +441,18 @@ function Navbar() {
           </li>
           {/* Settings */}
           <li className="nav-item nav-item-box">
-            <Link to="/general-settings"><TbSettings className="ti" /></Link>
+            <Link to={`profile/${id}`}><TbSettings className="ti" /></Link>
           </li>
 
           {/* Profile */}
-          {user ? (
+          {userData ? (
             <li className="nav-item dropdown has-arrow main-drop profile-nav">
               <a className="nav-link userset" data-bs-toggle="dropdown" href="#">
                 <span className="user-info p-0">
                   <span className="user-letter">
-                    {user.profileImage && user.profileImage.length > 0 ? (
+                    {userData?.profileImage?.url ? (
                       <img
-                        src={user.profileImage[0].url}
+                        src={userData.profileImage.url}
                         alt="Profile"
                         style={{
                           width: "40px",
@@ -471,8 +472,8 @@ function Navbar() {
                           fontWeight: "bold"
                         }}
                       >
-                        {user.firstName?.charAt(0)?.toUpperCase() || ''}
-                        {user.lastName?.charAt(0)?.toUpperCase() || ''}
+                        {userData.firstName?.charAt(0)?.toUpperCase() || ''}
+                        {userData.lastName?.charAt(0)?.toUpperCase() || ''}
                       </div>
                     )}
                   </span>
@@ -481,9 +482,9 @@ function Navbar() {
               <div className="dropdown-menu menu-drop-user">
                 <div className="profileset d-flex align-items-center">
                   <span className="user-img me-2">
-                    {user.profileImage && user.profileImage.length > 0 ? (
+                    {userData?.profileImage?.url  ? (
                       <img
-                        src={user.profileImage[0].url}
+                        src={userData.profileImage.url}
                         alt="Profile"
                         style={{
                           width: "40px",
@@ -521,10 +522,10 @@ function Navbar() {
                 <Link className="dropdown-item" to="/sales-report">
                   <TbFileText className=" me-2" /> {t("reports")}
                 </Link>
-                <Link className="dropdown-item" to="/general-settings">
+                {/* <Link className="dropdown-item" to="/general-settings">
                   <TbSettings className=" me-2" /> {t("settings")}
-                </Link>
-                <hr className="my-2" />
+                </Link> */}
+                {/* <hr className="my-2" /> */}
                 <Link className="dropdown-item logout pb-0" onClick={handleLogout}>
                   <TbLogout className=" me-2" /> {t("logout")}
                 </Link>
