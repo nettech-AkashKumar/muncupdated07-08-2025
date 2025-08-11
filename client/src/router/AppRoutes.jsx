@@ -102,6 +102,7 @@ const AppRoutes = () => {
       {/* Auth & 404 remain outside layout */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/otp" element={<OtpVerification />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
