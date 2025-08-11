@@ -10,6 +10,7 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import { CiClock2 } from 'react-icons/ci';
+import './activities.css'
 
 const ViewAllNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -203,22 +204,34 @@ const ViewAllNotifications = () => {
   };
 
   // Format timestamp
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInHours = (now - date) / (1000 * 60 * 60);
+  // const formatTimestamp = (timestamp) => {
+  //   const date = new Date(timestamp);
+  //   const now = new Date();
+  //   const diffInHours = (now - date) / (1000 * 60 * 60);
 
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-      return `${diffInMinutes} minutes ago`;
-    } else if (diffInHours < 24) {
-      const hours = Math.floor(diffInHours);
-      return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else {
-      const days = Math.floor(diffInHours / 24);
-      return `${days} day${days > 1 ? 's' : ''} ago`;
-    }
-  };
+  //   if (diffInHours < 1) {
+  //     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+  //     return `${diffInMinutes} minutes ago`;
+  //   } else if (diffInHours < 24) {
+  //     const hours = Math.floor(diffInHours);
+  //     return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  //   } else {
+  //     const days = Math.floor(diffInHours / 24);
+  //     return `${days} day${days > 1 ? 's' : ''} ago`;
+  //   }
+  // };
+const formatTimestamp = (timestamp) => {
+  const date = new Date(timestamp);
+  
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+};
 
   // Load notifications on component mount
   useEffect(() => {
@@ -253,25 +266,7 @@ const ViewAllNotifications = () => {
         </div>
         {notifications.length > 0 && (
           <div style={{display:'flex',gap:'10px'}}>
-            <button
-              onClick={() => setDeleteConfirm({ type: 'all' })}
-              style={{
-                background:'#dc3545',
-                color:'white',
-                border:'none',
-                padding:'8px 16px',
-                borderRadius:'6px',
-                fontSize:'14px',
-                fontWeight:'500',
-                cursor:'pointer',
-                display:'flex',
-                alignItems:'center',
-                gap:'8px'
-              }}
-            >
-              <FaTrash />
-              Clear All
-            </button>
+            
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
@@ -289,17 +284,36 @@ const ViewAllNotifications = () => {
                   gap:'8px'
                 }}
               >
-                {/* <FaCheckDouble /> */}
+                <FaCheckDouble />
                 Mark All as Read
               </button>
             )}
+            <button
+              onClick={() => setDeleteConfirm({ type: 'all' })}
+              style={{
+                background:'white',
+                color:'#dc3545',
+                border:'none',
+                padding:'8px 16px',
+                borderRadius:'6px',
+                fontSize:'14px',
+                fontWeight:'500',
+                cursor:'pointer',
+                display:'flex',
+                alignItems:'center',
+                gap:'8px'
+              }}
+            >
+              <FaTrash />
+              Clear All
+            </button>
             
           </div>
         )}
       </div>
 
       {/* all messages */}
-      <div style={{marginTop:'5px',overflowY:'auto',maxHeight:'calc(100vh - 160px)',borderRadius:'8px',backgroundColor:'#f8f9fa'}}>
+      <div style={{marginTop:'5px',overflowY:'auto',maxHeight:'calc(100vh - 160px)',borderRadius:'8px',backgroundColor:'white'}}>
         {!user ? (
           <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 20px',textAlign:'center',color:'#6c757d'}}>
             <FaBell style={{fontSize:'48px',color:'#dee2e6',marginBottom:'16px'}} />
@@ -347,14 +361,14 @@ const ViewAllNotifications = () => {
               <div 
                 key={notification._id} 
                 style={{
-                  display:'flex',
-                  padding:'12px 20px',
-                  gap:'15px',
+                  // display:'flex',
+                  // padding:'12px 20px',
+                  // gap:'15px',
                   // border:'1px solid #e9ecef',
                   // borderRadius:'8px',
-                  backgroundColor: '#fff',
+                  // backgroundColor: '#fff',
                   // marginBottom:'15px',
-                  position:'relative',
+                  // position:'relative',
                   // borderLeft: notification.read ? '1px solid #e9ecef' : '4px solid #667eea',
                   // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                   // transition: 'all 0.3s ease'
@@ -367,6 +381,7 @@ const ViewAllNotifications = () => {
                 //   e.currentTarget.style.transform = 'translateY(0)';
                 //   e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
                 // }}
+                className='notification-items notification-hover-group'
               >
                 <div>
                   {notification.sender?.profileImage ? (
@@ -432,7 +447,7 @@ const ViewAllNotifications = () => {
                 
                 {/* Action buttons */}
                 <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px'}}>
-                <div style={{display:'flex',justifyContent:'center',gap:'4px',marginTop:'0px'}}>
+                <div style={{}} className='notification-default-info'>
                     {/* <CiClock2 style={{fontSize:'12px',color:'#6c757d'}} /> */}
                     <span style={{fontWeight:'400',color:'#6c757d'}}>
                       {formatTimestamp(notification.timestamp)}
@@ -450,18 +465,20 @@ const ViewAllNotifications = () => {
                         backgroundColor: '#FFD700',
                         borderRadius: '50%',
                         border: '1px solid white',
-                        boxShadow: '0 0 4px rgba(0,0,0,0.2)'
+                        boxShadow: '0 0 4px rgba(0,0,0,0.2)',
+                        display: 'inline-block',
+                        verticalAlign: 'middle',
                       }}>
                         
                       </span>
                     )}
                   </div>
 
-                <div style={{display:'flex',gap:'8px',justifyContent:'center',marginTop:'8px'}}>
+                <div style={{}} className='notification-hover-actions'>
                   {!notification.read && (
                     <button
                       style={{
-                        // width:'32px',
+                        width:'32px',
                         height:'32px',
                         border:'none',
                         borderRadius:'6px',
@@ -469,24 +486,25 @@ const ViewAllNotifications = () => {
                         alignItems:'center',
                         justifyContent:'center',
                         cursor:'pointer',
-                        background:'#28a745',
-                        color:'white',
-                        fontSize:'12px',
+                        background:'#FBFBFB',
+                        color:'#1368EC',
+                        fontSize:'15px',
                         transition: 'all 0.3s ease'
                       }}
+                      className='notification-action-btn mark-read'
                       onClick={() => markAsRead(notification._id)}
                       title="Mark as read"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#218838';
-                        e.currentTarget.style.transform = 'scale(1.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = '#28a745';
-                        e.currentTarget.style.transform = 'scale(1)';
-                      }}
+                      // onMouseEnter={(e) => {
+                      //   e.currentTarget.style.background = '#218838';
+                      //   e.currentTarget.style.transform = 'scale(1.1)';
+                      // }}
+                      // onMouseLeave={(e) => {
+                      //   e.currentTarget.style.background = '#28a745';
+                      //   e.currentTarget.style.transform = 'scale(1)';
+                      // }}
                     >
-                      {/* <FaCheck /> */}
-                      Mark as read
+                      <FaCheck />
+                      {/* Mark as read */}
                     </button>
                   )}
                   
@@ -495,26 +513,27 @@ const ViewAllNotifications = () => {
                       width:'32px',
                       height:'32px',
                       border:'none',
-                      borderRadius:'6px',
+                      // borderRadius:'6px',
                       display:'flex',
                       alignItems:'center',
                       justifyContent:'center',
                       cursor:'pointer',
-                      background:'#dc3545',
-                      color:'white',
-                      fontSize:'12px',
+                      background:'#FBFBFB',
+                      color:'#dc3545',
+                      fontSize:'15px',
                       transition: 'all 0.3s ease'
                     }}
+                    className='notification-action-btn delete'
                     onClick={() => setDeleteConfirm({ notificationId: notification._id })}
                     title="Delete notification"
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = '#c82333';
-                      e.currentTarget.style.transform = 'scale(1.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = '#dc3545';
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
+                    // onMouseEnter={(e) => {
+                    //   e.currentTarget.style.background = '#c82333';
+                    //   e.currentTarget.style.transform = 'scale(1.1)';
+                    // }}
+                    // onMouseLeave={(e) => {
+                    //   e.currentTarget.style.background = '#dc3545';
+                    //   e.currentTarget.style.transform = 'scale(1)';
+                    // }}
                   >
                     <FaTrash />
                   </button>

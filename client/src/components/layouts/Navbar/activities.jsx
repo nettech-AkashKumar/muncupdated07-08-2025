@@ -5,6 +5,8 @@ import { TbBell, TbCirclePlus, TbCommand, TbDeviceLaptop, TbDotsVertical, TbFile
 import { FaTrash } from 'react-icons/fa';
 import { io } from 'socket.io-client';
 
+import './activities.css'; // Import your CSS file for styles
+
 const Activities = ({ onNotificationsRead }) => {
   const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
@@ -23,7 +25,7 @@ const Activities = ({ onNotificationsRead }) => {
       
       if (!userId) return;
       
-      const response = await fetch(`${backendurl}/api/notifications/${userId}?limit=10`, {
+      const response = await fetch(`${backendurl}/api/notifications/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -169,20 +171,32 @@ const Activities = ({ onNotificationsRead }) => {
   };
 
   // Format time ago
+  // const formatTimeAgo = (timestamp) => {
+  //   const now = new Date();
+  //   const time = new Date(timestamp);
+  //   const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+    
+  //   if (diffInMinutes < 1) return 'Just now';
+  //   if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
+    
+  //   const diffInHours = Math.floor(diffInMinutes / 60);
+  //   if (diffInHours < 24) return `${diffInHours} hours ago`;
+    
+  //   const diffInDays = Math.floor(diffInHours / 24);
+  //   return `${diffInDays} days ago`;
+  // };
   const formatTimeAgo = (timestamp) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
-    
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours} hours ago`;
-    
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays} days ago`;
-  };
+  const date = new Date(timestamp);
+  
+  return date.toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  });
+};
 
   useEffect(() => {
     if (user) {
@@ -214,7 +228,7 @@ const Activities = ({ onNotificationsRead }) => {
                         <li className="notification-message">
                           <div className="media d-flex">
                             <div className="flex-grow-1">
-                              <p className="noti-details">Loading notifications...</p>
+                              <p className="noti-details">Loading Notifications...</p>
                             </div>
                           </div>
                         </li>
@@ -222,13 +236,23 @@ const Activities = ({ onNotificationsRead }) => {
                         <li className="notification-message">
                           <div className="media d-flex">
                             <div className="flex-grow-1">
-                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center' }}> No notifications yet !!</p>
+                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center' }}> No Notifications yet !!</p>
+                            </div>
+                          </div>
+                        </li>
+                      ) : notifications.filter(notification => !notification.read).length === 0 ? (
+                        <li className="notification-message">
+                          <div className="media d-flex">
+                            <div className="flex-grow-1">
+                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center' }}> No New Notifications !!</p>
                             </div>
                           </div>
                         </li>
                       ) : (
-                        notifications.map((notification) => (
-                          <li key={notification._id} className={`notification-message ${!notification.read ? 'unread' : ''}`} style={{ position: 'relative',border:'1px solid #E6E6E6',marginBottom:'5px',borderRadius:'8px',padding:'10px',backgroundColor:'#F9F9F9',cursor:'pointer' }}>
+                        notifications.filter(notification => !notification.read).map((notification) => (
+                          <li key={notification._id} className={`notification-item ${!notification.read ? 'unread' : ''}`} 
+                          style={{}}
+                          >
                             <div style={{ textDecoration: 'none' }} onClick={() => markAsRead(notification._id)}>
                               <div className="media d-flex">
                                 <span className="avatar flex-shrink-0">
