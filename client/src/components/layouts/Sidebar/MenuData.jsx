@@ -564,6 +564,16 @@ export const getMenuData = () => {
           icon: <TbReportMoney className="icons" />,
         },
         {
+          label: "Profit & Loss",
+          path: "/profit&loss",
+          icon: <TbReportMoney className="icons" />,
+        },
+         {
+          label: "Overdue Report",
+          path: "/overdue-report",
+          icon: <TbReportMoney className="icons" />,
+        },
+        {
           label: "Trial Balance",
           path: "/trial-balance",
           icon: <TbAlertCircle className="icons" />,

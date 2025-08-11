@@ -201,14 +201,14 @@ const Activities = ({ onNotificationsRead }) => {
 
   return (
     <div>
-        <div className="topnav-dropdown-header">
-                    <h5 className="notification-title">{t("notifications")}</h5>
-                    <a href="#" className="clear-noti" onClick={(e) => {
-                      e.preventDefault();
-                      markAllAsRead();
-                    }}>{t("markAllAsRead")}</a>
-                  </div>
-                  <div className="noti-content">
+        <div className="" style={{padding:'5px 12px',backgroundColor:'#FDFDFD',borderTopLeftRadius: '8px',borderTopRightRadius: '8px', borderBottom: '1px solid white',display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+          <h5 className="notification-title" style={{color:'#262626',marginTop:'8px'}}>Notification</h5>
+          <a href="#" className="clear-noti" style={{color:'#1368EC', textDecoration:'none'}} onClick={(e) => {
+            e.preventDefault();
+            markAllAsRead();
+            }}>Clear All</a>
+          </div>
+                  <div className="noti-content" style={{padding:'5px 10px'}}>
                     <ul className="notification-list">
                       {loading ? (
                         <li className="notification-message">
@@ -222,26 +222,26 @@ const Activities = ({ onNotificationsRead }) => {
                         <li className="notification-message">
                           <div className="media d-flex">
                             <div className="flex-grow-1">
-                              <p className="noti-details" style={{ marginTop: '10px', paddingLeft: '10px' }}> No notifications</p>
+                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center' }}> No notifications yet !!</p>
                             </div>
                           </div>
                         </li>
                       ) : (
                         notifications.map((notification) => (
-                          <li key={notification._id} className={`notification-message ${!notification.read ? 'unread' : ''}`} style={{ position: 'relative' }}>
-                            <Link to="/chat" style={{ textDecoration: 'none' }} onClick={() => markAsRead(notification._id)}>
+                          <li key={notification._id} className={`notification-message ${!notification.read ? 'unread' : ''}`} style={{ position: 'relative',border:'1px solid #E6E6E6',marginBottom:'5px',borderRadius:'8px',padding:'10px',backgroundColor:'#F9F9F9',cursor:'pointer' }}>
+                            <div style={{ textDecoration: 'none' }} onClick={() => markAsRead(notification._id)}>
                               <div className="media d-flex">
                                 <span className="avatar flex-shrink-0">
                                   {notification.sender?.profileImage ? (
                                     Array.isArray(notification.sender.profileImage) && notification.sender.profileImage.length > 0 ? (
-                                      <img alt="Profile" src={notification.sender.profileImage[0].url} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                      <img alt="Profile" src={notification.sender.profileImage[0].url} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                                     ) : (
-                                      <img alt="Profile" src={notification.sender.profileImage} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                                      <img alt="Profile" src={notification.sender.profileImage} style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
                                     )
                                   ) : (
                                     <div style={{
-                                      width: '40px',
-                                      height: '40px',
+                                      width: '50px',
+                                      height: '50px',
                                       borderRadius: '50%',
                                       backgroundColor: '#007AFF',
                                       color: 'white',
@@ -251,20 +251,21 @@ const Activities = ({ onNotificationsRead }) => {
                                       fontSize: '14px',
                                       fontWeight: 'bold'
                                     }}>
-                                      {notification.sender?.firstName?.slice(0, 2).toUpperCase() || 'U'}
+                                      {notification.sender?.firstName?.slice(0, 2).toUpperCase() || 'NA'}
                                     </div>
                                   )}
                                 </span>
                                 <div className="flex-grow-1">
-                                  <p className="noti-details" style={{ textDecoration: 'none' }}>
-                                    <span className="noti-title" style={{textDecoration: 'none', fontWeight: 'bold'}}>
-                                      {notification.sender?.firstName} {notification.sender?.lastName}: 
-                                    </span> {notification.message}
+                                  <p className="noti-details" style={{ textDecoration: 'none', marginLeft:'5px',marginTop:'5px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <span className="noti-title" style={{textDecoration: 'none', fontWeight: 'bold'}}>{notification.sender?.firstName} {notification.sender?.lastName}</span>
+                                      <span className="noti-time" style={{ textDecoration: 'none',fontSize:'10px' }}>{formatTimeAgo(notification.timestamp)}</span>
+                                    </div>
+                                    {notification.message.split(" ").length > 5 ? notification.message.split(" ").slice(0, 10).join(" ") + "..." : notification.message}
                                   </p>
-                                  <p className="noti-time" style={{ textDecoration: 'none' }}>{formatTimeAgo(notification.timestamp)}</p>
                                 </div>
                               </div>
-                            </Link>
+                            </div>
                             
                             {/* Delete button */}
                             <button
@@ -275,7 +276,7 @@ const Activities = ({ onNotificationsRead }) => {
                               }}
                               style={{
                                 position: 'absolute',
-                                top: '20px',
+                                top: '35px',
                                 right: '10px',
                                 width: '20px',
                                 height: '20px',
@@ -297,8 +298,8 @@ const Activities = ({ onNotificationsRead }) => {
                             {!notification.read && (
                               <div style={{
                                 position: 'absolute',
-                                top: '10px',
-                                right: '35px',
+                                top: '40px',
+                                right: '40px',
                                 width: '8px',
                                 height: '8px',
                                 backgroundColor: '#FFD700',
@@ -312,9 +313,8 @@ const Activities = ({ onNotificationsRead }) => {
                       )}
                     </ul>
                   </div>
-                  <div className="topnav-dropdown-footer d-flex align-items-center gap-3">
-                    <button className="btn btn-secondary btn-md w-100" type="button">{t("cancel")}</button>
-                    <Link to="/ViewAllNotifications" className="btn btn-primary btn-md w-100">{t("viewAll")}</Link>
+                  <div className="" style={{padding:'8px',backgroundColor:'#FDFDFD',borderBottomLeftRadius: '10px',borderBottomRightRadius: '10px',textAlign: 'center'}}>
+                    <Link to="/ViewAllNotifications" className="" style={{width:'100%',color:'#1368EC',backgroundColor:'#F9F9F9',textAlign:'center',textDecoration:'none'}}>View All</Link>
                   </div>
     </div>
   )

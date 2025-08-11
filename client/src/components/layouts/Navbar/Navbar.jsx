@@ -435,7 +435,7 @@ function Navbar() {
                 </span>
               )}
             </a>
-            <div className="dropdown-menu notifications">
+            <div className="dropdown-menu notifications" style={{border:'1px solid #E6E6E6', borderRadius: '8px'}}>
               <Activities onNotificationsRead={handleNotificationsRead} />
             </div>
           </li>

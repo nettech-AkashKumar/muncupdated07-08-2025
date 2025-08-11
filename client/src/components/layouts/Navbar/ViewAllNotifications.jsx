@@ -231,7 +231,7 @@ const ViewAllNotifications = () => {
   }, [userId]);
 
   return (
-    <div style={{padding:'10px 20px'}}>
+    <div style={{padding:'0px 20px',height:'88vh'}}>
       {/* Add CSS for loading animation */}
       <style>
         {`
@@ -247,33 +247,12 @@ const ViewAllNotifications = () => {
         <div>
           <span style={{fontSize:'22px',fontWeight:'700'}}>All Notifications</span>
           <br/>
-          <span style={{fontSize:'19px',fontWeight:'400',color:'#86888bff'}}>
+          {/* <span style={{fontSize:'19px',fontWeight:'400',color:'#86888bff'}}>
             {notifications.length > 0 ? `${notifications.length} notification${notifications.length > 1 ? 's' : ''}` : 'No notifications'}
-          </span>
+          </span> */}
         </div>
         {notifications.length > 0 && (
           <div style={{display:'flex',gap:'10px'}}>
-            {unreadCount > 0 && (
-              <button
-                onClick={markAllAsRead}
-                style={{
-                  background:'#667eea',
-                  color:'white',
-                  border:'none',
-                  padding:'8px 16px',
-                  borderRadius:'6px',
-                  fontSize:'14px',
-                  fontWeight:'500',
-                  cursor:'pointer',
-                  display:'flex',
-                  alignItems:'center',
-                  gap:'8px'
-                }}
-              >
-                <FaCheckDouble />
-                Mark All as Read
-              </button>
-            )}
             <button
               onClick={() => setDeleteConfirm({ type: 'all' })}
               style={{
@@ -291,14 +270,36 @@ const ViewAllNotifications = () => {
               }}
             >
               <FaTrash />
-              Delete All
+              Clear All
             </button>
+            {unreadCount > 0 && (
+              <button
+                onClick={markAllAsRead}
+                style={{
+                  background:'white',
+                  color:'#1368EC',
+                  border:'none',
+                  padding:'8px 16px',
+                  borderRadius:'6px',
+                  fontSize:'14px',
+                  fontWeight:'500',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  gap:'8px'
+                }}
+              >
+                {/* <FaCheckDouble /> */}
+                Mark All as Read
+              </button>
+            )}
+            
           </div>
         )}
       </div>
 
       {/* all messages */}
-      <div style={{marginTop:'15px'}}>
+      <div style={{marginTop:'5px',overflowY:'auto',maxHeight:'calc(100vh - 160px)',borderRadius:'8px',backgroundColor:'#f8f9fa'}}>
         {!user ? (
           <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'60px 20px',textAlign:'center',color:'#6c757d'}}>
             <FaBell style={{fontSize:'48px',color:'#dee2e6',marginBottom:'16px'}} />
@@ -347,25 +348,25 @@ const ViewAllNotifications = () => {
                 key={notification._id} 
                 style={{
                   display:'flex',
-                  padding:'15px 20px',
+                  padding:'12px 20px',
                   gap:'15px',
-                  border:'1px solid #e9ecef',
-                  borderRadius:'8px',
-                  backgroundColor: notification.read ? 'white' : '#f8f9fa',
-                  marginBottom:'15px',
+                  // border:'1px solid #e9ecef',
+                  // borderRadius:'8px',
+                  backgroundColor: '#fff',
+                  // marginBottom:'15px',
                   position:'relative',
-                  borderLeft: notification.read ? '1px solid #e9ecef' : '4px solid #667eea',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  transition: 'all 0.3s ease'
+                  // borderLeft: notification.read ? '1px solid #e9ecef' : '4px solid #667eea',
+                  // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  // transition: 'all 0.3s ease'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                }}
+                // onMouseEnter={(e) => {
+                //   e.currentTarget.style.transform = 'translateY(-2px)';
+                //   e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                // }}
+                // onMouseLeave={(e) => {
+                //   e.currentTarget.style.transform = 'translateY(0)';
+                //   e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                // }}
               >
                 <div>
                   {notification.sender?.profileImage ? (
@@ -395,61 +396,72 @@ const ViewAllNotifications = () => {
                     width:'50px',
                     height:'50px',
                     borderRadius:'50%',
-                    backgroundColor:'#e9ecef',
+                    backgroundColor:'#007AFF',
                     display: (notification.sender?.profileImage && 
                               ((Array.isArray(notification.sender.profileImage) && notification.sender.profileImage.length > 0) || 
                                typeof notification.sender.profileImage === 'string')) ? 'none' : 'flex',
                     alignItems:'center',
                     justifyContent:'center',
-                    color:'#6c757d',
+                    color:'white',
                     fontSize:'16px',
                     fontWeight:'600'
                   }}>
-                    {notification.sender?.firstName && notification.sender?.lastName 
+                    {/* {notification.sender?.firstName && notification.sender?.lastName 
                       ? `${notification.sender.firstName.charAt(0)}${notification.sender.lastName.charAt(0)}`
                       : notification.sender?.firstName 
                         ? notification.sender.firstName.substring(0, 2).toUpperCase()
-                        : 'U'
-                    }
+                        : 'NA'
+                    } */}
+                    {notification.sender?.firstName?.slice(0, 2).toUpperCase() || 'NA'}
                   </div>
                 </div>
                 <div style={{flex:1}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                     <div>
-                      <span style={{fontWeight:'600',color:'#495057'}}>
+                      <span style={{fontWeight:'600',color:'black'}}>
                         {notification.sender?.firstName} {notification.sender?.lastName}
                       </span>
-                      <span style={{fontWeight:'400',color:'#6c757d',marginLeft:'8px'}}> 
+                      <br/>
+                      <span style={{fontWeight:'400',color:'#6c757d'}}> 
                         {notification.message}
                       </span>
                     </div>
                   </div>
-                  <div style={{display:'flex',alignItems:'center',gap:'4px',marginTop:'8px'}}>
-                    <CiClock2 style={{fontSize:'12px',color:'#6c757d'}} />
-                    <span style={{fontSize:'12px',fontWeight:'400',color:'#6c757d'}}>
+                  
+                </div>
+                
+                {/* Action buttons */}
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:'10px'}}>
+                <div style={{display:'flex',justifyContent:'center',gap:'4px',marginTop:'0px'}}>
+                    {/* <CiClock2 style={{fontSize:'12px',color:'#6c757d'}} /> */}
+                    <span style={{fontWeight:'400',color:'#6c757d'}}>
                       {formatTimestamp(notification.timestamp)}
                     </span>
                     {!notification.read && (
                       <span style={{
-                        background:'#667eea',
+                        // background:'#667eea',
                         color:'white',
                         fontSize:'10px',
-                        padding:'2px 6px',
-                        borderRadius:'10px',
-                        marginLeft:'8px'
+                        marginTop: '8px',
+                        // right: '10px',
+                        width: '8px',
+                        height: '8px',
+                        marginLeft:'8px',
+                        backgroundColor: '#FFD700',
+                        borderRadius: '50%',
+                        border: '1px solid white',
+                        boxShadow: '0 0 4px rgba(0,0,0,0.2)'
                       }}>
-                        New
+                        
                       </span>
                     )}
                   </div>
-                </div>
-                
-                {/* Action buttons */}
-                <div style={{display:'flex',gap:'8px',alignItems:'flex-start'}}>
+
+                <div style={{display:'flex',gap:'8px',justifyContent:'center',marginTop:'8px'}}>
                   {!notification.read && (
                     <button
                       style={{
-                        width:'32px',
+                        // width:'32px',
                         height:'32px',
                         border:'none',
                         borderRadius:'6px',
@@ -473,7 +485,8 @@ const ViewAllNotifications = () => {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      <FaCheck />
+                      {/* <FaCheck /> */}
+                      Mark as read
                     </button>
                   )}
                   
@@ -505,6 +518,7 @@ const ViewAllNotifications = () => {
                   >
                     <FaTrash />
                   </button>
+                </div>
                 </div>
               </div>
             ))}
