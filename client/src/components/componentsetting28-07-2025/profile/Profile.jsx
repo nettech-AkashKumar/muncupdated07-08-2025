@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import BASE_URL from "../../../pages/config/config";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import Iconss from "../../../assets/images/Iconss.png"
 
 const UserProfile = () => {
   const { user } = useAuth();
@@ -107,46 +108,45 @@ const UserProfile = () => {
 
   return (
     <div>
-      <div
-        className="profile-container pb-2"
-        style={{
-          backgroundColor: "white",
-          borderRadius: "5px",
-          border: "1px solid rgb(211, 211, 211)",
-        }}
-      >
-        <div>
-          <h1 className="py-2 px-3" style={{ fontSize: "17px" }}>
-            Profile
-          </h1>
-          <hr style={{ margin: "0" }} />
-        </div>
-        <div className="basic-information  px-3">
+      <div className="profile-container pb-2">
           {userData ? (
             <div>
+              <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:'20px'}}>
+        <div className="section-top-profile">
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'4px'}}>
+          <span className="pprreofile" style={{color:'#262626'}}>
+            Profile
+          </span>
+          <span className="pprreofile" style={{backgroundColor:'#1368EC', borderRadius:'4px', padding:'8px', color:'#FFFFFF'}}>
+            Sales Manager
+          </span>
+          </div>
+          <hr style={{ color:'#b9b9b9ff', height:'1px', }} />
               <label
                 htmlFor=""
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "5px",
-                  fontWeight: "600",
-                  padding: "18px 0",
-                }}
               >
-                <LuUser style={{ color: "#007AFF" }} />
-                <span>Basic Information</span>
+                <span className="pprreofile" style={{color:'#262626'}}>Basic Information</span>
               </label>
-
-              <form onSubmit={handleSubmit}>
+              
                 <div
-                  className="image-uploader"
-                  style={{ display: "flex", gap: "15px", alignItems: "center" }}
+                  className=""
+                 style={{
+                  display:'flex',
+                  alignItems:'center',
+                  justifyContent:'space-between',
+                  border:'2px dashed #dadadaff',
+                  padding:'20px 20px',
+                  borderRadius:'8px',
+                  margin:'10px',
+
+                 }}
+
                 >
                   <div
                     className="add-image-circle"
                     style={{
-                      border: "1px dotted grey",
+                      display:'flex',
+                      border: "2px solid #1368EC",
                       width: "100px",
                       height: "100px",
                       display: "flex",
@@ -154,7 +154,7 @@ const UserProfile = () => {
                       alignItems: "center",
                       color: "grey",
                       cursor: "pointer",
-                      borderRadius: "5px",
+                      borderRadius: "50%",
                       overflow: "hidden",
                     }}
                   >
@@ -167,6 +167,7 @@ const UserProfile = () => {
                           height: "100%",
                           objectFit: "cover",
                           pointerEvents: "none",
+                          borderRadius:'50%'
                         }}
                       />
                     ) : (
@@ -187,31 +188,42 @@ const UserProfile = () => {
                     ref={fileInputRef}
                     onChange={handleFileChange}
                   />
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <span
-                      onClick={handleIconClick}
-                      className="setting-imgupload-btn"
-                      style={{
-                        display: "flex",
+                  
+                  <div style={{ display: "flex", flexDirection: "column", alignItems:'center' }}>
+                    <div style={{
+                       display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        gap:'5px',
                         textAlign: "center",
-                        backgroundColor: " #007AFF",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "5px",
+                        backgroundColor: " #E3F3FF",
+                        color: "#1368EC",
+                        border: "1px solid #BBE1FF",
+                        borderRadius: "15px",
                         width: "150px",
                         height: "45px",
                         cursor: "pointer",
-                      }}
+                    }}>
+                    <img src={Iconss} alt="" style={{width:'20px', height:'20px'}} />
+                    <span
+                      onClick={handleIconClick}
+                      className="setting-imgupload-btn"
                     >
                       Upload Image
                     </span>
-                    <p>
+                    </div>
+                    <p style={{color:'#888888', fontFamily:'"Roboto", sans-serif', fontWeight:400, fontSize:'12px', marginTop:'10px'}}>
                       Upload an image below 2MB, Accepted File format JPG, PNG
                     </p>
                   </div>
+                  <div className="invisible">
+                    ;lpk
+                  </div>
                 </div>
+              </div>
+
+                {/* details field */}
+                <div className="section-top-profile">
                 <div className="profle-details-form py-4 d-flex flex-column gap-3">
                   <div style={{ display: "flex", gap: "20px" }}>
                     <div
@@ -222,15 +234,11 @@ const UserProfile = () => {
                         gap: "5px",
                       }}
                     >
-                      <label style={{ fontWeight: "500" }} htmlFor="">
-                        First Name <span style={{ color: "red" }}>*</span>
+                      <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                        First Name
                       </label>
-                      <input
+                      <input className="ffrrstnameinput"
                         readOnly
-                        style={{
-                          border: "1px solid #cbc6c6",
-                          padding: "8px 5px",
-                        }}
                         type="text"
                         value={userData?.firstName || ""}
                       />
@@ -243,10 +251,10 @@ const UserProfile = () => {
                         gap: "5px",
                       }}
                     >
-                      <label style={{ fontWeight: "500" }} htmlFor="">
+                      <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
                         Last Name <span style={{ color: "red" }}>*</span>
                       </label>
-                      <input
+                      <input className="ffrrstnameinput"
                         readOnly
                         style={{
                           border: "1px solid #cbc6c6",
@@ -254,6 +262,26 @@ const UserProfile = () => {
                         }}
                         type="text"
                         value={userData?.lastName || ""}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", gap: "20px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "100%",
+                        gap: "5px",
+                      }}
+                    >
+                      <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                        Phone Number
+                      </label>
+                      <input className="ffrrstnameinput"
+                        readOnly
+                        type="text"
+                        value={userData?.phone || ""}
                       />
                     </div>
                     <div
@@ -264,34 +292,10 @@ const UserProfile = () => {
                         gap: "5px",
                       }}
                     >
-                      <label style={{ fontWeight: "500" }} htmlFor="">
-                        Phone Number <span style={{ color: "red" }}>*</span>
+                      <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                        Email 
                       </label>
-                      <input
-                        readOnly
-                        style={{
-                          border: "1px solid #cbc6c6",
-                          padding: "8px 5px",
-                        }}
-                        type="text"
-                        value={userData?.phone || ""}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ display: "flex", gap: "20px" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        width: "32.2%",
-                        gap: "5px",
-                      }}
-                    >
-                      <label style={{ fontWeight: "500" }} htmlFor="">
-                        Email <span style={{ color: "red" }}>*</span>
-                      </label>
-                      <input
+                      <input className="ffrrstnameinput"
                         readOnly
                         style={{
                           border: "1px solid #cbc6c6",
@@ -303,21 +307,7 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
-
                 <div className="address-information pb-4">
-                  <label
-                    htmlFor=""
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "5px",
-                      fontWeight: "600",
-                      padding: "18px 0",
-                    }}
-                  >
-                    <CiLocationOn style={{ color: "#007AFF" }} />
-                    <span>Address Information</span>
-                  </label>
                   <div className="d-flex flex-column gap-3">
                     <div
                       style={{
@@ -326,12 +316,13 @@ const UserProfile = () => {
                         gap: "5px",
                       }}
                     >
-                      <label style={{ fontWeight: "500" }} htmlFor="">
-                        Address<span style={{ color: "red" }}>*</span>
+                      <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                        Address
                       </label>
-                      <input
+                      <input className="ffrrstnameinput"
                         readOnly
                         style={{
+                          height:'100px',
                           border: "1px solid #cbc6c6",
                           padding: "8px 5px",
                         }}
@@ -348,10 +339,10 @@ const UserProfile = () => {
                           gap: "5px",
                         }}
                       >
-                        <label style={{ fontWeight: "500" }} htmlFor="">
-                          Country<span style={{ color: "red" }}>*</span>
+                        <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                          Country
                         </label>
-                        <select
+                        <select className="ffrrstnameinput"
                           style={{
                             border: "1px solid #cbc6c6",
                             padding: "8px 5px",
@@ -372,10 +363,10 @@ const UserProfile = () => {
                           gap: "5px",
                         }}
                       >
-                        <label style={{ fontWeight: "500" }} htmlFor="">
-                          State<span style={{ color: "red" }}>*</span>
+                        <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                          State
                         </label>
-                        <select
+                        <select className="ffrrstnameinput"
                           style={{
                             border: "1px solid #cbc6c6",
                             padding: "8px 5px",
@@ -388,9 +379,7 @@ const UserProfile = () => {
                           <option value="">Jharkhand</option>
                         </select>
                       </div>
-                    </div>
-                    <div style={{ display: "flex", gap: "20px" }}>
-                      <div
+                       <div
                         style={{
                           display: "flex",
                           flexDirection: "column",
@@ -398,10 +387,10 @@ const UserProfile = () => {
                           gap: "5px",
                         }}
                       >
-                        <label style={{ fontWeight: "500" }} htmlFor="">
-                          City<span style={{ color: "red" }}>*</span>
+                        <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                          City
                         </label>
-                        <select
+                        <select className="ffrrstnameinput"
                           style={{
                             border: "1px solid #cbc6c6",
                             padding: "8px 5px",
@@ -422,10 +411,10 @@ const UserProfile = () => {
                           gap: "5px",
                         }}
                       >
-                        <label style={{ fontWeight: "500" }} htmlFor="">
-                          Postal Code<span style={{ color: "red" }}>*</span>
+                        <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
+                          Postal Code
                         </label>
-                        <input
+                        <input className="ffrrstnameinput"
                           type="number"
                           style={{
                             border: "1px solid #cbc6c6",
@@ -437,21 +426,25 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
-
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "end",
                     gap: "10px",
+                      fontFamily: "Roboto, sans-serif",
+                     fontWeight:400,
+                     fontSize:'16px',
+                     lineHeight:'14px',
                   }}
                 >
                   <button
                     className="settingbtn"
                     style={{
-                      border: "none",
-                      padding: "10px",
-                      backgroundColor: "#81BDff",
-                      color: "white",
+                      border: "1px solid #E6E6E6",
+                      borderRadius:'4px',
+                      padding: "8px",
+                      backgroundColor: "#FFFFFF",
+                      color: "#676767",
                       borderRadius: "5px",
                     }}
                   >
@@ -460,22 +453,23 @@ const UserProfile = () => {
                   <button
                     className="settingbtn"
                     style={{
-                      border: "none",
-                      padding: "10px",
-                      backgroundColor: "#007AFF",
-                      color: "white",
+                      border: "1px solid #676767",
+                      borderRadius:'4px',
+                      padding: "8px",
+                      backgroundColor: "#262626",
+                      color: "#FFFFFF",
                       borderRadius: "5px",
                     }}
                   >
-                    Save Changes
+                    Save
                   </button>
                 </div>
-              </form>
+                </div>
+                </form>
             </div>
           ) : (
             <p>No Data found</p>
           )}
-        </div>
       </div>
     </div>
   );
