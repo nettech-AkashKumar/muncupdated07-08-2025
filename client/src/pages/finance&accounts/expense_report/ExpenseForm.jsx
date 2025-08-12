@@ -51,6 +51,7 @@ const ExpenseForm = () => {
 
   const handleImageUpload = (e) => {
   const file = e.target.files[0];
+   console.log("Selected file:", file)
   if (file) {
     const imageUrl = URL.createObjectURL(file);
     localStorage.setItem("previewImage", imageUrl);
@@ -58,6 +59,7 @@ const ExpenseForm = () => {
   }
 };
 
+console.log('njinj uvgb', handleImageUpload)
   
 
 
@@ -129,14 +131,15 @@ const ExpenseForm = () => {
     position: "relative",
     borderRadius: "8px",
     cursor: "pointer",
+    width:"100%"
   };
 
-  const uploadInputStyle = {
-    position: "absolute",
-    inset: 0,
-    opacity: 0,
-    cursor: "pointer",
-  };
+  // const uploadInputStyle = {
+  //   position: "absolute",
+  //   inset: 0,
+  //   opacity: 0,
+  //   cursor: "pointer",
+  // };
 
   const uploadContentStyle = {
     zIndex: 2,
@@ -309,7 +312,7 @@ const ExpenseForm = () => {
       </div>
 
       {/* Receipt Upload */}
-      <div style={receiptContainerStyle}>
+      {/* <div style={receiptContainerStyle}>
         <label style={{color:"#262626", fontSize:"16px", fontWeight:"400"}}>Receipt Image</label>
         <div style={uploadBoxStyle}>
           <input
@@ -317,7 +320,7 @@ const ExpenseForm = () => {
             accept="image/png, image/jpeg"
             // onChange={(e) => setFile(e.target.files[0])}
             onChange={handleImageUpload}
-            style={uploadInputStyle}
+            style={{display:"none"}}
           />
           <div style={uploadContentStyle}>
             <span role="img" aria-label="upload" style={uploadIconStyle}><img src={image} alt="image" /></span>
@@ -325,6 +328,25 @@ const ExpenseForm = () => {
             <small>Supports JPEG, PNG, JPG</small>
           </div>
         </div>
+      </div> */}
+      <div style={receiptContainerStyle}>
+         <label htmlFor="receipt-upload" style={uploadBoxStyle}>
+  <div style={uploadContentStyle}>
+    <span role="img" aria-label="upload" style={uploadIconStyle}>
+      <img src={image} alt="image" />
+    </span>
+    <p>Drag your image here, or <span style={browseTextStyle}>browse</span></p>
+    <small>Supports JPEG, PNG, JPG</small>
+  </div>
+</label>
+
+<input
+  id="receipt-upload"
+  type="file"
+  accept="image/png, image/jpeg"
+  onChange={handleImageUpload}
+  style={{ display: "none" }} // hidden but still functional
+/>
       </div>
 
       {/* Actions */}

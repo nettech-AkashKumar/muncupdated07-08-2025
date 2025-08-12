@@ -102,6 +102,11 @@ import OverdueReport from "../pages/finance&accounts/overdue_report/OverdueRepor
 import ExpenseReport from "../pages/finance&accounts/expense_report/ExpenseReport.jsx";
 import ExpenseForm from "../pages/finance&accounts/expense_report/ExpenseForm.jsx";
 import ExpenseFormEdit from "../pages/finance&accounts/expense_report/ExpenseFromEdit.jsx";
+import BC from "../pages/finance&accounts/b2b&b2c/BC.jsx";
+import PaymentHistory from "../pages/finance&accounts/payment_history/PaymentHistory.jsx";
+import CreditDebitNotes from "../pages/finance&accounts/credit&debit_note/CreditDebitNotes.jsx";
+import Credit from "../pages/finance&accounts/credit&debit_note/Credit.jsx";
+import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
 
 const AppRoutes = () => {
   return (
@@ -227,6 +232,11 @@ const AppRoutes = () => {
         <Route path="/expense-report" element={<ExpenseReport/>}/>
         <Route path="/add_expenses" element={<ExpenseForm/>}/>
         <Route path="/expenseformedit" element={<ExpenseFormEdit/>}/>
+        <Route path="/bc" element={<BC/>}/>
+        <Route path="/payment-history" element={<PaymentHistory/>}/>
+        <Route path="/credit&debit-note" element={<CreditDebitNotes/>}/>
+        <Route path="/credit" element={<Credit/>}/>
+        <Route path="/debit" element={<Debit/>}/>
       </Route>
 
        

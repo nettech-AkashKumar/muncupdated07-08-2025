@@ -17,8 +17,8 @@ const ExpenseFormEdit = () => {
             <span style={{color:"#676767", fontSize:"18px", fontFamily:'"Roboto", sans-serif',fontWeight:"500"}}>Expense Report<MdNavigateNext /></span>
             <span style={{color:"#262626",fontSize:"18px", fontFamily:'"Roboto", sans-serif',fontWeight:"500"}}>Tea</span>
         </div>
-              <div className="d-flex gap-3" style={{margin:"20px auto" , width:"1000px"}}>
-                <div>
+              <div className="d-flex gap-3" style={{margin:"20px auto" , width:"1000px",}}>
+                <div style={{boxShadow:"rgba(0, 0, 0, 0.35) 0px 5px 15px",borderRadius:"8px"}}>
                  <div style={{borderRadius:"8px",padding:"20px", backgroundColor:"white",  display:"flex", flexDirection:"column", gap:"15px"}}>
                  <div style={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
                     <span style={{color:"#262626",fontSize:"18px", fontFamily:'"Roboto", sans-serif',fontWeight:"500"}}>Expense Details</span>
