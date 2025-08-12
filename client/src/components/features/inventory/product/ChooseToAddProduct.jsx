@@ -19,12 +19,12 @@ function ChooseToAddProduct() {
     setSelectedFile(null); // Reset file when changing options
   };
 
-  
+
   const handleClick = () => {
-    inputRef.current.click(); 
+    inputRef.current.click();
   };
 
-  const handleFileChange = async(e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       setFileName(file.name);
@@ -34,14 +34,14 @@ function ChooseToAddProduct() {
       formData.append('file', file);
       try {
         const response = await axios.post(`${BASE_URL}/api/products/import`, formData, {
-          headers:{
+          headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
         toast.success('CSV imported successfully')
         alert('CSV imported successfully')
         console.log('CSV import response:', response.data);
-      }catch(error) {
+      } catch (error) {
         toast.error('Failed to import CSV')
         console.error('Upload error', error)
       }
@@ -53,10 +53,10 @@ function ChooseToAddProduct() {
       <h2 style={{ textAlign: 'center' }}>How you want to add product?</h2>
       <div className='row' style={{ padding: '0px 250px', marginTop: '24px' }}>
         <div className='col'>
-          <div 
-            style={{ 
+          <div
+            style={{
               border: selectedOption === 'manual' ? '2px solid #007bff' : '2px solid #E6E6E6',
-              borderRadius: '16px', 
+              borderRadius: '16px',
               backgroundColor: 'white',
               cursor: 'pointer'
             }}
@@ -70,10 +70,10 @@ function ChooseToAddProduct() {
           </div>
         </div>
         <div className='col'>
-          <div 
-            style={{ 
+          <div
+            style={{
               border: selectedOption === 'bulk' ? '2px solid #007bff' : '2px solid #E6E6E6',
-              borderRadius: '16px', 
+              borderRadius: '16px',
               backgroundColor: 'white',
               cursor: 'pointer'
             }}
@@ -87,10 +87,10 @@ function ChooseToAddProduct() {
           </div>
         </div>
         <div className='col'>
-          <div 
-            style={{ 
+          <div
+            style={{
               border: selectedOption === 'scan' ? '2px solid #007bff' : '2px solid #E6E6E6',
-              borderRadius: '16px', 
+              borderRadius: '16px',
               backgroundColor: 'white',
               cursor: 'pointer'
             }}
@@ -105,51 +105,68 @@ function ChooseToAddProduct() {
         </div>
       </div>
       <div style={{ marginTop: '32px', textAlign: 'center' }}>
-        {selectedOption === 'bulk' || selectedOption === 'scan' ? (
+        {selectedOption === 'bulk' ? (
           <div>
-            <button 
-            onClick={handleClick} 
-            style={{ 
-              padding: '6px 16px', 
-              backgroundColor: selectedOption ? '#007bff' : '#E6E6E6', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '4px', 
-              cursor: 'pointer', 
-              fontSize: '14px', 
-              textDecoration: 'none' 
-            }}>
-                Continue
+            <button
+              onClick={handleClick}
+              style={{
+                padding: '6px 16px',
+                backgroundColor: selectedOption ? '#007bff' : '#E6E6E6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                textDecoration: 'none'
+              }}>
+              Continue
             </button>
-            <input 
-            type="file" 
-            ref={inputRef}
-            onChange={handleFileChange}
-            style={{
-              display:'none',
-            }}
-            accept={selectedOption === 'bulk' ? '.csv,.xlsx' : 'image/*'}
-          />
+            <input
+              type="file"
+              ref={inputRef}
+              onChange={handleFileChange}
+              style={{
+                display: 'none',
+              }}
+              accept={selectedOption === 'bulk' ? '.csv,.xlsx' : 'image/*'}
+            />
           </div>
-        ) : (
-          <div>
-          <Link 
-            to="/add-product" 
-            style={{ 
-              padding: '7px 16px', 
-              backgroundColor: selectedOption ? '#007bff' : '#E6E6E6', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '4px', 
-              cursor: 'pointer', 
-              fontSize: '14px', 
-              textDecoration: 'none',
-            }}
-          >
-            Continue
-          </Link>
-          </div>
-        )}
+        ) : selectedOption === 'scan' ? (
+           <Link 
+      to="/scan-product"
+      style={{ 
+        padding: '7px 16px', 
+        backgroundColor: '#007bff', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '4px', 
+        cursor: 'pointer', 
+        fontSize: '14px',
+        textDecoration: 'none'
+      }}
+    >
+      Continue
+    </Link> 
+        ) :
+          (
+            <div>
+              <Link
+                to="/add-product"
+                style={{
+                  padding: '7px 16px',
+                  backgroundColor: selectedOption ? '#007bff' : '#E6E6E6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  textDecoration: 'none',
+                }}
+              >
+                Continue
+              </Link>
+            </div>
+          )}
       </div>
     </div>
   );
