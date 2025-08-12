@@ -153,12 +153,12 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-  console.log("🟢 Socket connected:", socket.id);
+  // console.log("🟢 Socket connected:", socket.id);
 
   socket.on("add-user", (userId) => {
-    console.log("👤 User added to online list:", userId, "Type:", typeof userId);
+    // console.log("👤 User added to online list:", userId, "Type:", typeof userId);
     onlineUsers.set(userId, socket.id);
-    console.log("👤 Current online users:", Array.from(onlineUsers.keys()));
+    // console.log("👤 Current online users:", Array.from(onlineUsers.keys()));
     // Emit the updated online users list to all connected clients
     io.emit("online-users", Array.from(onlineUsers.keys()));
   });
@@ -178,7 +178,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
+    // console.log("🔴 Socket disconnected:", socket.id);
     let disconnectedUserId = null;
     [...onlineUsers.entries()].forEach(([uid, sid]) => {
       if (sid === socket.id) {
@@ -188,8 +188,8 @@ io.on("connection", (socket) => {
     });
     // Emit the updated online users list to all connected clients
     if (disconnectedUserId) {
-      console.log("👤 User removed from online list:", disconnectedUserId);
-      console.log("👤 Remaining online users:", Array.from(onlineUsers.keys()));
+      // console.log("👤 User removed from online list:", disconnectedUserId);
+      // console.log("👤 Remaining online users:", Array.from(onlineUsers.keys()));
       io.emit("online-users", Array.from(onlineUsers.keys()));
     }
   });

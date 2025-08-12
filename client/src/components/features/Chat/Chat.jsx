@@ -18,7 +18,10 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { MdBlockFlipped } from "react-icons/md";
 import EmojiPicker from 'emoji-picker-react';
 import { LuRefreshCcw, LuChevronUp, LuMic, LuSend } from "react-icons/lu";
+import { TbFolderUp } from "react-icons/tb";
+
 import { useSocket } from '../../../Context/SocketContext';
+import ChatIcon from '../../../assets/img/icons/chat.png';
 
 const SOCKET_URL = import.meta.env.BACKEND_URL || 'http://localhost:5000'; // Use your backend port
 // const socket = io("http://localhost:5000"); // same as backend port
@@ -67,13 +70,13 @@ const Chat = () => {
   
   const { connectSocket, getSocket } = useSocket();
 
-  console.log("User object:", user);
-  console.log("User ID:", currentUserId);
-  console.log("User ID type:", typeof currentUserId);
-  console.log("User ID length:", currentUserId?.length);
-  console.log("Users:", users);
-  console.log("Online users:", onlineUsers);
-  console.log("Online users count:", onlineUsers.length);
+  // console.log("User object:", user);
+  // console.log("User ID:", currentUserId);
+  // console.log("User ID type:", typeof currentUserId);
+  // console.log("User ID length:", currentUserId?.length);
+  // console.log("Users:", users);
+  // console.log("Online users:", onlineUsers);
+  // console.log("Online users count:", onlineUsers.length);
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -584,21 +587,21 @@ const Chat = () => {
       
       // Emit add-user when connected
       if (socketInstance.connected) {
-        console.log("🟢 Socket connected successfully");
-        console.log("🟢 Emitting add-user with ID:", currentUserId);
+        // console.log("🟢 Socket connected successfully");
+        // console.log("🟢 Emitting add-user with ID:", currentUserId);
         socketInstance.emit('add-user', currentUserId);
       } else {
         socketInstance.on('connect', () => {
-          console.log("🟢 Socket connected successfully");
-          console.log("🟢 Emitting add-user with ID:", currentUserId);
+          // console.log("🟢 Socket connected successfully");
+          // console.log("🟢 Emitting add-user with ID:", currentUserId);
           socketInstance.emit('add-user', currentUserId);
         });
       }
       
       socketInstance.on('online-users', (online) => {
-        console.log("🟢 Online users received:", online);
-        console.log("🟢 Online users types:", online.map(id => typeof id));
-        console.log("🟢 Current user ID:", currentUserId, "Type:", typeof currentUserId);
+        // console.log("🟢 Online users received:", online);
+        // console.log("🟢 Online users types:", online.map(id => typeof id));
+        // console.log("🟢 Current user ID:", currentUserId, "Type:", typeof currentUserId);
         setOnlineUsers(online);
       });
       
@@ -1008,10 +1011,10 @@ const Chat = () => {
 
   return (
     <>
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh',marginTop:'-50px', backgroundColor:'rgb(231, 230, 230)', padding:'15px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '88vh', padding:'15px' }}>
 
       {/* header */}
-      <div style={{display:'flex', justifyContent:'space-between', marginBottom:'20px'}}>
+      {/* <div style={{display:'flex', justifyContent:'space-between', marginBottom:'20px'}}>
 
       <div>
       <span style={{fontWeight:'bold', fontSize:'25px'}}>Chat</span>
@@ -1024,30 +1027,37 @@ const Chat = () => {
         <button style={{backgroundColor:'white', color:'gray', padding:'5px 10px', display:'flex', alignItems:'center', border:'none'}}><LuChevronUp /></button>
       </div>
 
-      </div>
+      </div> */}
       
       {/* Main content */}
       <div style={{ display: 'flex', flex: 1, height:'100vh', gap:'15px'  }}>
       
         {/* Left panel: User list */}
         <div style={{ width: '25%', 
-          borderRight: '1px solid #ccc', 
+          border: '1px solid #E6E6E6', 
           padding: '15px',
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 140px)',
           display: 'flex', 
           flexDirection: 'column',
-          backgroundColor:'white', 
+          backgroundColor:'#FFFFFF', 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           borderRadius:'10px' }}>
 
           <div style={{ flexShrink: 0 }}>
 
-            <span style={{fontWeight:'bold', fontSize:'20px'}}>Chats</span>
+            <span style={{fontWeight:'500', fontSize:'20px'}}>Chats</span>
             
             {/* Search Box */}
             <div style={{ marginBottom: '15px', padding:'0px 10px', position: 'relative' }} className="chat-list-search-box" >
+              
+              <div style={{
+                display: 'flex',alignItems: 'center',gap: '6px',}}>
+
+                <CiSearch style={{fontSize:'20px'}} />
+              
               <input
                 type="text"
-                placeholder="Search For Contacts or Messages"
+                placeholder="Search"
                 className="chat-list-search-input"
                 value={searchQuery}
                 onChange={handleSearchChange}
@@ -1055,7 +1065,8 @@ const Chat = () => {
                   width: '100%',
                 }}
               />
-              <CiSearch />
+
+              </div>
               
               {/* Search Suggestions Dropdown */}
               {showSearchDropdown && searchSuggestions.length > 0 && (
@@ -1083,7 +1094,7 @@ const Chat = () => {
                         alignItems: 'center',
                         gap: '10px',
                         hover: {
-                          backgroundColor: '#f5f5f5'
+                        backgroundColor: '#f5f5f5'
                         }
                       }}
                       onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
@@ -1170,12 +1181,13 @@ const Chat = () => {
                 style={{
                   padding: '12px 15px',
                   cursor: 'pointer',
-                  background: selectedUser && selectedUser._id === userItem._id ? '#eee' : 'transparent',
+                  background: selectedUser && selectedUser._id === userItem._id ? '#E3F3FF' : 'transparent',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   margin:'12px',
-                  borderRadius: '5px'
+                  borderRadius: '5px',
+                  borderBottom: '1px solid #f0f0f0',
                 }}
                 onClick={() => {
                   setSelectedUser(userItem);
@@ -1192,9 +1204,19 @@ const Chat = () => {
                     <>
                     <div>
                     <div style={{ 
+                      width: '40px', 
+                      height: '40px', 
                       borderRadius: '50%', 
+                      backgroundColor: '#007AFF',
                       color: 'white',
+                      alignItems: 'center',
                       justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      border: '2px solid #ddd',
+                      display: 'flex',
+                      position: 'relative',
+                      textAlign: 'center',
                     }}>
                     <img 
                       src={userItem.profileImage} 
@@ -1204,7 +1226,6 @@ const Chat = () => {
                         height: '40px', 
                         borderRadius: '50%', 
                         objectFit: 'cover',
-                        border: '2px solid #ddd'
                       }}
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -1212,17 +1233,18 @@ const Chat = () => {
                       }}
                     />
                     
-                    </div>
-
                     {onlineUsers.includes(normalizeUserId(userItem._id)) ? (
-                      <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
                         <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
                       </div>
                       ) : (
-                      <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
                         <span style={{ color: 'gray', fontSize: 1 }}>●</span>
                       </div>
                       )}
+                    
+                    </div>
+
                       {console.log(`User ${userItem._id} online status:`, onlineUsers.includes(normalizeUserId(userItem._id)), 'Online users:', onlineUsers)}
                       {console.log(`User ID type:`, typeof userItem._id, 'Online users types:', onlineUsers.map(id => typeof id))}
 
@@ -1243,22 +1265,25 @@ const Chat = () => {
                       fontSize: '16px',
                       fontWeight: 'bold',
                       border: '2px solid #ddd',
-                      display: 'flex'
+                      display: 'flex',
+                      position: 'relative',
+                      textAlign: 'center',
                     }}
                   >
                     {(userItem.firstName || userItem.email || 'U').slice(0, 2).toUpperCase()}
 
-                  </div>
-
                     {onlineUsers.includes(normalizeUserId(userItem._id)) ? (
-                      <div style={{ marginTop: '-25px', marginLeft: '30px' }}>
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
                         <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
                       </div>
                     ) : (
-                      <div style={{ marginTop: '-25px', marginLeft: '30px' }}>
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
                         <span style={{ color: 'gray', fontSize: 1 }}>●</span>
                       </div>
                     )}
+                  </div>
+
+                    
                     {console.log(`User ${userItem._id} online status:`, onlineUsers.includes(normalizeUserId(userItem._id)), 'Online users:', onlineUsers)}
                     {console.log(`User ID type:`, typeof userItem._id, 'Online users types:', onlineUsers.map(id => typeof id))}
 
@@ -1266,8 +1291,7 @@ const Chat = () => {
                     </>
                   )}
 
-                  
-
+                  {/* name and message */}
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <span style={{ fontWeight: 'bold' }}>
@@ -1286,6 +1310,7 @@ const Chat = () => {
                       {getLastMessage(userItem._id)}
                     </span>
                   </div>
+
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
@@ -1345,10 +1370,12 @@ const Chat = () => {
           width: '75%',
           display: 'flex', 
           flexDirection: 'column', 
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 140px)',
           overflow: 'hidden',
-          backgroundColor:'white',
+          backgroundColor:'#FFFFFF',
+          border: '1px solid #E6E6E6',
           borderRadius:'10px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}>
 
         {selectedUser ? (
@@ -1407,14 +1434,17 @@ const Chat = () => {
                 </>
               )}
 
-                    {onlineUsers.includes(normalizeUserId(selectedUser._id)) && (
-                    <span style={{ color: 'rgb(43, 216, 66)', marginLeft: 25, marginTop:'25px', fontSize: 20, position:'absolute' }}>●</span>
-                    )}
+                    
 
               <div>
                 <span><b>{selectedUser.firstName} {selectedUser.lastName}</b></span>
-                <br/>
+
+                <div style={{display:'flex', gap:'5px', alignItems:'center'}}>
+                  {onlineUsers.includes(normalizeUserId(selectedUser._id)) && (
+                    <span style={{ color: 'rgb(43, 216, 66)', fontSize: 15 }}>●</span>
+                    )}
                 <span style={{color:'rgb(182, 180, 180)'}}>{onlineUsers.includes(normalizeUserId(selectedUser._id)) ? 'online' : 'offline'}</span>
+                </div>
               </div>
             </div>
 
@@ -1461,7 +1491,7 @@ const Chat = () => {
                 <div style={{ color: "grey", position: "relative", marginTop:'8px', marginRight:'10px' }}>
                 <div style={{display:'flex', gap:'20px', fontSize:'20px'}}>
                   <span><CiSearch /></span>
-                  <span onClick={() => setClickDropdown(!clickDropdown)}>
+                  <span onClick={() => setClickDropdown(!clickDropdown)} style={{transform:'rotate(90deg)', cursor:'pointer'}}>
                     <HiOutlineDotsVertical className="threedot-setting" />
                   </span>
                 </div>
@@ -1474,7 +1504,7 @@ const Chat = () => {
                  className="settings-dropdown-container"
                  style={{
                    position: "absolute",
-                   top: "200px",
+                   top: "120px",
                    right: "100px",
                    zIndex: "100",
                  }}
@@ -1638,8 +1668,9 @@ const Chat = () => {
                       width: '100%'
                     }}
                   >
+
                     {/* Profile Picture */}
-                    <div style={{ flexShrink: 0 }}>
+                    {/* <div style={{ flexShrink: 0 }}>
                       {msg.from === currentUserId ? (
                         // Current user's profile picture
                         user?.profileImage ? (
@@ -1718,17 +1749,22 @@ const Chat = () => {
                           </div>
                         )
                       )}
-                    </div>
+                    </div> */}
+
                     {/* Message Content */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: msg.from === currentUserId ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
-                      <span
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: msg.from === currentUserId ? 'flex-end' : 'flex-start', maxWidth: '70%',
+                          background: msg.from === currentUserId ? '#EBF7FF' : '#F9F9F9',
+                          border: msg.from === currentUserId ? '1px solid #BBE1FF' : '1px solid #E6E6E6',
+                          padding: '6px 12px',
+                          borderTopLeftRadius: msg.from === currentUserId ? '12px' : '0px',
+                          borderTopRightRadius: msg.from === currentUserId ? '0px' : '12px',
+                          borderBottomLeftRadius: '12px 12px',
+                          borderBottomRightRadius: '12px 12px',
+                          wordWrap: 'break-word', }}>
+                      <div
                         style={{
                           display: 'inline-block',
-                          background: msg.from === currentUserId ? 'rgb(225, 223, 223)' : 'rgb(225, 223, 223)',
-                          padding: '6px 12px',
-                          borderRadius: 12,
                           margin: '2px 0',
-                          wordWrap: 'break-word',
                           cursor: msg.fileUrl ? 'pointer' : 'default'
                         }}
                         onClick={msg.fileUrl ? () => window.open(msg.fileUrl, '_blank') : undefined}
@@ -1795,7 +1831,9 @@ const Chat = () => {
                             )}
                           </div>
                         )}
-                      </span>
+                        
+                      </div>
+
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                         <span style={{ fontSize: '10px', color: '#666' }}>
                           {msg.timestamp ? formatTime(msg.timestamp) : ''}
@@ -1806,6 +1844,7 @@ const Chat = () => {
                           </span>
                         )}
                       </div>
+                      
                     </div>
                     {/* Show three-dots icon for all messages (not in selection mode) */}
                     {!isSelectionMode && (
@@ -1922,12 +1961,12 @@ const Chat = () => {
                 marginTop: 'auto',
                 position: 'sticky',
                 bottom: 0,
-                backgroundColor: 'rgb(238, 237, 237)',
+                backgroundColor: 'white',
                 padding: '5px 15px',
                 alignItems:'center',
                 border:'1px solid rgb(212, 212, 212)',
                 borderRadius:'10px',
-                gap:'10px'
+                gap:'12px'
               }}>
 
                 <LuMic />
@@ -1937,7 +1976,7 @@ const Chat = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Type your message..."
-                  style={{ flex: 1, padding: 8, border:'none', outline:'none', backgroundColor:'rgb(238, 237, 237)' }}
+                  style={{ flex: 1, padding: 8, border:'none', outline:'none', backgroundColor:'white' }}
                 />
                 
                 <GrEmoji 
@@ -1949,8 +1988,8 @@ const Chat = () => {
                     className="emoji-picker-container"
                     style={{
                       position: "absolute",
-                      bottom: "60px",
-                      left: "10px",
+                      bottom: "70px",
+                      right: "5px",
                       zIndex: "1000"
                     }}
                   >
@@ -1958,13 +1997,87 @@ const Chat = () => {
                   </div>
                 )}
                 
+
+                <span
+                    onClick={() => setClickDropdownTwo(!clickDropdowntwo)}
+                    style={{ color: "grey", position: "relative" }}
+                  >
+                    <HiOutlineDotsVertical style={{ fontSize: "25px", color:'gray' }} />
+                </span>
+                  {clickDropdowntwo && (
+                    <div
+                      className="file-dropdown-container"
+                      style={{
+                        position: "absolute",
+                        top: "-200px",
+                        right: "130px",
+                        zIndex: "100",
+                      }}
+                    >
+
+                    {/* files options */}
+                    <div>
+                      <div
+                        className="send-file-container"
+                        style={{
+                        backgroundColor: "white",
+                        width: "150px",
+                        height: "auto",
+                        border: "1px solid #dfd8d8",
+                        padding:"10px 15px",
+                        display:"flex",
+                        flexDirection:"column",
+                        borderRadius:'10px'
+                        }}
+                      >
+                      <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
+                        <label htmlFor="file-upload2" className="custom-file-upload2" style={{color:"gray"}}>
+                          <CiCamera /> 
+                          <span>Camera</span>
+                        </label>
+                        <input 
+                          id="file-upload2" 
+                          type="file" 
+                          accept="image/*" 
+                          capture="environment"
+                          style={{color:"#4a4848"}} 
+                          onChange={handleFileSelect}
+                        />
+                      </div>
+                      <br/>
+                      <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
+                        <label for="file-upload3" className="custom-file-upload3" style={{color:"gray"}}><GrGallery /> Gallery</label>
+                        <input id="file-upload3" type="file" accept=".jpg,.jpeg,.pdf" style={{color:"#4a4848"}} 
+                          onChange={handleFileSelect} />
+                      </div>
+                      <br/>
+                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:"gray"}}>
+                        <MdOutlineAudiotrack />
+                        <span>Audio</span>
+                      </div>
+                      <br/>
+                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:'gray'}}>
+                        <VscLocation />
+                        <span>Location</span>
+                      </div>
+                      <br/>
+                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:'gray'}}>
+                        <RiUserFollowLine/>
+                        <span>Contact</span>
+                      </div>
+
+                      </div>
+                    </div>
+                  </div>
+                  )}
+
                 {/* send files */}
                 <label 
                   htmlFor="file-upload1" 
                   className="custom-file-upload1"
                   style={{ cursor: "pointer" }}
                 >
-                  <CiFolderOn style={{ fontSize: "20px", color:'gray' }} />
+                  <TbFolderUp style={{ fontSize: "25px", color:'gray' }} />
                 </label>
                 <input 
                   id="file-upload1" 
@@ -2042,79 +2155,6 @@ const Chat = () => {
                   </div>
                 )}
 
-                <span
-                    onClick={() => setClickDropdownTwo(!clickDropdowntwo)}
-                    style={{ color: "grey", position: "relative" }}
-                  >
-                    <HiOutlineDotsVertical style={{ fontSize: "20px", color:'gray' }} />
-                </span>
-                  {clickDropdowntwo && (
-                    <div
-                      className="file-dropdown-container"
-                      style={{
-                        position: "absolute",
-                        top: "-200px",
-                        right: "90px",
-                        zIndex: "100",
-                      }}
-                    >
-
-                    {/* files options */}
-                    <div>
-                      <div
-                        className="send-file-container"
-                        style={{
-                        backgroundColor: "white",
-                        width: "150px",
-                        height: "auto",
-                        border: "1px solid #dfd8d8",
-                        padding:"10px 15px",
-                        display:"flex",
-                        flexDirection:"column",
-                        borderRadius:'10px'
-                        }}
-                      >
-                      <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
-                        <label htmlFor="file-upload2" className="custom-file-upload2" style={{color:"gray"}}>
-                          <CiCamera /> 
-                          <span>Camera</span>
-                        </label>
-                        <input 
-                          id="file-upload2" 
-                          type="file" 
-                          accept="image/*" 
-                          capture="environment"
-                          style={{color:"#4a4848"}} 
-                          onChange={handleFileSelect}
-                        />
-                      </div>
-                      <br/>
-                      <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
-                        <label for="file-upload3" className="custom-file-upload3" style={{color:"gray"}}><GrGallery /> Gallery</label>
-                        <input id="file-upload3" type="file" accept=".jpg,.jpeg,.pdf" style={{color:"#4a4848"}} 
-                          onChange={handleFileSelect} />
-                      </div>
-                      <br/>
-                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:"gray"}}>
-                        <MdOutlineAudiotrack />
-                        <span>Audio</span>
-                      </div>
-                      <br/>
-                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:'gray'}}>
-                        <VscLocation />
-                        <span>Location</span>
-                      </div>
-                      <br/>
-                      <div style={{display:"flex", gap:"10px", alignItems:"center", color:'gray'}}>
-                        <RiUserFollowLine/>
-                        <span>Contact</span>
-                      </div>
-
-                      </div>
-                    </div>
-                  </div>
-                  )}
-
                 <button type="submit" style={{ border:'none', backgroundColor:'#007AFF', color:'white', display:'flex', justifyContent:'center', borderRadius:'8px', padding:'8px 10px' }}>
                   <LuSend />
                 </button>
@@ -2123,11 +2163,12 @@ const Chat = () => {
 
           </>
         ) : (
-          <div style={{padding:60, textAlign:'center'}}>
-
+          <div style={{padding:60, textAlign:'center',display:'flex',alignItems:'center', justifyContent:'center',alignContent:'center'}}>
+            <div style={{marginTop:'150px', textAlign:'center'}}>
+              <img src={ChatIcon} style={{width:'172px',marginBottom:'50px'}} />
              <h2 style={{ margin: 0, color: '#495057' }}>Welcome, {user?.firstName || 'User'} !</h2>
              
-             Select a user to start chatting
+             Select a user to start chatting.
             
             <br/><br/>
 {/* 
@@ -2148,6 +2189,7 @@ const Chat = () => {
             >
               Logout
             </button> */}
+            </div>
 
           </div>
         )}
