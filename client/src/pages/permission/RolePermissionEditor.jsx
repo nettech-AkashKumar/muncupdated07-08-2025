@@ -172,11 +172,13 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "../config/config";
 import "../../styles/permissions.css"; // Ensure this includes switch styling
+import { useParams } from "react-router-dom";
 
 const modules = ["Brand", "Category", "Product"];
 const permissionFields = ["Allow All", "Read", "Write", "Update", "Delete", "Import", "Export"];
 
 const Permission = () => {
+  const { roleId } = useParams();
   const [selectedRole, setSelectedRole] = useState(null);
   const [roles, setRoles] = useState([]);
   const [rolePermissions, setRolePermissions] = useState({});
@@ -186,23 +188,58 @@ const Permission = () => {
     fetchRoles();
   }, []);
 
-  const fetchRoles = async () => {
+    // auto select the role if id exists
+  useEffect(() => {
+    if (roleId && roles.length > 0) {
+      const found = roles.find((role) => role._id === roleId);
+      if (found) setSelectedRole(found);
+    }
+  }, [roleId, roles]);
+
+   useEffect(() => {
+    if (selectedRole?._id) {
+      fetchRolePermissions(selectedRole._id);
+    } else {
+      setRolePermissions({});
+    }
+  }, [selectedRole]);
+
+  // const fetchRoles = async () => {
+  //   try {
+  //     const res = await axios.get(`${BASE_URL}/api/role/getRole`);
+  //     setRoles(res.data);
+
+  //     const roleName = localStorage.getItem("selectedRoleName");
+  //     if (roleName) {
+  //       const matched = res.data.find((role) => role.roleName === roleName);
+  //       if (matched) {
+  //         setSelectedRole(matched);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching roles", err);
+  //   }
+  // };
+
+
+  //   const fetchRoles = async () => {
+  //   try {
+  //     const res = await axios.get(`${BASE_URL}/api/role/getRole`);
+  //     setRoles(res.data);
+  //   } catch (err) {
+  //     console.error("Error fetching roles", err);
+  //   }
+  // };
+  
+    const fetchRoles = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/role/getRole`);
       setRoles(res.data);
-
-      const roleName = localStorage.getItem("selectedRoleName");
-      if (roleName) {
-        const matched = res.data.find((role) => role.roleName === roleName);
-        if (matched) {
-          setSelectedRole(matched);
-        }
-      }
     } catch (err) {
       console.error("Error fetching roles", err);
     }
   };
-
+  
   useEffect(() => {
     if (selectedRole?._id) {
       fetchRolePermissions(selectedRole._id);

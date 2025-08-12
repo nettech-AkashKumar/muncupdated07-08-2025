@@ -14,12 +14,20 @@ import EmailDetail from "../EmailDetails/EmailDetail";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FaReply } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import BASE_URL from "../../../../pages/config/config";
+import { useLocation } from "react-router-dom";
 
 const EmailMessages = ({
   filteredEmails,
   handleToggleStar: externalToggleStar,
   isDeletedPage,
+ 
 }) => {
+
+  // to dynamic render name
+  const location  = useLocation();
+  const mailboxName = location.pathname.split("/").pop();
+  const displayMailboxName = mailboxName.charAt(0).toUpperCase() + mailboxName.slice(1)
   const [search, setSearch] = useState("");
   const [emails, setEmails] = useState([]);
 
@@ -33,7 +41,7 @@ const EmailMessages = ({
   useEffect(() => {
     const fetchEmail = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/email/receive");
+        const res = await axios.get(`${BASE_URL}/api/email/mail/receive`);
         const formattedData = res.data.data.map((email) => {
           const name = email.name;
           const initials = name
@@ -87,7 +95,7 @@ const EmailMessages = ({
 
   const handleDeleteSelected = async () => {
     try {
-      await axios.post("http://localhost:5000/api/email/delete", {
+      await axios.post(`${BASE_URL}/api/email/mail/delete`, {
         ids: selectedEmails,
       });
       setEmails((prev) =>
@@ -101,7 +109,7 @@ const EmailMessages = ({
 
   const handleDelete = async (id) => {
     try {
-      await axios.post("http://localhost:5000/api/email/delete", { ids: [id] });
+      await axios.post(`${BASE_URL}/api/email/mail/delete`, { ids: [id] });
       setEmails((prev) => prev.filter((email) => email._id !== id));
       setMenuOpenId(null);
     } catch (error) {
@@ -126,7 +134,7 @@ const EmailMessages = ({
   const handleToggleStar = async (id, currentStarred) => {
     try {
       const updated = await axios.put(
-        `http://localhost:5000/api/email/star/${id}`,
+        `${BASE_URL}/api/email/mail/star/${id}`,
         {
           starred: !currentStarred,
         }
@@ -157,7 +165,7 @@ const EmailMessages = ({
   // for delete permanently via delete page code
   const handlePermanentDelete = async () => {
     try {
-      await axios.post("http://localhost:5000/api/email/permanent-delete", {
+      await axios.post(`${BASE_URL}/api/email/mail/permanent-delete`, {
         ids: selectedEmails,
       });
       setEmails((prev) =>
@@ -192,7 +200,7 @@ const EmailMessages = ({
         {/* inbox */}
         <div className="inbox">
           <span style={{ color: "black", fontSize: "18px", fontWeight: 600 }}>
-            Inbox
+            {displayMailboxName}
           </span>
           <span className="twothreemail">
             {(filteredEmails || emails).length}Emails{" "}
@@ -203,9 +211,9 @@ const EmailMessages = ({
                 fontWeight: "bold",
               }}
             >
-              <BsDot style={{ color: "#fba64b", marginTop: "10px" }} />
+              {/* <BsDot style={{ color: "#fba64b", marginTop: "10px" }} /> */}
             </span>{" "}
-            56 Unread
+            {/* 56 Unread */}
             <span>
               {selectedEmails.length > 0 && (
                 <div className="selectdt">

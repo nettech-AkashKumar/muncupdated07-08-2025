@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import EmailMessages from "../EmailMessages/EmailMessages";
+import BASE_URL from "../../../../pages/config/config";
 
 const Deleted = () => {
    const [deletedEmails, setDeletedEmails] = useState([]);
@@ -8,7 +9,7 @@ const Deleted = () => {
    useEffect(() => {
     const fetchDeletedEmails = async () => {
       try {
-       const res = await axios.get("http://localhost:5000/api/email/deleted")
+       const res = await axios.get(`${BASE_URL}/api/email/mail/deleted`)
        console.log('res status from delete', res)
        const formatted = res.data.data.map((email) => {
         const name = email.name;

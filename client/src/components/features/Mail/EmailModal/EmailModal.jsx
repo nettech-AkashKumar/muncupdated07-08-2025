@@ -12,6 +12,7 @@ import { MdOutlineEditCalendar } from "react-icons/md";
 import { FaMinus } from "react-icons/fa";
 import { GoScreenFull } from "react-icons/go";
 import { toast } from "react-toastify";
+import BASE_URL from "../../../../pages/config/config";
 
 const EmailModal = ({
   show,
@@ -97,17 +98,17 @@ const EmailModal = ({
         formData.append("images", img);
       });
 
-      await axios.post("http://localhost:5000/api/email/send", formData, {
+      await axios.post(`${BASE_URL}/api/email/mail/send`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
       toast.success("Email sent successfully!", {
-        position: 'top-center'
+        position:'top-center'
       });
       if (onSent) {
-        onSent();
-      }
+  onSent();
+}
       onClose();
     } catch (error) {
       console.error("Error sending email", error);
@@ -194,7 +195,7 @@ const EmailModal = ({
   return (
     <div className="modal-overlay">
       <div className={`email-modal ${isExpanded ? "expanded-modal" : ""}`}>
-        <div className="modal-header1">
+        <div className="modal-header">
           <span>Compose New Email</span>
           <div className="header-actions">
             <button className="btns minus" onClick={onClose}>
@@ -209,7 +210,7 @@ const EmailModal = ({
           </div>
         </div>
 
-        <div className="modal-body1">
+        <div className="modal-body">
           <div className="to-field">
             <label>To</label>
             <input

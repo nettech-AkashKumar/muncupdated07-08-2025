@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import EmailModal from "../EmailModal/EmailModal";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
+import BASE_URL from "../../../../pages/config/config";
 
 const Sidebar = () => {
   const [emailshow, setEmailShow] = useState(false);
@@ -35,34 +36,34 @@ const Sidebar = () => {
 
   const drafts = JSON.parse(localStorage.getItem("emailDrafts")) || [];
 
-
-  const fetchEmails = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/email/receive");
-      setEmails(res.data.data);
-    } catch (error) {
-      console.error("Failed to fetch emails", error);
-    }
-  };
-  // for deleted
-  const fetchDeletedCount = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/email/deleted");
-      setDeletedCount(res.data.data.length);
-    } catch (error) {
-      console.error("Failed to fetch deleted emails", error);
-    }
-  };
-  useEffect(() => {
+  
+    const fetchEmails = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/email/mail/receive`);
+        setEmails(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch emails", error);
+      }
+    };
+    // for deleted
+    const fetchDeletedCount = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/email/mail/deleted`);
+        setDeletedCount(res.data.data.length);
+      } catch (error) {
+        console.error("Failed to fetch deleted emails", error);
+      }
+    };
+    useEffect(() => {
     fetchEmails();
     fetchDeletedCount();
 
     const interval = setInterval(() => {
-      fetchEmails();
-      fetchDeletedCount();
-    }, 10000);
+    fetchEmails();
+    fetchDeletedCount();
+  }, 10000); 
 
-    return () => clearInterval(interval);
+  return () => clearInterval(interval); 
   }, []);
 
   return (
@@ -87,7 +88,7 @@ const Sidebar = () => {
           <NavLink
             className={({ isActive }) => (isActive ? "item active" : "item")}
             style={{ textDecoration: "none" }}
-            to="/mail/inbox"
+             to="/mail/inbox"
           >
             <span>
               <HiOutlineInbox />
@@ -211,7 +212,7 @@ const Sidebar = () => {
         </div>
         {showLabelModal && (
           <div className="modal-overlay2">
-            <div className="modal-content1">
+            <div className="modal-content">
               <h3>Add New Label</h3>
               <input
                 type="text"

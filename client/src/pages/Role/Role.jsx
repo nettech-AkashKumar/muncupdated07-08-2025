@@ -199,10 +199,10 @@ const Role = () => {
   //   }
   // };
 
-  const handleViewPermissions = (roleName) => {
-    localStorage.setItem("selectedRoleName", roleName);
-    window.location.href = "/permissions"; // direct navigation without route param
-  };
+  // const handleViewPermissions = (roleName) => {
+  //   localStorage.setItem("selectedRoleName", roleName);
+  //   window.location.href = "/permissions"; // direct navigation without route param
+  // };
 
   return (
     <div className="page-wrapper">
@@ -382,10 +382,10 @@ const Role = () => {
                           <div className="edit-delete-action">
                             <a
                               className="me-2 p-2"
-                              // onClick={() =>
-                              //   navigate(`/permissions/${role._id}`)
-                              // }
-                              onClick={() => handleViewPermissions(role.roleName)}
+                              onClick={() =>
+                                navigate(`/permissions/${role._id}`)
+                              }
+                              // onClick={() => handleViewPermissions(role.roleName)}
 
                             >
                               <TbEye />
