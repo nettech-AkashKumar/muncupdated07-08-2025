@@ -411,15 +411,15 @@ function Navbar() {
             </Link>
           </li>
           {/* Notifications */}
-          <li className="nav-item dropdown nav-item-box" style={{ position: 'relative' }}>
+          <li className="nav-item dropdown nav-item-box">
             <a href="#" className="dropdown-toggle nav-link" data-bs-toggle="dropdown" onClick={(e) => e.preventDefault()}>
-              <TbBell />
+              <TbBell style={{position:'absolute',left:'7px'}} />
               {notificationCount > 0 && (
                 <span className="badge rounded-pill" style={{
                   position: 'absolute',
                   top: '-8px',
                   right: '-8px',
-                  backgroundColor: '#ff4757',
+                  backgroundColor: 'red',
                   color: 'white',
                   fontSize: '10px',
                   minWidth: '18px',

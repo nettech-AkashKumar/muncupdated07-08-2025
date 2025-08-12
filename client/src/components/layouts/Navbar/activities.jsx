@@ -285,7 +285,7 @@ const Activities = ({ onNotificationsRead }) => {
                                       <span className="noti-title" style={{textDecoration: 'none', fontWeight: 'bold'}}>{notification.sender?.firstName} {notification.sender?.lastName}</span>
                                       <span className="noti-time" style={{ textDecoration: 'none',fontSize:'10px' }}>{formatTimeAgo(notification.timestamp)}</span>
                                     </div>
-                                    {notification.message.split(" ").length > 5 ? notification.message.split(" ").slice(0, 10).join(" ") + "..." : notification.message}
+                                    {notification.message.split(" ").length > 4 ? notification.message.split(" ").slice(0, 4).join(" ") + "..." : notification.message}
                                   </p>
                                 </div>
                               </div>

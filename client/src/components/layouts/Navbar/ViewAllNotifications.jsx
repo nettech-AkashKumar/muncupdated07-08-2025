@@ -53,6 +53,7 @@ const ViewAllNotifications = () => {
 
       if (response.data) {
         setNotifications(response.data.notifications || []);
+        console.log('Fetched notifications:', notifications);
         setTotalPages(response.data.totalPages || 1);
         setCurrentPage(response.data.currentPage || 1);
         console.log('Fetched notifications:', response.data.notifications?.length || 0);
@@ -305,7 +306,7 @@ const formatTimestamp = (timestamp) => {
               }}
             >
               <FaTrash />
-              Clear All
+              Delete All
             </button>
             
           </div>
