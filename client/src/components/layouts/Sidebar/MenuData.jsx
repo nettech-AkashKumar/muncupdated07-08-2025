@@ -87,6 +87,12 @@ import {
   TbFileDescription,
 } from "react-icons/tb";
 import { useAuth } from "../../auth/AuthContext";
+import { FaStackOverflow } from "react-icons/fa6";
+import { GiExpense } from "react-icons/gi";
+import { IoLogoWebComponent } from "react-icons/io5";
+import { MdOutlinePayments } from "react-icons/md";
+import { MdOutlineSpeakerNotes } from "react-icons/md";
+import { SiFuturelearn } from "react-icons/si";
 
 export const getMenuData = () => {
   const { t } = useTranslation();
@@ -566,12 +572,32 @@ export const getMenuData = () => {
         {
           label: "Profit & Loss",
           path: "/profit&loss",
-          icon: <TbReportMoney className="icons" />,
+          icon: <SiFuturelearn className="icons"/>,
         },
          {
           label: "Overdue Report",
           path: "/overdue-report",
-          icon: <TbReportMoney className="icons" />,
+          icon: <FaStackOverflow  className="icons"/>,
+        },
+         {
+          label: "Expense Report",
+          path: "/expense-report",
+          icon: <GiExpense className="icons"/>,
+        },
+         {
+          label: "B2B & B2C",
+          path: "/bc",
+          icon: <IoLogoWebComponent className="icons"/>,
+        },
+         {
+          label: "Payment History",
+          path: "/payment-history",
+          icon: <MdOutlinePayments className="icons"/>,
+        },
+         {
+          label: "Credit & Debit Note",
+          path: "/credit&debit-note",
+          icon: <MdOutlineSpeakerNotes className="icons"/>,
         },
         {
           label: "Trial Balance",

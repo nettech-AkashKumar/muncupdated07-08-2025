@@ -98,6 +98,15 @@ import BalanceSheet from "../pages/finance&accounts/balance_sheet/BalanceSheet.j
 import ProfitLoss from "../pages/finance&accounts/profit_loss/ProfitLoss.jsx";
 import ProfitLossDateChoose from "../pages/finance&accounts/profit_loss/ProfitLossDateChoose.jsx";
 import ProfitLossSelectDate from "../pages/finance&accounts/profit_loss/ProfitLossSelectDate.jsx";
+import OverdueReport from "../pages/finance&accounts/overdue_report/OverdueReport.jsx";
+import ExpenseReport from "../pages/finance&accounts/expense_report/ExpenseReport.jsx";
+import ExpenseForm from "../pages/finance&accounts/expense_report/ExpenseForm.jsx";
+import ExpenseFormEdit from "../pages/finance&accounts/expense_report/ExpenseFromEdit.jsx";
+import BC from "../pages/finance&accounts/b2b&b2c/BC.jsx";
+import PaymentHistory from "../pages/finance&accounts/payment_history/PaymentHistory.jsx";
+import CreditDebitNotes from "../pages/finance&accounts/credit&debit_note/CreditDebitNotes.jsx";
+import Credit from "../pages/finance&accounts/credit&debit_note/Credit.jsx";
+import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
 
 const AppRoutes = () => {
   return (
@@ -219,7 +228,15 @@ const AppRoutes = () => {
         <Route path="/profit&loss" element={<ProfitLoss/>}/>
         <Route path="/profit_lossdate_choose" element={<ProfitLossDateChoose/>}/>
         <Route path="/profit_lossselect_date" element={<ProfitLossSelectDate/>}/>
-        <Route path="/overdue-report" element={<ProfitLossSelectDate/>}/>
+        <Route path="/overdue-report" element={<OverdueReport/>}/>
+        <Route path="/expense-report" element={<ExpenseReport/>}/>
+        <Route path="/add_expenses" element={<ExpenseForm/>}/>
+        <Route path="/expenseformedit" element={<ExpenseFormEdit/>}/>
+        <Route path="/bc" element={<BC/>}/>
+        <Route path="/payment-history" element={<PaymentHistory/>}/>
+        <Route path="/credit&debit-note" element={<CreditDebitNotes/>}/>
+        <Route path="/credit" element={<Credit/>}/>
+        <Route path="/debit" element={<Debit/>}/>
       </Route>
 
        
