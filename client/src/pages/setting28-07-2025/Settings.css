@@ -1,6 +1,5 @@
 .mainsetting {
   height: calc(100vh - 60px);
-  padding-top: 60px;
 }
 .genersettingdropdown:hover {
   background-color: #81bdff;
@@ -10,14 +9,26 @@
   transition: 0.5s;
 }
 
-/* Scrollbar container */
-.left-setting-sidebar::-webkit-scrollbar {
-  width: 7px; /* Vertical scrollbar width */
-  height: 8px; /* Horizontal scrollbar height (optional) */
-}
 
-/* Thumb (scrollable element) */
-.left-setting-sidebar::-webkit-scrollbar-thumb {
-  background-color: #c0bcbc73;
-  border-radius: 10px;
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+.left-setting-sidebar {
+  background-color: #ffffff;
+  height: 770px;
+  width: 250px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #E6E6E6;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border-radius: 8px;
+}
+.settingssh1 {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  letter-spacing: 0%;
+  color: #262626;
+   font-family: "Roboto", sans-serif;
 }

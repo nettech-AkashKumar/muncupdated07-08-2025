@@ -13,12 +13,16 @@ import "./Settings.css";
 import { Link, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../components/auth/AuthContext.jsx";
+import Vector from "../../assets/images/Vector.png";
+import Icons from "../../assets/images/Icons.png";
 
 const Settings = () => {
   const [showGeneralSettings, setShowGeneralSettings] = useState(false);
   const [showWebsiteSettings, setShowWebsitelSettings] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [activeItem, setActiveItem] = useState("");
+  const [activeMainItem, setActiveMainItem] = useState("");
   const { user } = useAuth();
   const id = user?._id;
 
@@ -34,85 +38,38 @@ const Settings = () => {
 
   return (
     <div>
-      <div className="mainsetting" style={{ backgroundColor: "#f7f7f7" }}>
-        {/* SETTING-HEADER? */}
-        <div
-          className="header-settings py-2 px-4"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <strong style={{ fontSize: "17px" }}>{t("settings")}</strong>
-            <p>{t("manage_settings")}</p>
-          </div>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <span
-              style={{
-                backgroundColor: "white",
-                padding: "3px 6px",
-                borderRadius: "4px",
-                border: "1px solid #d3d3d3",
-              }}
-            >
-              <LuRefreshCcw />
-            </span>
-            <span
-              style={{
-                backgroundColor: "white",
-                padding: "3px 6px",
-                borderRadius: "4px",
-                border: "1px solid #d3d3d3",
-              }}
-            >
-              <MdKeyboardArrowUp />
-            </span>
-          </div>
-        </div>
+      <div className="mainsetting"> 
         {/* MAIN-COMPONENT? */}
-        <div className="py-2 px-4 d-flex gap-4">
+        <div className=" px-4 d-flex gap-4">
           <div
-            className="left-setting-sidebar"
-            style={{
-              backgroundColor: "white",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              border: "1px solid #d3d3d3",
-              width: "330px",
-              overflowY: "auto",
-              height: "400px",
-            }}
-          >
+            className="left-setting-sidebar">
             <div>
-              <h1 style={{ fontSize: "17px" }}>{t("settings")}</h1>
-              <hr />
+              <h1 className="settingssh1" style={{ fontSize: "17px" }}>{t("settings")}</h1>
+              <hr style={{color:'#9c9c9cff'}} />
             </div>
             <div className="sidebar-nav-link">
               <div
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  paddingBottom: "30px",
+                  paddingBottom: "15px",
                   position: "relative",
                   cursor: "pointer",
                 }}
-                onClick={() => toggleDropdown("general")}
+                onClick={() => { toggleDropdown("general"); setActiveMainItem("general")}}
               >
-                <span style={{ color: "#212B36" }}>
+                <span className="settingssh1" style={{ backgroundColor:activeMainItem === "general" ? "#E3F3FF" : "", border:activeMainItem === "general" ? "1px solid #BBE1FF" : "none", borderRadius:activeMainItem === "general" ? "5px" : "", padding:"8px", display:"flex", alignItems:'center', gap:"8px"  }}>
                   {" "}
-                  <CiSettings /> {t("General Settings")}
-                </span>
-                <span>
+                  <img src={Vector} alt="" /> {t("General Settings")}
                   <RiArrowDropDownLine
                     style={{
-                      backgroundColor: "#F2F2F2",
                       borderRadius: "50%",
-                      width: "17px",
-                      height: "17px",
+                      width: "30px",
+                      height: "25px",
+                      fontWeight:300,
                       transition: "transform 0.3s",
-                      transform: openDropdown === "general" ? "rotate(360deg)" : "rotate(270deg)"
+                      transform: openDropdown === "general" ? "rotate(360deg)" : "rotate(270deg)",
+                      color:activeMainItem === "general" ?  "#1368EC" : "",
                     }}
                   />
                 </span>
@@ -126,10 +83,12 @@ const Settings = () => {
                     flexDirection: "column",
                   }}
                 >
-                  <Link to={`profile/${id}`} style={{ textDecoration: "none", color: "black" }}>
+                  <Link to={`profile/${id}`} style={{ textDecoration: "none", color: "black" }}
+                  onClick={() => setActiveItem("profile")}
+                  >
                     {" "}
                     <span
-                      className="genersettingdropdown"
+                      className="settingssh1"
                       style={{
                         marginLeft: "10px",
                         marginRight: "10px",
@@ -138,15 +97,18 @@ const Settings = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        color:activeItem === "profile" ? "#1368EC" : "#676767"
                       }}
                     >
                       {" "}
-                      {t("profile")} <RxDotFilled />
+                      {t("profile")}
                     </span>
                   </Link>
-                  <Link to="/security-settings" style={{ textDecoration: "none", color: "black" }}>
+                  <Link to="/security-settings" style={{ textDecoration: "none", color: "black" }}
+                  onClick={() => setActiveItem("security")}
+                  >
                     <span
-                      className="genersettingdropdown"
+                      className="settingssh1"
                       style={{
                         marginLeft: "10px",
                         marginRight: "10px",
@@ -155,9 +117,10 @@ const Settings = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        color:activeItem === "security" ? "#1368EC" : "#676767"
                       }}
                     >
-                      {t("Security")} <RxDotFilled />
+                      {t("Security")}
                     </span>
                   </Link>
                   {/* <Link to="notification" style={{ textDecoration: "none", color: "black" }}>
@@ -198,24 +161,23 @@ const Settings = () => {
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  paddingBottom: "30px",
+                  paddingBottom: "15px",
                   cursor: "pointer",
                 }}
-                onClick={() => toggleDropdown("website")}
+                onClick={() => {toggleDropdown("website"); setActiveMainItem("website")}}
               >
-                <span style={{ color: "#212B36", fontSize: "17px" }}>
+                <span className="settingssh1" style={{ backgroundColor:activeMainItem === "website" ? "#E3F3FF" : "", border:activeMainItem === "website" ? "1px solid #BBE1FF" : "none", borderRadius:activeMainItem === "website" ? "5px" : "", padding:"8px", display:"flex", alignItems:'center', gap:"8px"  }}>
                   {" "}
-                  <AiOutlineGlobal /> {t("Website Settings")}
-                </span>
-                <span>
+                  <img src={Icons} alt="" /> {t("Website Settings")}
                   <RiArrowDropDownLine
                     style={{
-                      backgroundColor: "#F2F2F2",
-                      borderRadius: "50%",
-                      width: "20px",
-                      height: "20px",
+                       borderRadius: "50%",
+                      width: "30px",
+                      height: "25px",
+                      fontWeight:300,
                       transition: "transform 0.3s",
-                      transform: openDropdown === "website" ? "rotate(360deg)" : "rotate(270deg)"
+                      transform: openDropdown === "website" ? "rotate(360deg)" : "rotate(270deg)",
+                      color:activeMainItem === "website" ?  "#1368EC" : "",
                     }}
                   />
                 </span>
@@ -247,9 +209,9 @@ const Settings = () => {
                       {t("system settings")} <RxDotFilled />
                     </span>
                   </Link> */}
-                  <Link to="company-settings" style={{ textDecoration: "none", color: "black" }}>
+                  <Link to="company-settings" style={{ textDecoration: "none", color: "black" }}  onClick={() => setActiveItem("company-settings")}>
                     <span
-                      className="genersettingdropdown"
+                      className="settingssh1"
                       style={{
                         marginLeft: "10px",
                         marginRight: "10px",
@@ -258,14 +220,15 @@ const Settings = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        color:activeItem === "company-settings" ? "#1368EC" : "#676767"
                       }}
                     >
-                      {t("Company Settings")}<RxDotFilled />
+                      {t("Company Settings")}
                     </span>
                   </Link>
-                  <Link to="/language-settings" style={{ textDecoration: "none", color: "black" }}>
+                  <Link to="/language-settings" style={{ textDecoration: "none", color: "black" }} onClick={() => setActiveItem("language-settings")}>
                     <span
-                      className="genersettingdropdown"
+                      className="settingssh1"
                       style={{
                         marginLeft: "10px",
                         marginRight: "10px",
@@ -274,9 +237,10 @@ const Settings = () => {
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        color:activeItem === "language-settings" ? "#1368EC" : "#676767"
                       }}
                     >
-                      {t("localization")} <RxDotFilled />
+                      {t("localization")}
                     </span>
                   </Link>
                   {/* <Link to="prefixes" style={{ textDecoration: "none", color: "black" }}>
