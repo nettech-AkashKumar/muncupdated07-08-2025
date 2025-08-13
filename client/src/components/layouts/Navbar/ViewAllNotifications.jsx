@@ -43,7 +43,7 @@ const ViewAllNotifications = () => {
       const token = getToken();
       
       const response = await axios.get(
-        `${BASE_URL}/api/notifications/paginated/${userId}?page=${page}&limit=50`,
+        `${BASE_URL}/api/notifications/paginated/${userId}?page=${page}&limit=100`,
         {
           headers: {
             Authorization: `Bearer ${token}`
