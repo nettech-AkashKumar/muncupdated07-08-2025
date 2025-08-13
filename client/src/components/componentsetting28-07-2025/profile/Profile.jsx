@@ -252,7 +252,7 @@ const UserProfile = () => {
                       }}
                     >
                       <label className="ffrrstname" style={{ fontWeight: "500" }} htmlFor="">
-                        Last Name <span style={{ color: "red" }}>*</span>
+                        Last Name
                       </label>
                       <input className="ffrrstnameinput"
                         readOnly

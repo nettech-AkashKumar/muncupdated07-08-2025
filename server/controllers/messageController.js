@@ -44,12 +44,12 @@ exports.saveMessage = async (req, res) => {
       const notification = new Notification({
         recipient: to,
         sender: from,
-        message: message.length > 50 ? message.substring(0, 50) + '...' : message,
+        message: message,
         type: 'message',
         conversationId: conversation._id
       });
       await notification.save();
-      console.log('📧 Notification created for user:', to);
+      // console.log('📧 Notification created for user:', to);
     } catch (notificationError) {
       console.error('❌ Error creating notification:', notificationError);
       // Don't fail the message save if notification fails
@@ -198,7 +198,7 @@ exports.deleteSelectedMessages = async (req, res) => {
     const { messages: selectedMessages, from, to } = req.body;
     const currentUserId = req.user.id; // Get the authenticated user's ID
     
-    console.log('Received selected messages to delete:', selectedMessages);
+    // console.log('Received selected messages to delete:', selectedMessages);
     
     // Sort participants to ensure consistent ordering
     const participants = [from, to].sort();
@@ -209,7 +209,7 @@ exports.deleteSelectedMessages = async (req, res) => {
       return res.json({ success: true, message: 'No conversation found' });
     }
     
-    console.log('Original conversation messages count:', conversation.messages.length);
+    // console.log('Original conversation messages count:', conversation.messages.length);
     
     // Create a set of message identifiers to delete (using timestamp + message content)
     const messagesToDelete = new Set();
@@ -218,7 +218,7 @@ exports.deleteSelectedMessages = async (req, res) => {
       messagesToDelete.add(identifier);
     });
     
-    console.log('Messages to delete (identifiers):', Array.from(messagesToDelete));
+    // console.log('Messages to delete (identifiers):', Array.from(messagesToDelete));
     
     // Remove selected messages (only if they belong to the current user)
     const originalLength = conversation.messages.length;
@@ -233,14 +233,14 @@ exports.deleteSelectedMessages = async (req, res) => {
       const shouldDelete = messagesToDelete.has(messageIdentifier);
       
       if (shouldDelete) {
-        console.log('Deleting message:', msg.message, 'Identifier:', messageIdentifier);
+        // console.log('Deleting message:', msg.message, 'Identifier:', messageIdentifier);
       }
       
       return !shouldDelete;
     });
     
-    console.log('Messages after deletion:', conversation.messages.length);
-    console.log('Deleted', originalLength - conversation.messages.length, 'messages');
+    // console.log('Messages after deletion:', conversation.messages.length);
+    // console.log('Deleted', originalLength - conversation.messages.length, 'messages');
     
     // Update lastMessage if it was deleted
     if (conversation.messages.length > 0) {
@@ -270,7 +270,7 @@ exports.deleteSelectedMessages = async (req, res) => {
 exports.getConversations = async (req, res) => {
   try {
     const userId = req.params.userId;
-    console.log("Fetching conversations for user ID:", userId);
+    // console.log("Fetching conversations for user ID:", userId);
 
     const conversations = await Message.find({
       participants: { $in: [userId] }
@@ -279,10 +279,10 @@ exports.getConversations = async (req, res) => {
       .populate("messages.from", "_id firstName lastName email profileImage") // Also populate message sender details
       .sort({ 'lastMessage.timestamp': -1 }); // Sort by most recent first
 
-    console.log("Found conversations:", conversations.length);
+    // console.log("Found conversations:", conversations.length);
     res.status(200).json(conversations);
   } catch (err) {
-    console.error("❌ Error fetching conversations:", err.message);
+    // console.error("❌ Error fetching conversations:", err.message);
     res.status(500).json({ message: "Failed to fetch conversations" });
   }
 }; 
