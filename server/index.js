@@ -112,10 +112,13 @@ app.use("/api/profile", userProfileRoutes);
 
 // api for mail 
 app.use("/api/email/mail", emailrouter)
+
 // email verify via otp api security
 app.use("/api/email", emailverifyroute);
+
 // google auth api
 app.use("/api/auth", authrouter);
+
 // mobile verify via sms
 app.use("/api/mobile", mobileverifyrouter);
 
@@ -130,6 +133,10 @@ app.use("/api/companyprofile", companysettingrouter);
 
 // Localization api
 app.use("/api/localizationsetting", localizationrouter);
+
+// cloudnary configuration
+app.use("/api/cloudinary-signature", require("./routes/file"));
+
 
 
 
