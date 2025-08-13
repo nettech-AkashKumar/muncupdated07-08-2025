@@ -53,16 +53,17 @@ const ViewAllNotifications = () => {
 
       if (response.data) {
         setNotifications(response.data.notifications || []);
-        console.log('Fetched notifications:', notifications);
+        // console.log('Fetched notifications:', notifications);
+        // console.log('API response:', response.data.notifications);
         setTotalPages(response.data.totalPages || 1);
         setCurrentPage(response.data.currentPage || 1);
-        console.log('Fetched notifications:', response.data.notifications?.length || 0);
+        // console.log('Fetched notifications:', response.data.notifications?.length || 0);
       } else {
         setError('Failed to load notifications');
         toast.error('Failed to load notifications');
       }
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      // console.error('Error fetching notifications:', error);
       setError(error.response?.data?.message || error.message || 'Failed to load notifications');
       toast.error('Failed to load notifications');
     } finally {
@@ -88,7 +89,7 @@ const ViewAllNotifications = () => {
         setUnreadCount(response.data.count);
       }
     } catch (error) {
-      console.error('Error fetching unread count:', error);
+      // console.error('Error fetching unread count:', error);
     }
   };
 
@@ -119,7 +120,7 @@ const ViewAllNotifications = () => {
       fetchUnreadCount();
       toast.success('Notification marked as read');
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      // console.error('Error marking notification as read:', error);
       toast.error('Failed to mark notification as read');
     }
   };
@@ -243,6 +244,7 @@ const formatTimestamp = (timestamp) => {
       setLoading(false);
     }
   }, [userId]);
+
 
   return (
     <div style={{padding:'0px 20px',height:'88vh'}}>

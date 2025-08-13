@@ -77,6 +77,7 @@ const Chat = () => {
   // console.log("Users:", users);
   // console.log("Online users:", onlineUsers);
   // console.log("Online users count:", onlineUsers.length);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -262,58 +263,59 @@ const Chat = () => {
         }, 100);
       } catch (error) {
         // Fallback: upload to backend for local storage
-        try {
-          const token = localStorage.getItem('token');
-          const formData = new FormData();
-          formData.append('file', file);
-          formData.append('from', currentUserId);
-          formData.append('to', selectedUser._id);
-          const uploadUrl = `${backendurl}/api/upload-file`;
-          const response = await fetch(uploadUrl, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` },
-            body: formData
-          });
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.message || 'Failed to upload file');
-          // Success: use local file URL
-          const fileMessage = {
-            from: currentUserId,
-            message: `📎 ${file.name}`,
-            fileUrl: data.fileUrl,
-            fileType: file.type,
-            fileName: file.name,
-            timestamp: new Date(),
-            read: false,
-            replyTo: null
-          };
-          setMessages(prev => {
-            const newMessages = {
-              ...prev,
-              [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
-            };
-            return newMessages;
-          });
-          // Only add user to left panel if they're not already there (this ensures only users with actual conversations appear)
-          setUsers(prev => {
-            const exists = prev.some(u => u._id === selectedUser._id);
-            return exists ? prev : [selectedUser, ...prev];
-          });
-          socket.current.emit('send-msg', {
-            from: currentUserId,
-            to: selectedUser._id,
-            message: fileMessage.message,
-            fileUrl: fileMessage.fileUrl,
-            fileType: fileMessage.fileType,
-            fileName: fileMessage.fileName,
-            replyTo: fileMessage.replyTo
-          });
-          setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          }, 100);
-        } catch (fallbackError) {
-          setPopup({ show: true, message: 'Failed to upload file to both Cloudinary and local storage.' });
-        }
+        // try {
+        //   const token = localStorage.getItem('token');
+        //   const formData = new FormData();
+        //   formData.append('file', file);
+        //   formData.append('from', currentUserId);
+        //   formData.append('to', selectedUser._id);
+        //   const uploadUrl = `${backendurl}/api/upload-file`;
+        //   const response = await fetch(uploadUrl, {
+        //     method: 'POST',
+        //     headers: { 'Authorization': `Bearer ${token}` },
+        //     body: formData
+        //   });
+        //   const data = await response.json();
+        //   if (!response.ok) throw new Error(data.message || 'Failed to upload file');
+        //   // Success: use local file URL
+        //   const fileMessage = {
+        //     from: currentUserId,
+        //     message: `📎 ${file.name}`,
+        //     fileUrl: data.fileUrl,
+        //     fileType: file.type,
+        //     fileName: file.name,
+        //     timestamp: new Date(),
+        //     read: false,
+        //     replyTo: null
+        //   };
+        //   setMessages(prev => {
+        //     const newMessages = {
+        //       ...prev,
+        //       [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
+        //     };
+        //     return newMessages;
+        //   });
+        //   // Only add user to left panel if they're not already there (this ensures only users with actual conversations appear)
+        //   setUsers(prev => {
+        //     const exists = prev.some(u => u._id === selectedUser._id);
+        //     return exists ? prev : [selectedUser, ...prev];
+        //   });
+        //   socket.current.emit('send-msg', {
+        //     from: currentUserId,
+        //     to: selectedUser._id,
+        //     message: fileMessage.message,
+        //     fileUrl: fileMessage.fileUrl,
+        //     fileType: fileMessage.fileType,
+        //     fileName: fileMessage.fileName,
+        //     replyTo: fileMessage.replyTo
+        //   });
+        //   setTimeout(() => {
+        //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        //   }, 100);
+        // } catch (fallbackError) {
+        //   setPopup({ show: true, message: 'Failed to upload file to both Cloudinary and local storage.' });
+        // }
+        setPopup({ show: true, message: 'Failed to upload file.' });
       }
     }
     setSelectedFiles([]);
@@ -341,7 +343,7 @@ const Chat = () => {
   const calculateUnreadCount = (userId) => {
     const userMessages = messages[userId] || [];
     const unreadCount = userMessages.filter(msg => msg.from === userId && !msg.read).length;
-    console.log(`Unread count for user ${userId}:`, unreadCount, 'Messages:', userMessages.length);
+    // console.log(`Unread count for user ${userId}:`, unreadCount, 'Messages:', userMessages.length);
     return unreadCount;
   };
 
@@ -460,7 +462,7 @@ const Chat = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Primary API status:", conversationsRes.status);
+      // console.log("Primary API status:", conversationsRes.status);
       let conversationsData;
       try {
         conversationsData = await conversationsRes.json();
@@ -468,7 +470,7 @@ const Chat = () => {
         conversationsData = [];
       }
       if (!Array.isArray(conversationsData)) {
-        console.log('Primary conversations response not array, raw:', conversationsData);
+        // console.log('Primary conversations response not array, raw:', conversationsData);
       }
       if ((!conversationsRes.ok || !Array.isArray(conversationsData) || conversationsData.length === 0)) {
         // Fallback to alternate mount
@@ -476,19 +478,19 @@ const Chat = () => {
           const altRes = await fetch(`${backendurl}/api/conversations/${currentUserId}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log("Fallback API status:", altRes.status);
+          // console.log("Fallback API status:", altRes.status);
           const altData = await altRes.json();
           if (altRes.ok && Array.isArray(altData)) {
             conversationsRes = altRes;
             conversationsData = altData;
           }
         } catch (e) {
-          console.log('Fallback fetch failed:', e.message);
+          // console.log('Fallback fetch failed:', e.message);
         }
       }
 
-      console.log("Conversations data (final):", conversationsData);
-      console.log("Current user ID:", currentUserId);
+      // console.log("Conversations data (final):", conversationsData);
+      // console.log("Current user ID:", currentUserId);
 
       if (Array.isArray(conversationsData) && conversationsData.length > 0) {
         // Extract user IDs from conversations and build messages
@@ -497,15 +499,15 @@ const Chat = () => {
         const usersWithConversations = [];
         
         conversationsData.forEach((conversation, index) => {
-          console.log(`Processing conversation ${index}:`, conversation);
-          console.log("Conversation participants:", conversation.participants);
+          // console.log(`Processing conversation ${index}:`, conversation);
+          // console.log("Conversation participants:", conversation.participants);
           // Normalize participants as objects with _id
           const normalizedParticipants = (conversation.participants || []).map((p) =>
             typeof p === 'string' ? { _id: p } : p
           );
           // Find the other participant (not the current user)
           const otherParticipant = normalizedParticipants.find(p => String(p._id) !== String(currentUserId));
-          console.log("Other participant found:", otherParticipant);
+          // console.log("Other participant found:", otherParticipant);
           
           if (otherParticipant) {
             conversationUserIds.push(otherParticipant._id);
@@ -537,9 +539,9 @@ const Chat = () => {
           }
         });
         
-        console.log("Users with conversations:", usersWithConversations);
-        console.log("All messages:", allMessages);
-        console.log("Conversation user IDs:", conversationUserIds);
+        // console.log("Users with conversations:", usersWithConversations);
+        // console.log("All messages:", allMessages);
+        // console.log("Conversation user IDs:", conversationUserIds);
         
         setMessages(allMessages);
         // Deduplicate users by _id in case of duplicates
@@ -553,13 +555,13 @@ const Chat = () => {
         usersWithConversations.forEach(userItem => {
           const unreadCount = calculateUnreadCount(userItem._id);
           initialUnreadCounts[userItem._id] = unreadCount;
-          console.log(`Initial unread count for ${userItem._id}:`, unreadCount);
+          // console.log(`Initial unread count for ${userItem._id}:`, unreadCount);
         });
         setUnreadCounts(initialUnreadCounts);
         
 
       } else {
-        console.log("No conversations found or response not ok");
+        // console.log("No conversations found or response not ok");
         // If no conversations, don't show any users in left panel
         setUsers([]);
         setMessages({});
@@ -698,10 +700,10 @@ const Chat = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Failed to fetch messages');
         
-        console.log('Fetched messages for selected user:', data);
-        console.log('Message count:', data.length);
-        console.log('User messages:', data.filter(msg => msg.from === currentUserId).length);
-        console.log('Sample message structure:', data[0]);
+        // console.log('Fetched messages for selected user:', data);
+        // console.log('Message count:', data.length);
+        // console.log('User messages:', data.filter(msg => msg.from === currentUserId).length);
+        // console.log('Sample message structure:', data[0]);
         
         setMessages((prev) => ({
           ...prev,
@@ -749,7 +751,7 @@ const Chat = () => {
           Object.keys(messages).forEach(userId => {
             const count = calculateUnreadCount(userId);
             newUnreadCounts[userId] = count;
-            console.log(`User ${userId}: ${count} unread messages`);
+            // console.log(`User ${userId}: ${count} unread messages`);
           });
           setUnreadCounts(newUnreadCounts);
         }, 200);
@@ -766,7 +768,7 @@ const Chat = () => {
     Object.keys(messages).forEach(userId => {
       newUnreadCounts[userId] = calculateUnreadCount(userId);
     });
-    console.log("Updating unread counts:", newUnreadCounts);
+    // console.log("Updating unread counts:", newUnreadCounts);
     setUnreadCounts(newUnreadCounts);
   }, [messages, selectedUser]);
 
@@ -809,14 +811,14 @@ const Chat = () => {
             from: msg.from
           }));
         
-        console.log('Selected messages to delete:', selectedMessageData);
+        // console.log('Selected messages to delete:', selectedMessageData);
         
         const requestBody = { 
           messages: selectedMessageData,
           from: currentUserId, 
           to: selectedUser._id 
         };
-        console.log('Request body:', requestBody);
+        // console.log('Request body:', requestBody);
         
         const response = await fetch(`${backendurl}/api/messages/delete-selected`, {
           method: 'DELETE',
@@ -828,7 +830,7 @@ const Chat = () => {
         });
         
         const responseData = await response.json();
-        console.log('Backend response:', responseData);
+        // console.log('Backend response:', responseData);
         
         if (!response.ok) {
           throw new Error(responseData.message || 'Failed to delete messages');
@@ -842,8 +844,8 @@ const Chat = () => {
           }
         );
         const refreshData = await refreshRes.json();
-        console.log('Refreshed messages from server:', refreshData);
-        console.log('Refreshed message count:', refreshData.length);
+        // console.log('Refreshed messages from server:', refreshData);
+        // console.log('Refreshed message count:', refreshData.length);
         
         if (refreshRes.ok) {
           setMessages(prev => ({
@@ -861,7 +863,7 @@ const Chat = () => {
           }));
         } else {
           // Fallback: manually remove selected messages from local state
-          console.log('Server refresh failed, using local state fallback');
+          // console.log('Server refresh failed, using local state fallback');
           setMessages(prev => ({
             ...prev,
             [selectedUser._id]: (prev[selectedUser._id] || []).filter((msg, index) => 
@@ -904,7 +906,7 @@ const Chat = () => {
         from: currentUserId,
         to: selectedUser._id
       };
-      console.log('Deleting message with request body:', requestBody);
+      // console.log('Deleting message with request body:', requestBody);
       
       const response = await fetch(`${backendurl}/api/messages/delete-selected`, {
         method: 'DELETE',
@@ -915,9 +917,9 @@ const Chat = () => {
         body: JSON.stringify(requestBody),
       });
       
-      console.log('Delete response status:', response.status);
+      // console.log('Delete response status:', response.status);
       const responseData = await response.json();
-      console.log('Delete response data:', responseData);
+      // console.log('Delete response data:', responseData);
       
       if (!response.ok) {
         throw new Error(responseData.message || 'Failed to delete message');
@@ -936,7 +938,7 @@ const Chat = () => {
         messageTimestamp: msg.timestamp
       });
       
-      console.log('Message deleted successfully');
+      // console.log('Message deleted successfully');
     } catch (error) {
       console.error('Error deleting message:', error);
       alert('Failed to delete message: ' + error.message);
@@ -1196,7 +1198,7 @@ const Chat = () => {
                     ...prev,
                     [userItem._id]: 0
                   }));
-                  console.log("Selected user:", userItem._id, "Clearing unread count");
+                  // console.log("Selected user:", userItem._id, "Clearing unread count");
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

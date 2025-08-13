@@ -10,9 +10,9 @@ const crypto = require('crypto');
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
 });
 
 // Create uploads directory for local storage fallback
@@ -124,7 +124,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
     });
 
     // Try Cloudinary first
-    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    if (process.env.CLOUD_NAME && process.env.CLOUD_API_KEY && process.env.CLOUD_API_SECRET) {
       try {
         console.log('Attempting Cloudinary upload...');
         
@@ -221,27 +221,27 @@ router.get('/test-cloudinary', auth, async (req, res) => {
   try {
     console.log('Testing Cloudinary configuration...');
     console.log('Environment variables:', {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Missing',
-      api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
-      api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing'
+      cloud_name: process.env.CLOUD_NAME ? 'Set' : 'Missing',
+      api_key: process.env.CLOUD_API_KEY ? 'Set' : 'Missing',
+      api_secret: process.env.CLOUD_API_SECRET ? 'Set' : 'Missing'
     });
 
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
       return res.status(500).json({ 
         message: 'Cloudinary credentials missing',
         details: {
-          cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
-          api_key: !!process.env.CLOUDINARY_API_KEY,
-          api_secret: !!process.env.CLOUDINARY_API_SECRET
+          cloud_name: !!process.env.CLOUD_NAME,
+          api_key: !!process.env.CLOUD_API_KEY,
+          api_secret: !!process.env.CLOUD_API_SECRET
         }
       });
     }
 
     // Test Cloudinary connection with credentials
     const testConfig = {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUD_API_KEY,
+      api_secret: process.env.CLOUD_API_SECRET
     };
     
     console.log('Cloudinary config (first few chars):', {
@@ -268,9 +268,9 @@ router.get('/test-cloudinary', auth, async (req, res) => {
       message: 'Cloudinary configuration error',
       error: error.message,
       details: {
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Missing',
-        api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
-        api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing'
+        cloud_name: process.env.CLOUD_NAME ? 'Set' : 'Missing',
+        api_key: process.env.CLOUD_API_KEY ? 'Set' : 'Missing',
+        api_secret: process.env.CLOUD_API_SECRET ? 'Set' : 'Missing'
       }
     });
   }
@@ -282,15 +282,15 @@ router.get('/cloudinary-signature', auth, (req, res) => {
   const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
   const signature = crypto
     .createHash('sha1')
-    .update(stringToSign + process.env.CLOUDINARY_API_SECRET)
+    .update(stringToSign + process.env.CLOUD_API_SECRET)
     .digest('hex');
 
   res.json({
     timestamp,
     signature,
     folder,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: process.env.CLOUD_NAME,
+    apiKey: process.env.CLOUD_API_KEY,
   });
 });
 
