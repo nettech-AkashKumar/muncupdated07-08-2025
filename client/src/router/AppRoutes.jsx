@@ -107,6 +107,7 @@ import PaymentHistory from "../pages/finance&accounts/payment_history/PaymentHis
 import CreditDebitNotes from "../pages/finance&accounts/credit&debit_note/CreditDebitNotes.jsx";
 import Credit from "../pages/finance&accounts/credit&debit_note/Credit.jsx";
 import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
+import Dashboards from "../pages/dashboard/Dashboards.jsx";
 
 const AppRoutes = () => {
   return (
@@ -173,6 +174,7 @@ const AppRoutes = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/variant-attributes" element={<Variant />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-2" element={<Dashboards/>} />
         <Route path="/theme" element={<ThemeCustomizer />} />
         <Route path="/language" element={<LanguageSwitcher />} />
         <Route path="/debit-note" element={<DebitNote />} />
