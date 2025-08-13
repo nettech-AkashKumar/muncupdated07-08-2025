@@ -17,6 +17,7 @@ function ProductList() {
       try {
         const res = await axios.get(`${BASE_URL}/api/products`);
         setProducts(res.data);
+        console.log("Products right:", res.data);
         // Initialize all to "general"
         const initialTabs = res.data.reduce((acc, product) => {
           acc[product._id] = "general";

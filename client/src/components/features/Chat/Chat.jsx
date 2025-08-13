@@ -172,50 +172,91 @@ const Chat = () => {
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
     // Check file size and type for each file
-    const maxSize = 1 * 1024 * 1024; // 1MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'application/pdf'];
+    const maxSize = 10 * 1024 * 1024; // 10MB - more reasonable for chat files
+    const allowedTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
+      'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/quicktime',
+      'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain', 'application/zip', 'application/x-rar-compressed'
+    ];
+    
     const validFiles = files.filter(file => {
       if (file.size > maxSize) {
-        setPopup({ show: true, message: `${file.name}: File size must be less than 1MB` });
+        setPopup({ 
+          show: true, 
+          message: `${file.name}: File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB` 
+        });
         return false;
       }
       if (!allowedTypes.includes(file.type)) {
-        setPopup({ show: true, message: `${file.name}: Invalid file type.` });
+        setPopup({ 
+          show: true, 
+          message: `${file.name}: File type not supported. Allowed types: Images, Videos, PDFs, Documents, Archives, and Text files.` 
+        });
         return false;
       }
       return true;
     });
-    setSelectedFiles(validFiles);
-    setShowEmojiPicker(false);
+    
+    if (validFiles.length > 0) {
+      setSelectedFiles(validFiles);
+      setShowEmojiPicker(false);
+      console.log(`Selected ${validFiles.length} valid files:`, validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
+    }
   };
 
   const handleFileUpload = async () => {
     if (!selectedFiles.length || !selectedUser) return;
     setIsUploading(true);
     setUploadProgress(0);
+    
     for (const file of selectedFiles) {
       try {
-        // Try signed Cloudinary upload
+        // Try signed Cloudinary upload first
         const token = localStorage.getItem('token');
         const sigRes = await fetch(`${backendurl}/api/cloudinary-signature`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        
+        if (!sigRes.ok) {
+          throw new Error('Failed to get Cloudinary signature');
+        }
+        
         const { timestamp, signature, apiKey, cloudName, folder } = await sigRes.json();
+        
+        // Validate Cloudinary configuration
+        if (!timestamp || !signature || !apiKey || !cloudName) {
+          throw new Error('Invalid Cloudinary configuration');
+        }
+        
         const formData = new FormData();
         formData.append('file', file);
         formData.append('api_key', apiKey);
         formData.append('timestamp', timestamp);
         formData.append('signature', signature);
         formData.append('folder', folder);
-        for (let pair of formData.entries()) {
-          console.log('Cloudinary upload param:', pair[0], '=', pair[1]);
-        }
+        
+        console.log('Uploading to Cloudinary:', {
+          cloudName,
+          folder,
+          fileName: file.name,
+          fileSize: file.size
+        });
+        
         const uploadRes = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
           { method: 'POST', body: formData }
         );
+        
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json();
+          throw new Error(errorData.error?.message || 'Cloudinary upload failed');
+        }
+        
         const data = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(data.error?.message || 'Failed to upload file');
+        console.log('Cloudinary upload successful:', data);
+        
         // Success: use Cloudinary URL
         const fileMessage = {
           from: currentUserId,
@@ -228,27 +269,44 @@ const Chat = () => {
           read: false,
           replyTo: null
         };
+        
         // Save file message to backend for persistence
-        await fetch(`${backendurl}/api/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(fileMessage),
+        // try {
+        //   const saveResponse = await fetch(`${backendurl}/api/messages`, {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     body: JSON.stringify(fileMessage),
+        //   });
+          
+        //   if (!saveResponse.ok) {
+        //     const errorData = await saveResponse.json();
+        //     console.warn('Failed to save message to backend:', errorData);
+        //     // Continue with local state update even if backend save fails
+        //   } else {
+        //     console.log('Message saved to backend successfully');
+        //   }
+        // } catch (saveError) {
+        //   console.warn('Error saving message to backend:', saveError);
+        //   // Continue with local state update even if backend save fails
+        // }
+        
+        // setMessages(prev => {
+        //   const newMessages = {
+        //     ...prev,
+        //     [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
+        //   };
+        //   return newMessages;
+        // });
+        
+        // Only add user to left panel if they're not already there
+        setUsers(prev => {
+          const exists = prev.some(u => u._id === selectedUser._id);
+          return exists ? prev : [selectedUser, ...prev];
         });
-        setMessages(prev => {
-          const newMessages = {
-            ...prev,
-            [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
-          };
-          return newMessages;
-        });
-                  // Only add user to left panel if they're not already there (this ensures only users with actual conversations appear)
-          setUsers(prev => {
-            const exists = prev.some(u => u._id === selectedUser._id);
-            return exists ? prev : [selectedUser, ...prev];
-          });
+        
         socket.current.emit('send-msg', {
           from: currentUserId,
           to: selectedUser._id,
@@ -258,66 +316,80 @@ const Chat = () => {
           fileName: fileMessage.fileName,
           replyTo: fileMessage.replyTo
         });
+        
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
-      } catch (error) {
+        
+      } catch (cloudinaryError) {
+        console.error('Cloudinary upload failed:', cloudinaryError);
+        
         // Fallback: upload to backend for local storage
-        // try {
-        //   const token = localStorage.getItem('token');
-        //   const formData = new FormData();
-        //   formData.append('file', file);
-        //   formData.append('from', currentUserId);
-        //   formData.append('to', selectedUser._id);
-        //   const uploadUrl = `${backendurl}/api/upload-file`;
-        //   const response = await fetch(uploadUrl, {
-        //     method: 'POST',
-        //     headers: { 'Authorization': `Bearer ${token}` },
-        //     body: formData
-        //   });
-        //   const data = await response.json();
-        //   if (!response.ok) throw new Error(data.message || 'Failed to upload file');
-        //   // Success: use local file URL
-        //   const fileMessage = {
-        //     from: currentUserId,
-        //     message: `📎 ${file.name}`,
-        //     fileUrl: data.fileUrl,
-        //     fileType: file.type,
-        //     fileName: file.name,
-        //     timestamp: new Date(),
-        //     read: false,
-        //     replyTo: null
-        //   };
-        //   setMessages(prev => {
-        //     const newMessages = {
-        //       ...prev,
-        //       [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
-        //     };
-        //     return newMessages;
-        //   });
-        //   // Only add user to left panel if they're not already there (this ensures only users with actual conversations appear)
-        //   setUsers(prev => {
-        //     const exists = prev.some(u => u._id === selectedUser._id);
-        //     return exists ? prev : [selectedUser, ...prev];
-        //   });
-        //   socket.current.emit('send-msg', {
-        //     from: currentUserId,
-        //     to: selectedUser._id,
-        //     message: fileMessage.message,
-        //     fileUrl: fileMessage.fileUrl,
-        //     fileType: fileMessage.fileType,
-        //     fileName: fileMessage.fileName,
-        //     replyTo: fileMessage.replyTo
-        //   });
-        //   setTimeout(() => {
-        //     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        //   }, 100);
-        // } catch (fallbackError) {
-        //   setPopup({ show: true, message: 'Failed to upload file to both Cloudinary and local storage.' });
-        // }
-        setPopup({ show: true, message: 'Failed to upload file.' });
+        try {
+          console.log('Attempting fallback upload to backend...');
+          const token = localStorage.getItem('token');
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('from', currentUserId);
+          formData.append('to', selectedUser._id);
+
+          const uploadUrl = `${backendurl}/api/cloudinary-signature/upload-file`;
+          const response = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Backend upload failed');
+          }
+
+          const data = await response.json();
+          console.log('Backend upload successful:', data);
+
+          // Success: use local file URL
+          const fileMessage = {
+            from: currentUserId,
+            to: selectedUser._id,
+            message: `📎 ${file.name}`,
+            fileUrl: data.fileUrl,
+            fileType: file.type,
+            fileName: file.name,
+            timestamp: new Date(),
+            read: false,
+            replyTo: null
+          };
+
+          setUsers(prev => {
+            const exists = prev.some(u => u._id === selectedUser._id);
+            return exists ? prev : [selectedUser, ...prev];
+          });
+
+          socket.current.emit('send-msg', {
+            from: currentUserId,
+            to: selectedUser._id,
+            message: fileMessage.message,
+            fileUrl: fileMessage.fileUrl,
+            fileType: fileMessage.fileType,
+            fileName: fileMessage.fileName,
+            replyTo: fileMessage.replyTo
+          });
+          
+          setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+          
+        } catch (fallbackError) {
+          console.error('Both Cloudinary and backend upload failed:', fallbackError);
+          setPopup({ 
+            show: true, 
+            message: `Failed to upload ${file.name}. Please try again or contact support.` 
+          });
+        }
       }
     }
+    
     setSelectedFiles([]);
     setIsUploading(false);
   };
@@ -1009,6 +1081,131 @@ const Chat = () => {
     });
     setMessage('');
     setReplyTo(null);
+  };
+
+  // Test Cloudinary configuration
+  const testCloudinaryConfig = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Testing Cloudinary with token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/test-cloudinary`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      console.log('Cloudinary test response status:', response.status);
+      console.log('Cloudinary test response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Cloudinary test failed with status:', response.status);
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Response is not JSON:', contentType);
+        console.error('Response text:', responseText);
+        throw new Error(`Expected JSON but got ${contentType}`);
+      }
+      
+      const data = await response.json();
+      console.log('Cloudinary test result:', data);
+      
+      if (data.message) {
+        setPopup({ 
+          show: true, 
+          message: `Cloudinary Test: ${data.message}` 
+        });
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Failed to test Cloudinary config:', error);
+      setPopup({ 
+        show: true, 
+        message: `Cloudinary test failed: ${error.message}` 
+      });
+      return null;
+    }
+  };
+
+  // Check environment configuration
+  const checkEnvironment = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Checking environment with token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/env-check`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      console.log('Environment check response status:', response.status);
+      console.log('Environment check response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Environment check failed with status:', response.status);
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Response is not JSON:', contentType);
+        console.error('Response text:', responseText);
+        throw new Error(`Expected JSON but got ${contentType}`);
+      }
+      
+      const data = await response.json();
+      console.log('Environment check result:', data);
+      
+      if (!data || !data.cloudinary) {
+        console.error('Invalid response structure:', data);
+        throw new Error('Invalid response structure from server');
+      }
+      
+      // Show results in popup
+      const message = `Environment Check:\n\nCloudinary:\n- Cloud Name: ${data.cloudinary.cloud_name}\n- API Key: ${data.cloudinary.api_key}\n- API Secret: ${data.cloudinary.api_secret}\n\nUploads:\n- Directory: ${data.uploads.directory}\n- Exists: ${data.uploads.exists}\n- Writable: ${data.uploads.writable}`;
+      
+      setPopup({ 
+        show: true, 
+        message: message 
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Failed to check environment:', error);
+      setPopup({ 
+        show: true, 
+        message: `Failed to check environment: ${error.message}` 
+      });
+      return null;
+    }
+  };
+
+  // Simple ping test to verify routing
+  const testPing = async () => {
+    try {
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/ping`);
+      const data = await response.json();
+      console.log('Ping test result:', data);
+      setPopup({ 
+        show: true, 
+        message: `Ping test successful: ${data.message}` 
+      });
+      return data;
+    } catch (error) {
+      console.error('Failed to ping:', error);
+      setPopup({ 
+        show: true, 
+        message: `Ping test failed: ${error.message}` 
+      });
+      return null;
+    }
   };
 
   return (
@@ -1750,8 +1947,7 @@ const Chat = () => {
                             {selectedUser?.firstName?.slice(0, 2).toUpperCase()}
                           </div>
                         )
-                      )}
-                    </div> */}
+                      } */}
 
                     {/* Message Content */}
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: msg.from === currentUserId ? 'flex-end' : 'flex-start', maxWidth: '70%',
@@ -1818,6 +2014,7 @@ const Chat = () => {
                                   gap: '8px'
                                 }}
                                 onClick={(e) => {
+                                 
                                   e.stopPropagation();
                                   window.open(msg.fileUrl, '_blank');
                                 }}
@@ -2120,7 +2317,7 @@ const Chat = () => {
                       </button>
                     </div>
                     <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
-                      Total Size: {selectedFiles.reduce((sum, file) => sum + file.size, 0)}
+                      Total Size: {formatFileSize(selectedFiles.reduce((sum, file) => sum + file.size, 0))}
                     </div>
                     {selectedFiles.map((file, index) => (
                       <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
@@ -2139,21 +2336,23 @@ const Chat = () => {
                         </button>
                       </div>
                     ))}
-                    <button 
-                      onClick={handleFileUpload}
-                      disabled={isUploading}
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        backgroundColor: isUploading ? "#ccc" : "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: isUploading ? "not-allowed" : "pointer"
-                      }}
-                    >
-                      {isUploading ? "Uploading..." : "Send Files"}
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                      <button 
+                        onClick={handleFileUpload}
+                        disabled={isUploading}
+                        style={{
+                          flex: 1,
+                          padding: "8px",
+                          backgroundColor: isUploading ? "#ccc" : "#007bff",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: isUploading ? "not-allowed" : "pointer"
+                        }}
+                      >
+                        {isUploading ? "Uploading..." : "Send Files"}
+                      </button>
+                    </div>
                   </div>
                 )}
 
