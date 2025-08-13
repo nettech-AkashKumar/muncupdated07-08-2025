@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FiEyeOff } from "react-icons/fi";
 import { GrShieldSecurity } from "react-icons/gr";
 import { PiGoogleLogoFill } from "react-icons/pi";
@@ -85,11 +85,10 @@ const Security = () => {
         status: updatedStatus,
       }));
       toast.info(
-        `Account ${
-          updatedStatus === "Active" ? "reactivated" : "deactivated"
+        `Account ${updatedStatus === "Active" ? "reactivated" : "deactivated"
         } successfully`,
         {
-          position:'top-center'
+          position: 'top-center'
         }
       );
       console.log("Updated isActive:", res.data.status);
@@ -106,7 +105,7 @@ const Security = () => {
       );
       alert(res.data.message || "Account Deleted");
       localStorage.removeItem("userId");
-      window.location.href = "/users";
+      window.location.href = "/login";
     } catch (error) {
       console.error("Error while deleting account", error);
     }
@@ -129,13 +128,14 @@ const Security = () => {
       );
       setTwoFactorEnabled(data.twoFactorEnabled);
       toast.info(data.message, {
-        position:'top-center'
+        position: 'top-center'
       })
     } catch (error) {
       console.error(error);
       alert("Failed to toggle 2FA");
     }
   };
+
   return (
     <div>
       <div
@@ -145,7 +145,7 @@ const Security = () => {
           <h1 className="sseddetryprof">
             Profile
           </h1>
-          <hr style={{ margin: "0", height:'1px', color:'#bdbdbdff' }} />
+          <hr style={{ margin: "0", height: '1px', color: '#bdbdbdff' }} />
         </div>
         <div className="notification-content px-3">
           <div
@@ -153,8 +153,8 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginTop:'12px',
-              marginBottom:'13px'
+              marginTop: '12px',
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -170,27 +170,27 @@ const Security = () => {
               >
                 <img src={Lock} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Password</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   Last Changed{" "}
                   {currentUser?.passwordChangedAt
                     ? new Date(
-                        currentUser.passwordChangedAt
-                      ).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })
+                      currentUser.passwordChangedAt
+                    ).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
                     : "N/A"}
                 </span>
               </div>
             </div>
             <div>
-                <img src={Eddit} alt="" style={{height:'16px', width:'16px', cursor:'pointer'}} onClick={() => setChangedPassword(true)} />
+              <img src={Eddit} alt="" style={{ height: '16px', width: '16px', cursor: 'pointer' }} onClick={() => setChangedPassword(true)} />
               <SecurityChangePassword
                 isOpen={changePassword}
                 onClose={() => setChangedPassword(false)}
@@ -202,7 +202,7 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -218,7 +218,7 @@ const Security = () => {
               >
                 <img src={Auuth} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>
                   Two Factor Authentication
                 </span>
@@ -228,29 +228,29 @@ const Security = () => {
               </div>
             </div>
             <div>
-              <label style={{display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer'}}>
-                <input type="checkbox" checked={twoFactorEnabled} onChange={toggleTwoFactor} style={{display:'none'}} />
+              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <input type="checkbox" checked={twoFactorEnabled} onChange={toggleTwoFactor} style={{ display: 'none' }} />
                 <span
-                style={{
-                  width:'50px', height:'24px', backgroundColor:twoFactorEnabled ? "#5cb85c" : "#d9534f", borderRadius:'12px', position:'relative', transition:'background-color 0.3s'
-                }}
+                  style={{
+                    width: '50px', height: '24px', backgroundColor: twoFactorEnabled ? "#5cb85c" : "#d9534f", borderRadius: '12px', position: 'relative', transition: 'background-color 0.3s'
+                  }}
                 >
                   <span
-                  style={{
-                    position:'absolute',
-                    top:'2px',
-                    left:twoFactorEnabled ? "26px" : "2px",
-                    width:'20px',
-                    height:'20px',
-                     backgroundColor: "white",
-        borderRadius: "50%",
-        transition: "left 0.3s",
-                  }}
+                    style={{
+                      position: 'absolute',
+                      top: '2px',
+                      left: twoFactorEnabled ? "26px" : "2px",
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: "white",
+                      borderRadius: "50%",
+                      transition: "left 0.3s",
+                    }}
                   >
                   </span>
-                <span style={{marginLeft:'10px', color:'#333', fontWeight:'bold'}}>
-                 {twoFactorEnabled ? "" : ""}
-                </span>
+                  <span style={{ marginLeft: '10px', color: '#333', fontWeight: 'bold' }}>
+                    {twoFactorEnabled ? "" : ""}
+                  </span>
                 </span>
               </label>
             </div>
@@ -260,7 +260,7 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -276,7 +276,7 @@ const Security = () => {
               >
                 <img src={GAuuth} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Google Authentication</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>Connect to Google</span>
               </div>
@@ -312,28 +312,28 @@ const Security = () => {
                 }}
                 render={(renderProps) => (
                   <button
-                  onClick={renderProps.onClick}
-                  disabled={renderProps.disabled}
-                  style={{
-                    background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
+                    onClick={renderProps.onClick}
+                    disabled={renderProps.disabled}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
 
-                  }}
+                    }}
                   >
-<FcGoogle size={32}/>
+                    <FcGoogle size={32} />
                   </button>
                 )}
               />
             </div>
           </div>
-           <div
+          <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -349,7 +349,7 @@ const Security = () => {
               >
                 <img src={Emver} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Email Verification</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   Verified Email: {currentUser?.email || "Not available"}
@@ -373,12 +373,27 @@ const Security = () => {
                   <IoIosCheckmark />
                 </span>
               )}
-              <img src={Delet} alt="" style={{cursor:'pointer'}}/>
-              <EmailVerification
-                isOpen={showOTPModal}
-                onClose={() => setShowOTPModal(false)}
+              <img src={Eddit} alt="change" onClick={() => setShowOTPModal(true)} style={{ cursor: 'pointer' }} />
+              {showOTPModal && (
+                <EmailVerification
+                  isOpen={showOTPModal}
+                  onClose={() => setShowOTPModal(false)}
+                />
+              )}
+
+              <img
+                src={Delet}
+                alt="del"
+                style={{
+                  cursor: 'pointer',
+                  position: 'relative',
+                  zIndex: 9999
+                }}
+                onClick={() => setShowOTPModal(false)}
               />
-              <img src={Eddit} alt="change" onClick={() => setShowOTPModal(true)} style={{cursor:'pointer'}}/>
+
+
+
             </div>
           </div>
           <div
@@ -386,7 +401,7 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -402,7 +417,7 @@ const Security = () => {
               >
                 <img src={Phver} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>
                   Phone Number Verification
                 </span>
@@ -428,12 +443,12 @@ const Security = () => {
                   <IoIosCheckmark />
                 </span>
               )}
-              <img src={Delet} alt="" style={{cursor:'pointer'}}/>
+              <img src={Eddit} alt="delet" onClick={() => setShowMobileModal(true)} style={{ cursor: 'pointer' }} />
               <MobileVerification
                 isOpen={showmobileModal}
                 onClose={() => setShowMobileModal(false)}
               />
-              <img src={Eddit} alt="delet" onClick={() => setShowMobileModal(true)} style={{cursor:'pointer'}}/>
+              <img src={Delet} alt="" style={{ position: 'relative', cursor: 'pointer', zIndex: "9999" }} onClick={() => setShowMobileModal(false)} />
             </div>
           </div>
           <div
@@ -441,7 +456,7 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -457,7 +472,7 @@ const Security = () => {
               >
                 <img src={Demanage} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Device Management</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   Manage device associated with the account{" "}
@@ -465,7 +480,7 @@ const Security = () => {
               </div>
             </div>
             <div>
-              <img src={Devcce} alt="" onClick={() => setDeviceManage(true)} style={{cursor:'pointer'}}/>
+              <img src={Devcce} alt="" onClick={() => setDeviceManage(true)} style={{ cursor: 'pointer' }} />
               {devicemanage && (
                 <DeviceManagement
                   isOpen={devicemanage}
@@ -480,12 +495,12 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
               <div
-               style={{
+                style={{
                   backgroundColor: " #F1F1F1",
                   width: "35px",
                   height: "35px",
@@ -496,7 +511,7 @@ const Security = () => {
               >
                 <img src={AccntAct} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Account Activity</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   Manage activities associated with the account
@@ -504,7 +519,7 @@ const Security = () => {
               </div>
             </div>
             <div>
-              <img src={Eye} alt="" onClick={() => setDeviceManage(true)} style={{cursor:'pointer'}}/>
+              <img src={Eye} alt="" onClick={() => setDeviceManage(true)} style={{ cursor: 'pointer' }} />
             </div>
           </div>
           <div
@@ -512,7 +527,7 @@ const Security = () => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
-              marginBottom:'13px'
+              marginBottom: '13px'
             }}
           >
             <div style={{ display: "flex", gap: "8px", padding: "15px 0" }}>
@@ -528,7 +543,7 @@ const Security = () => {
               >
                 <img src={Deact} alt="" />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Deactivate Account</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   This will shutdown Your account will be reactive when you sign
@@ -539,39 +554,39 @@ const Security = () => {
             <div>
               {currentUser && (
                 <label style={{ display: "flex", alignItems: "center", cursor: "pointer" }}>
-  <input
-    type="checkbox"
-    checked={currentUser.status === "Active"}
-    onChange={handleToggleStatus}
-    style={{ display: "none" }}
-  />
-  <span
-    style={{
-      width: "50px",
-      height: "24px",
-      backgroundColor: currentUser.status === "Active" ? "#5cb85c" : "#d9534f",
-      borderRadius: "12px",
-      position: "relative",
-      transition: "background-color 0.3s",
-    }}
-  >
-    <span
-      style={{
-        position: "absolute",
-        top: "2px",
-        left: currentUser.status === "Active" ? "26px" : "2px",
-        width: "20px",
-        height: "20px",
-        backgroundColor: "white",
-        borderRadius: "50%",
-        transition: "left 0.3s",
-      }}
-    />
-  </span>
-  <span style={{ marginLeft: "10px", color: "#333", fontWeight: "bold" }}>
-    {currentUser.status === "Active" ? "" : ""}
-  </span>
-</label>
+                  <input
+                    type="checkbox"
+                    checked={currentUser.status === "Active"}
+                    onChange={handleToggleStatus}
+                    style={{ display: "none" }}
+                  />
+                  <span
+                    style={{
+                      width: "50px",
+                      height: "24px",
+                      backgroundColor: currentUser.status === "Active" ? "#5cb85c" : "#d9534f",
+                      borderRadius: "12px",
+                      position: "relative",
+                      transition: "background-color 0.3s",
+                    }}
+                  >
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "2px",
+                        left: currentUser.status === "Active" ? "26px" : "2px",
+                        width: "20px",
+                        height: "20px",
+                        backgroundColor: "white",
+                        borderRadius: "50%",
+                        transition: "left 0.3s",
+                      }}
+                    />
+                  </span>
+                  <span style={{ marginLeft: "10px", color: "#333", fontWeight: "bold" }}>
+                    {currentUser.status === "Active" ? "" : ""}
+                  </span>
+                </label>
               )}
             </div>
           </div>
@@ -582,7 +597,7 @@ const Security = () => {
               alignItems: "center",
             }}
           >
-            <div style={{ display: "flex", gap: "8px", padding: "15px 0", marginBottom:'15px' }}>
+            <div style={{ display: "flex", gap: "8px", padding: "15px 0", marginBottom: '15px' }}>
               <div
                 style={{
                   backgroundColor: " #F1F1F1",
@@ -593,9 +608,9 @@ const Security = () => {
                   alignItems: "center",
                 }}
               >
-                <img src={DelAcc} alt="" style={{cursor:'pointer'}}/>
+                <img src={DelAcc} alt="" style={{ cursor: 'pointer' }} />
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap:'5px' }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: '5px' }}>
                 <span className="sseddetryprof" style={{ fontWeight: "600" }}>Delete Account</span>
                 <span className="sseddetryprofchannged" style={{ color: "grey" }}>
                   Your account will be permanently deleted
@@ -603,7 +618,7 @@ const Security = () => {
               </div>
             </div>
             <div>
-              <img src={Delet} onClick={handleDeleteAccount} alt="" />
+              <img src={Delet} onClick={handleDeleteAccount} alt="" style={{cursor:'pointer'}}/>
             </div>
           </div>
         </div>
