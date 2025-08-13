@@ -217,23 +217,6 @@ const Login = () => {
               </div>
             </form>
           </div>
-          {/* for two factor authentication */}
-          {/* {
-          otpStep && (
-            <form onSubmit={handleVerifyOtp} style={{ marginTop: "20px" }}>
-              <label htmlFor="">OTP sent to your email</label>
-              <input
-                type='text'
-                name='otp'
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder='Enter OTP'
-                required
-              />
-              <button type='submit'>Verify OTP</button>
-            </form>
-          )
-        } */}
         </div>
       </div>
     </div>

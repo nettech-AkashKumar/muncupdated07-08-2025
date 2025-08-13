@@ -307,7 +307,7 @@ const UserProfile = () => {
                     </div>
                   </div>
                 </div>
-                <div className="address-information pb-4">
+                <div className="address-information pb-4" style={{padding:'0px 13px'}}>
                   <div className="d-flex flex-column gap-3">
                     <div
                       style={{

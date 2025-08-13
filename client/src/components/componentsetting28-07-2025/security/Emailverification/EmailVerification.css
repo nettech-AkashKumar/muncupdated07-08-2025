@@ -1,4 +1,4 @@
-.verifymodal-overlay {
+/* .verifymodal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -111,4 +111,92 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+} */
+
+
+.pphnnemail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
+
+.pphnnemail-card {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  width: 400px;
+  text-align: center;
+}
+
+.pphnnemail-card, .eerrerhead {
+  margin-bottom: 15px;
+  color: #262626;
+  font-size: 18px;
+}
+
+.pphnnemail-card, .enterlabeler {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 400;
+  text-align: left;
+}
+
+.pphnnemail-card input[type="email"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.pphnnemail-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pphnnemail-btn.black {
+  background: black;
+  color: white;
+}
+
+.pphnnemail-info {
+  margin: 10px 0;
+}
+
+.pphnnemail-otp-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pphnnemail-otp-boxes input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.pphnnemail-resend {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.pphnnemail-resend span {
+  color: blue;
+  cursor: pointer;
+}
+
+.pphnnemail-success {
+  padding: 20px;
+}
+

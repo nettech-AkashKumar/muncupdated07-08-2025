@@ -40,7 +40,7 @@ const DeviceManagement = ({ isOpen, onClose, userId }) => {
                             <th className='devicemanageth'>Date</th>
                             <th className='devicemanageth'>Location</th>
                             <th className='devicemanageth'>IP Address</th>
-                            <th className='devicemanageth'></th>
+                            <th className='devicemanageth'>Action</th>
                         </tr>
                     </thead>
                     <tbody className='devicemanagetbody'>

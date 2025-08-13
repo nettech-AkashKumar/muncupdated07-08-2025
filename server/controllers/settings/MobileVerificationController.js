@@ -24,7 +24,8 @@ const sendOtp = async (req, res) => {
 };
 
 const verifyOtp = async (req, res) => {
-  const { mobile, otp, email } = req.body;
+  const { mobile, otp } = req.body;
+  const userId = req.user._id;
 
   try {
     const record = await MobileVerificationModal.findOne({ mobile }).sort({
@@ -40,8 +41,8 @@ const verifyOtp = async (req, res) => {
       return res.status(400).json({ error: "OTP expired" });
 
     // update mobile number in user's profile
-    const updatedUser = await User.findOneAndUpdate(
-      { email }, //this is for updating same number
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
       { mobile, phoneVerified:true },
       { new: true }
     );

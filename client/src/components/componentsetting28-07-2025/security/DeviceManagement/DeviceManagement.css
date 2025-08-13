@@ -19,6 +19,12 @@
   overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   animation: fadeIn 0.3s ease-in-out;
+  height: 500px;
+  overflow: scroll;
+  padding: 10px;
+}
+.devicemanagemodal-box::-webkit-scrollbar {
+  display: none;
 }
 
 .devicemanagemodal-header {
@@ -39,9 +45,11 @@
   color: white;
   border: none;
   font-size: 18px;
-  padding: 4px 10px;
+  width: 25px;
+  height: 25px;
   border-radius: 50%;
   cursor: pointer;
+
 }
 
 .devicemanagetable {
@@ -52,6 +60,7 @@
 
 .devicemanagethead {
   background-color: #f1f3f5;
+  text-align: center;
 }
 
 .devicemanagethead .devicemanageth {
@@ -67,6 +76,7 @@
   border-top: 1px solid #e0e0e0;
   font-size: 14px;
   color: #444;
+  text-align: center;
 }
 
 .devicemanagetbody .devicemanagetr:hover {
