@@ -82,6 +82,7 @@ function Barcode() {
       img: selectedProduct.images[0].url || '',
       expiryDate: selectedProduct.variants.Expiry[0] || '0',
       barcode: selectedProduct.itemBarcode || '',
+      barcodeImg: '',
     }));
     setSearchQuery(selectedProduct.productName);
     setShowDropdown(false);
@@ -113,6 +114,7 @@ function Barcode() {
       expiryDate: "",
       quantity: "",
       barcode: "",
+      barcodeImg: "",
       showProductName: false,
       showSku: false,
       showPrice: false,
@@ -143,11 +145,13 @@ function Barcode() {
       return;
     }
 
-    const barcodeValue = selectedProduct.itemBarcode;
+    const barcodeNumber = selectedProduct.itemBarcode;
+    const barcodeValue = selectedProduct.itemBarcode; // 12-digit
 
     setProduct((prev) => ({
       ...prev,
-      barcode: barcodeValue,
+      barcode: barcodeNumber,
+      barcodeImg: barcodeNumber,
     }));
 
     setTimeout(() => {
@@ -157,9 +161,9 @@ function Barcode() {
         const barcodeElement = document.getElementById(barcodeId);
         if (barcodeElement) {
           JsBarcode(barcodeElement, barcodeValue, {
-            format: "EAN13",
+            format: "CODE39",
             lineColor: "#000",
-            width: 2,
+            width: 1,
             height: 60,
             displayValue: true,
           });
@@ -513,11 +517,11 @@ function Barcode() {
             zIndex: '10',
             overflowY: 'auto',
           }}>
-            <div ref={formRef} style={{width:'760px',height:'auto',margin:'auto',marginTop:'80px',marginBottom:'80px',backgroundColor:'white',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'10px 16px',display:'flex',overflowY:'auto'}}>
+            <div ref={formRef} style={{width:'700px',height:'auto',margin:'auto',marginTop:'80px',marginBottom:'80px',backgroundColor:'white',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'10px 16px',display:'flex',overflowY:'auto'}}>
               <div className='row'>
                 {Array.from({ length: numberOfBarcodes || 1 }).map((_, index) => (
-                  <div key={index} className='col-6' style={{height:'300px'}}>
-                    <div style={{ marginTop: "10px",border:'2px solid #E6E6E6',borderRadius:'8px',width:'320px',padding:'16px 24px',height:'300px',marginBottom:'10px' }}>
+                  <div key={index} className='col-6' style={{height:'300px',}}>
+                    <div style={{ marginTop: "10px",border:'2px solid #E6E6E6',borderRadius:'8px',width:'320px',padding:'16px 24px',height:'280px',marginBottom:'10px' }}>
                       
                       {product.showProductName && product.productName && (
                           <>
@@ -554,8 +558,7 @@ function Barcode() {
                           )}
                       </div>
                       <div style={{marginTop:'10px',textAlign:'center'}}>
-                        <span style={{fontWeight:'600',color:'black'}}>Barcode: {product.barcode}</span>
-                        <br/>
+                        {/* <span style={{fontWeight:'600',color:'black'}}>Barcode: {product.barcode}</span> */}
                         {product.barcode && (
                           <svg id={`barcode-svg-${index}`}></svg>
                         )}

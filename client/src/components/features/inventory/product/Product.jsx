@@ -6,6 +6,7 @@ import { FaShoppingBag } from "react-icons/fa";
 import "../../../../styles/product/product-list.css";
 import BASE_URL from "../../../../pages/config/config";
 import { CiCirclePlus } from "react-icons/ci";
+import { Link } from 'react-router-dom'
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -52,7 +53,7 @@ function ProductList() {
             <li><button type="button" className="icon-btn" title="Export Excel"><FaFileExcel /></button></li>
           </div>
           <div className="d-flex gap-2">
-            <a className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-purchase"><CiCirclePlus className="me-1" />Add Products</a>
+            <Link to="/choose-adproduct" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-purchase"><CiCirclePlus className="me-1" />Add Products</Link>
             <a className="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#view-notes"><i data-feather="download" className="me-2" />Import Purchase</a>
           </div>
         </div>
