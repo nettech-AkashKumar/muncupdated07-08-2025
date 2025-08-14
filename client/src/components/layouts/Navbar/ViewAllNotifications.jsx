@@ -20,7 +20,8 @@ const ViewAllNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  
+  const [selectedNotifications, setSelectedNotifications] = useState([]);
+
   // Get user data from localStorage
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user?.id || user?._id;
@@ -205,6 +206,40 @@ const ViewAllNotifications = () => {
     }
   };
 
+  // Handle checkbox change
+  const handleCheckboxChange = (notificationId) => {
+    setSelectedNotifications(prev =>
+      prev.includes(notificationId)
+        ? prev.filter(id => id !== notificationId)
+        : [...prev, notificationId]
+    );
+  };
+
+  // Delete selected notifications
+  const deleteSelectedNotifications = async () => {
+    try {
+      const token = getToken();
+      await axios.delete(
+        `${BASE_URL}/api/notifications/bulk-delete`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          data: { userId, notificationIds: selectedNotifications }
+        }
+      );
+      setNotifications(prev =>
+        prev.filter(notification => !selectedNotifications.includes(notification._id))
+      );
+      setSelectedNotifications([]);
+      setDeleteConfirm(null);
+      toast.success('Selected notifications deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete selected notifications');
+      setDeleteConfirm(null);
+    }
+  };
+
   // Format timestamp
   // const formatTimestamp = (timestamp) => {
   //   const date = new Date(timestamp);
@@ -263,9 +298,6 @@ const formatTimestamp = (timestamp) => {
         <div>
           <span style={{fontSize:'22px',fontWeight:'700'}}>All Notifications</span>
           <br/>
-          {/* <span style={{fontSize:'19px',fontWeight:'400',color:'#86888bff'}}>
-            {notifications.length > 0 ? `${notifications.length} notification${notifications.length > 1 ? 's' : ''}` : 'No notifications'}
-          </span> */}
         </div>
         {notifications.length > 0 && (
           <div style={{display:'flex',gap:'10px'}}>
@@ -310,7 +342,27 @@ const formatTimestamp = (timestamp) => {
               <FaTrash />
               Delete All
             </button>
-            
+            {selectedNotifications.length > 0 && (
+              <button
+                onClick={() => setDeleteConfirm({ type: 'selected' })}
+                style={{
+                  background:'white',
+                  color:'#dc3545',
+                  border:'none',
+                  padding:'8px 16px',
+                  borderRadius:'6px',
+                  fontSize:'14px',
+                  fontWeight:'500',
+                  cursor:'pointer',
+                  display:'flex',
+                  alignItems:'center',
+                  gap:'8px'
+                }}
+              >
+                <FaTrash />
+                Delete Selected
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -361,31 +413,15 @@ const formatTimestamp = (timestamp) => {
         ) : (
           <>
             {notifications.map((notification) => (
-              <div 
-                key={notification._id} 
-                style={{
-                  // display:'flex',
-                  // padding:'12px 20px',
-                  // gap:'15px',
-                  // border:'1px solid #e9ecef',
-                  // borderRadius:'8px',
-                  // backgroundColor: '#fff',
-                  // marginBottom:'15px',
-                  // position:'relative',
-                  // borderLeft: notification.read ? '1px solid #e9ecef' : '4px solid #667eea',
-                  // boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  // transition: 'all 0.3s ease'
-                }}
-                // onMouseEnter={(e) => {
-                //   e.currentTarget.style.transform = 'translateY(-2px)';
-                //   e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
-                // }}
-                // onMouseLeave={(e) => {
-                //   e.currentTarget.style.transform = 'translateY(0)';
-                //   e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-                // }}
-                className='notification-items notification-hover-group'
-              >
+              <div key={notification._id} className='notification-items notification-hover-group'>
+                {/* Checkbox */}
+                <input
+                  type="checkbox"
+                  checked={selectedNotifications.includes(notification._id)}
+                  onChange={() => handleCheckboxChange(notification._id)}
+                  style={{marginRight:'12px',verticalAlign:'middle'}}
+                />
+
                 <div>
                   {notification.sender?.profileImage ? (
                     Array.isArray(notification.sender.profileImage) && notification.sender.profileImage.length > 0 ? (
@@ -433,6 +469,7 @@ const formatTimestamp = (timestamp) => {
                     {notification.sender?.firstName?.slice(0, 2).toUpperCase() || 'NA'}
                   </div>
                 </div>
+
                 <div style={{flex:1}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                     <div>
@@ -629,13 +666,18 @@ const formatTimestamp = (timestamp) => {
           >
             <FaExclamationTriangle style={{ fontSize: '40px', color: '#dc3545', marginBottom: '10px' }} />
             <h3 style={{ marginBottom: '10px', color: '#343a40' }}>
-              {deleteConfirm.type === 'all' ? 'Confirm Delete All' : 'Confirm Deletion'}
+              {deleteConfirm.type === 'all'
+                ? 'Confirm Delete All'
+                : deleteConfirm.type === 'selected'
+                  ? 'Confirm Delete Selected'
+                  : 'Confirm Deletion'}
             </h3>
             <p style={{ marginBottom: '20px', color: '#6c757d' }}>
-              {deleteConfirm.type === 'all' 
+              {deleteConfirm.type === 'all'
                 ? 'Are you sure you want to delete all notifications? This action cannot be undone.'
-                : 'Are you sure you want to delete this notification? This action cannot be undone.'
-              }
+                : deleteConfirm.type === 'selected'
+                  ? 'Are you sure you want to delete selected notifications? This action cannot be undone.'
+                  : 'Are you sure you want to delete this notification? This action cannot be undone.'}
             </p>
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
               <button
@@ -652,12 +694,18 @@ const formatTimestamp = (timestamp) => {
                 onClick={() => {
                   if (deleteConfirm.type === 'all') {
                     deleteAllNotifications();
+                  } else if (deleteConfirm.type === 'selected') {
+                    deleteSelectedNotifications();
                   } else {
                     deleteNotification(deleteConfirm.notificationId);
                   }
                 }}
               >
-                {deleteConfirm.type === 'all' ? 'Delete All' : 'Delete'}
+                {deleteConfirm.type === 'all'
+                  ? 'Delete All'
+                  : deleteConfirm.type === 'selected'
+                    ? 'Delete Selected'
+                    : 'Delete'}
               </button>
               <button
                 style={{

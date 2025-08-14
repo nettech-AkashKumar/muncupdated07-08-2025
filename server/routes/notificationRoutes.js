@@ -18,6 +18,9 @@ router.put('/read-all/:userId', auth.verifyToken, notificationController.markAll
 // Delete a notification
 router.delete('/:notificationId', auth.verifyToken, notificationController.deleteNotification);
 
+//Delete selected notifications
+router.delete('/bulk-delete', auth.verifyToken, notificationController.deleteSelectedNotification);
+
 // Delete all notifications for a user
 router.delete('/all/:userId', auth.verifyToken, notificationController.deleteAllNotifications);
 
