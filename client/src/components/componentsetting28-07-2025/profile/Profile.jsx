@@ -180,7 +180,7 @@ const UserProfile = () => {
                     )}
                   </div>
 
-                  <input
+                  <input 
                     type="file"
                     name="profileImage"
                     accept="image/*"

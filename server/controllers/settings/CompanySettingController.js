@@ -13,7 +13,21 @@ const sendCompanyProfile = async (req, res) => {
       companystate,
       companycity,
       companypostalcode,
+      gstin,
+      cin,
+      companydescription
     } = req.body;
+
+     const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+    const cinRegex = /^[A-Z]{1}[0-9]{5}[A-Z]{2}[0-9]{4}[A-Z]{3}[0-9]{6}$/;
+
+       if (!gstinRegex.test(gstin)) {
+      return res.status(400).json({ success: false, message: "Invalid GSTIN format" });
+    }
+    if (!cinRegex.test(cin)) {
+      return res.status(400).json({ success: false, message: "Invalid CIN format" });
+    }
+
 
     const existingProfile = await companysettingModal.findOne();
     
@@ -29,6 +43,9 @@ const sendCompanyProfile = async (req, res) => {
       companystate,
       companycity,
       companypostalcode,
+      gstin,
+      cin,
+      companydescription,
       companyIcon: req.files?.companyIcon?.[0]?.path || existingProfile?.companyIcon || "",
       companyFavicon: req.files?.companyFavicon?.[0]?.path || existingProfile?.companyFavicon || "",
       companyLogo: req.files?.companyLogo?.[0]?.path || existingProfile?.companyLogo || "",
