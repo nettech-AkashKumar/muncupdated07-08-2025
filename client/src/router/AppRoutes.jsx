@@ -108,6 +108,8 @@ import CreditDebitNotes from "../pages/finance&accounts/credit&debit_note/Credit
 import Credit from "../pages/finance&accounts/credit&debit_note/Credit.jsx";
 import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
 import Dashboards from "../pages/dashboard/Dashboards.jsx";
+import AddWarehouse from "../components/features/warehouse/AddWarehouse.jsx";
+import WarehouseDetails from "../components/features/warehouse/WarehouseDetails.jsx";
 
 const AppRoutes = () => {
   return (
@@ -197,6 +199,8 @@ const AppRoutes = () => {
         <Route path="/stock-transfer" element={<StockTransfer />} />
         <Route path="/hsn" element={<Hsn />} />
         <Route path="/warehouse" element={<Warehouse />} />
+        <Route path="/addwarehouse" element={<AddWarehouse />} />
+        <Route path="/WarehouseDetails" element={<WarehouseDetails/>} />
 
         {/* customer */}
         <Route path="/customers" element={<AllCustomer />} />
