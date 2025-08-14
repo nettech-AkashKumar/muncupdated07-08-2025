@@ -116,8 +116,8 @@ import BASE_URL from "../../../../pages/config/config";
 const EmailVerification = ({ isOpen, onClose }) => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
-const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
 
   const handleSendOtp = async () => {
@@ -136,8 +136,8 @@ const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
       setOtp(updatedOtp);
 
       if (value && index < 5) {
-  otpRefs[index + 1].current.focus();
-}
+        otpRefs[index + 1].current.focus();
+      }
 
     }
   };
@@ -174,7 +174,8 @@ const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
           <>
             <h3 className="eerrerhead">Email Verification</h3>
             <label className="enterlabeler">Enter Email</label>
-            <input className="emmmmiliunput"
+            <input 
+              className="pphnnemail-otp-input"
               type="email"
               placeholder="you@example.com"
               value={email}
@@ -192,9 +193,10 @@ const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
         {step === 2 && (
           <>
-            <h3>Email Verification</h3>
+            <h3 className="eerrerhead">Email Verification</h3>
             <label>Enter Email</label>
-            <input type="email" value={email} disabled />
+            <input className="pphnnemail-otp-input"
+              type="email" value={email} disabled />
 
             <p className="pphnnemail-info">
               Enter Verification Code sent to your Email
@@ -202,6 +204,7 @@ const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
             <div className="pphnnemail-otp-boxes">
               {otp.map((digit, idx) => (
                 <input
+                  className="pphnnemail-otp-input"
                   key={idx}
                   type="text"
                   maxLength="1"
@@ -213,7 +216,7 @@ const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
             </div>
             <p className="pphnnemail-resend">
               Have not received the OTP?{" "}
-              <span onClick={handleResend}>Send again</span>
+              <span className="seededagain" onClick={handleResend}>Send again</span>
             </p>
             <button
               className="pphnnemail-btn black"

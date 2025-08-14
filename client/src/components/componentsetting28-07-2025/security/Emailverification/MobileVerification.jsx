@@ -146,12 +146,12 @@ const MobileVerification = ({ isOpen, onClose }) => {
         mobile,
         otp: otp.join(""),
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-    }
-    );
+      );
       localStorage.setItem("currentMobile", mobile);
       setStep(3);
       setTimeout(() => {
@@ -170,18 +170,18 @@ const MobileVerification = ({ isOpen, onClose }) => {
         {/* Step 1 */}
         {step === 1 && (
           <>
-            <h3>Phone Verification</h3>
+            <h3 className="eerrerhead">Phone Verification</h3>
             <div>
-             <label style={{width:'100%'}}>Enter Phone Number</label>
-            <input style={{width:'100%', marginBottom:'20px'}}
-              type="tel"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              placeholder="+91 98765 54123"
-              required
-              pattern="[0-9]{10}"
-              title="Please enter a 10-digit mobile number"
-            />
+              <label style={{ width: '100%' }}>Enter Phone Number</label>
+              <input className="pphnnemail-otp-input" style={{ width: '100%', marginBottom: '20px', marginTop: '10px' }}
+                type="tel"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                placeholder="+91 98765 54123"
+                required
+                pattern="[0-9]{10}"
+                title="Please enter a 10-digit mobile number"
+              />
             </div>
             <button
               type="button"
@@ -197,15 +197,16 @@ const MobileVerification = ({ isOpen, onClose }) => {
         {/* Step 2 */}
         {step === 2 && (
           <>
-            <h3>Phone Verification</h3>
+            <h3 className="eerrerhead">Phone Verification</h3>
             <label>Enter Phone Number</label>
-            <input type="tel" value={mobile} readOnly />
+            <input className="pphnnemail-otp-input" type="tel" value={mobile} readOnly />
             <div className="pphnnemail-info">
               Enter Verification Code sent to your Phone Number
             </div>
             <div className="pphnnemail-otp-boxes">
               {otp.map((digit, index) => (
                 <input
+                  className="pphnnemail-otp-input"
                   key={index}
                   ref={otpRefs[index]}
                   type="text"

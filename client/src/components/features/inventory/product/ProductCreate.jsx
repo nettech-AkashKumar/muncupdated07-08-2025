@@ -357,8 +357,8 @@ const ProductForm = () => {
 
   const generateBarcode = () => {
     const prefix = "BR"; // Optional
-    const randomNumber = Math.floor(100000000 + Math.random() * 900000000);
-    return `${prefix}${randomNumber}`;
+    const randomNumber = Math.floor(100000000000 + Math.random() * 900000000000);
+    return `${randomNumber}`;
   };
   const [categoryName, setCategoryName] = useState("");
   const [categorySlug, setCategorySlug] = useState("");
