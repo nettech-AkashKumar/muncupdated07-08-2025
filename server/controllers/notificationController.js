@@ -1,5 +1,6 @@
 const Notification = require('../models/notificationModel');
 const User = require('../models/usersModels');
+const mongoose = require('mongoose');
 
 // Create a new notification
 exports.createNotification = async (recipientId, senderId, message, type = 'message', conversationId = null) => {
@@ -135,26 +136,48 @@ exports.deleteSelectedNotification = async (req, res) => {
   try {
     const { notificationIds, userId } = req.body;
 
+    console.log('Bulk delete request:', { notificationIds, userId });
+
     // Validate inputs
     if (!userId) {
+      console.log('Missing userId in request body');
       return res.status(400).json({ message: 'User ID is required' });
     }
 
     if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
+      console.log('Invalid notificationIds:', notificationIds);
       return res.status(400).json({ message: 'No valid notification IDs provided' });
     }
 
     // Validate ObjectIDs
     const validIds = notificationIds.filter(id => {
       try {
-        return ObjectId.isValid(id);
+        return mongoose.Types.ObjectId.isValid(id);
       } catch {
         return false;
       }
     });
 
+    console.log('Valid IDs count:', validIds.length, 'out of', notificationIds.length);
+
     if (validIds.length === 0) {
       return res.status(400).json({ message: 'No valid ObjectIDs provided' });
+    }
+
+    // Check if notifications exist and belong to the user before deleting
+    const existingNotifications = await Notification.find({
+      _id: { $in: validIds },
+      recipient: userId
+    });
+
+    console.log('Found notifications to delete:', existingNotifications.length);
+
+    if (existingNotifications.length === 0) {
+      return res.status(404).json({ 
+        message: 'No notifications found to delete for this user',
+        providedIds: notificationIds,
+        validIds
+      });
     }
 
     // Ensure all notificationIds belong to the user
@@ -162,6 +185,8 @@ exports.deleteSelectedNotification = async (req, res) => {
       _id: { $in: validIds },
       recipient: userId
     });
+
+    console.log('Delete result:', result);
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ 

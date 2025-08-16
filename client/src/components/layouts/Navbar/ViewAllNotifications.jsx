@@ -194,28 +194,55 @@ const ViewAllNotifications = () => {
       return;
     }
 
+    // Validate that all selected notifications exist in the current notifications list
+    const validSelectedIds = selectedNotifications.filter(id => 
+      notifications.some(notification => notification._id === id)
+    );
+
+    if (validSelectedIds.length !== selectedNotifications.length) {
+      console.warn('Some selected notifications are no longer valid:', {
+        selected: selectedNotifications,
+        valid: validSelectedIds
+      });
+    }
+
+    if (validSelectedIds.length === 0) {
+      toast.error('No valid notifications selected');
+      setDeleteConfirm(null);
+      return;
+    }
+
     try {
-      console.log('Deleting selected notifications:', selectedNotifications);
+      console.log('Deleting selected notifications:', validSelectedIds);
+      console.log('User ID:', userId);
       const token = getToken();
+      
+      const requestData = { userId, notificationIds: validSelectedIds };
+      console.log('Request data:', requestData);
+      
       const response = await axios.delete(
         `${BASE_URL}/api/notifications/bulk-delete`,
         {
           headers: {
             Authorization: `Bearer ${token}`
           },
-          data: { userId, notificationIds: selectedNotifications }
+          data: requestData
         }
       );
 
+      console.log('Response:', response.data);
+
       setNotifications(prev =>
-        prev.filter(notification => !selectedNotifications.includes(notification._id))
+        prev.filter(notification => !validSelectedIds.includes(notification._id))
       );
       setSelectedNotifications([]);
       setDeleteConfirm(null);
       toast.success(response.data.message || 'Selected notifications deleted successfully');
     } catch (error) {
-      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete selected notifications';
       console.error('Error deleting selected notifications:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to delete selected notifications';
       toast.error(errorMessage);
       setDeleteConfirm(null);
     }
@@ -289,25 +316,27 @@ const ViewAllNotifications = () => {
                 Mark All as Read
               </button>
             )}
-            <button
-              onClick={() => setDeleteConfirm({ type: 'all' })}
-              style={{
-                background: 'white',
-                color: '#dc3545',
-                border: 'none',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
-              <FaTrash />
-              Delete All
-            </button>
+            {selectedNotifications.length === 0 && (
+              <button
+                onClick={() => setDeleteConfirm({ type: 'all' })}
+                style={{
+                  background: 'white',
+                  color: '#dc3545',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <FaTrash />
+                Delete All
+              </button>
+            )}
             {selectedNotifications.length > 0 && (
               <button
                 onClick={() => setDeleteConfirm({ type: 'selected' })}
@@ -326,7 +355,7 @@ const ViewAllNotifications = () => {
                 }}
               >
                 <FaTrash />
-                Delete Selected
+                Delete Selected ({selectedNotifications.length})
               </button>
             )}
           </div>
