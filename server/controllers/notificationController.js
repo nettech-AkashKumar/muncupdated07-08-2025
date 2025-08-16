@@ -135,23 +135,53 @@ exports.deleteSelectedNotification = async (req, res) => {
   try {
     const { notificationIds, userId } = req.body;
 
-    if (!notificationIds || notificationIds.length === 0) {
-      return res.status(400).json({ message: 'No notification IDs provided' });
+    // Validate inputs
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
     }
 
+    if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
+      return res.status(400).json({ message: 'No valid notification IDs provided' });
+    }
+
+    // Validate ObjectIDs
+    const validIds = notificationIds.filter(id => {
+      try {
+        return ObjectId.isValid(id);
+      } catch {
+        return false;
+      }
+    });
+
+    if (validIds.length === 0) {
+      return res.status(400).json({ message: 'No valid ObjectIDs provided' });
+    }
+
+    // Ensure all notificationIds belong to the user
     const result = await Notification.deleteMany({
-      _id: { $in: notificationIds },
+      _id: { $in: validIds },
       recipient: userId
     });
 
     if (result.deletedCount === 0) {
-      return res.status(404).json({ message: 'No notifications found to delete' });
+      return res.status(404).json({ 
+        message: 'No notifications found to delete for this user',
+        providedIds: notificationIds,
+        validIds
+      });
     }
 
-    res.status(200).json({ message: `${result.deletedCount} notifications deleted successfully` });
+    res.status(200).json({ 
+      message: `${result.deletedCount} notification${result.deletedCount > 1 ? 's' : ''} deleted successfully`,
+      deletedCount: result.deletedCount
+    });
   } catch (error) {
-    console.error('Error deleting notifications:', error);
-    res.status(500).json({ message: 'Failed to delete notifications', error: error.message });
+    console.error('Error deleting selected notifications:', error);
+    res.status(500).json({ 
+      message: 'Failed to delete notifications', 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
