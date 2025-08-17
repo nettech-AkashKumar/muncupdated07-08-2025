@@ -222,7 +222,7 @@ const Activities = ({ onNotificationsRead }) => {
             markAllAsRead();
             }}>Clear All</a>
           </div>
-                  <div className="noti-content" style={{padding:'5px 10px'}}>
+                  <div className="" style={{padding:'5px 10px',lineHeight:'normal',height:'auto',width:'350px',position:'relative',overflowY:'auto',maxHeight:'300px'}}>
                     <ul className="notification-list">
                       {loading ? (
                         <li className="notification-message">
@@ -244,7 +244,7 @@ const Activities = ({ onNotificationsRead }) => {
                         <li className="notification-message">
                           <div className="media d-flex">
                             <div className="flex-grow-1">
-                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center' }}> No New Notifications !!</p>
+                              <p className="noti-details" style={{ marginTop: '10px', textAlign:'center',}}> No New Notifications !!</p>
                             </div>
                           </div>
                         </li>

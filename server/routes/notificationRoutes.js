@@ -15,14 +15,14 @@ router.put('/read/:notificationId', auth.verifyToken, notificationController.mar
 // Mark all notifications as read for a user
 router.put('/read-all/:userId', auth.verifyToken, notificationController.markAllAsRead);
 
-// Delete a notification
-router.delete('/:notificationId', auth.verifyToken, notificationController.deleteNotification);
-
-//Delete selected notifications
+// Delete selected notifications (must come before /:notificationId)
 router.delete('/bulk-delete', auth.verifyToken, notificationController.deleteSelectedNotification);
 
-// Delete all notifications for a user
+// Delete all notifications for a user (must come before /:notificationId)
 router.delete('/all/:userId', auth.verifyToken, notificationController.deleteAllNotifications);
+
+// Delete a notification
+router.delete('/:notificationId', auth.verifyToken, notificationController.deleteNotification);
 
 // Get notifications with pagination
 router.get('/paginated/:userId', auth.verifyToken, notificationController.getNotificationsWithPagination);
