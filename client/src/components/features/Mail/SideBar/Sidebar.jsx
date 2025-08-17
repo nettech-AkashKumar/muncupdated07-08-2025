@@ -179,8 +179,6 @@ const Sidebar = () => {
               {emails.filter((email) => email.spam && !email.deleted).length}
             </span>
           </NavLink>
-          {showMore && (
-            <>
               <NavLink
                 className={({ isActive }) =>
                   isActive ? "item active" : "item"
@@ -211,11 +209,13 @@ const Sidebar = () => {
                   All Emails{" "}
                 </span>
                 <span>{emails.length}</span>
-              </NavLink>
+          </NavLink>
+           {/* {showMore && (
+            <>
             </>
           )}
 
-          {/* <div className="item" onClick={() => setshowMore((prev) => !prev)}>
+          <div className="item" onClick={() => setshowMore((prev) => !prev)}>
             {showMore ? "Show Less" : "Show More"}{" "}
             {!showMore && <FaAngleDown />} {showMore && <FaAngleUp />}{" "}
           </div> */}
@@ -248,13 +248,13 @@ const Sidebar = () => {
           </div>
         )} */}
         {/* <div className="section border-bootom"> */}
-          {/* <div className="section-title">
+        {/* <div className="section-title">
             Labels{" "}
             <div className="plus" onClick={() => setShowLabelModal(true)}>
               <FaSquarePlus />
             </div>
           </div> */}
-          {/* {(showAllLabels ? customLabels : customLabels.slice(0, 5)).map(
+        {/* {(showAllLabels ? customLabels : customLabels.slice(0, 5)).map(
             (label, index) => (
               <NavLink
                 key={index}
@@ -271,7 +271,7 @@ const Sidebar = () => {
               </NavLink>
             )
           )} */}
-          {/* <NavLink
+        {/* <NavLink
           className={({ isActive }) => (isActive ? "item active" : "item")}
           style={{ textDecoration: "none", color: "black" }}
           to="/teamevents"
@@ -312,7 +312,7 @@ const Sidebar = () => {
           </div>
         </NavLink> */}
 
-          {/* {customLabels.length > 5 && (
+        {/* {customLabels.length > 5 && (
             <div
               className="item"
               onClick={() => setShowAllLabels((prev) => !prev)}
