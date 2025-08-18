@@ -341,7 +341,7 @@ function AddWarehouse() {
                 display: "block",
               }}
             >
-              Warehouse Owner
+              Warehouse Contact Person(Manager)
             </label>
             <input
               type="text"
@@ -516,6 +516,7 @@ function AddWarehouse() {
       {/* Layout Section */}
       <div
         style={{
+          overflow:'auto',
           margin: "30px auto",
           width: "100%",
           maxWidth: "900px",

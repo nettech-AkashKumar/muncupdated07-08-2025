@@ -8,7 +8,7 @@ import { FiSun, FiMoon } from "react-icons/fi"; // Icons
 import day_night_icon from "../../assets/img/day-night.png"
 import line from "../../assets/img/Rectangle.png"
 import CreateModel from "./CreateModel";
-
+import './DashboardHeader.css'
 
 
 const ToggleWrapper = styled.div`
@@ -45,8 +45,9 @@ const DashboardHeader = () => {
      const [isDay, setIsDay] = useState(true);
      const [createModel, setCreateModel] =useState (false)
   return (
-    <div className="d-flex justify-content-between align-items-center" >
-      <div
+    <div className="dashboard-container-main d-flex justify-content-between align-items-center flex-wrap" >
+      <div 
+       className="dashboard-select-user-box"
         style={{
           display: "flex",
           alignItems: "center",
@@ -76,6 +77,7 @@ const DashboardHeader = () => {
         </select>
       </div>
       <div
+      className="dashboard-search-box"
         style={{
           border: "1px solid #C2C9D1",
           borderRadius: "8px",
@@ -96,7 +98,7 @@ const DashboardHeader = () => {
           style={{ border: "none", outline: "none", width:"100%" }}
         />
       </div>
-        <div className="d-flex align-items-center gap-4" style={{fontFamily:'"Poppins", sans-serif'}}>
+        <div className="dashboard-btn-manage d-flex align-items-center gap-4" style={{fontFamily:'"Poppins", sans-serif'}}>
             <img src={settings_dash_icon} alt="settings_dash_icon" />
              <img src={bell_icon_dash} alt="{bell_icon_dash" />
 

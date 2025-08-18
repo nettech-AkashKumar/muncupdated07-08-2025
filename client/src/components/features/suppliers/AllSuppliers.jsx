@@ -33,6 +33,7 @@ function AllSuppliers() {
     try {
       const res = await fetch(`${BASE_URL}/api/suppliers`);
       const data = await res.json();
+      
       setSuppliers(data);
     } catch (err) {
       // handle error
@@ -134,6 +135,7 @@ function AllSuppliers() {
               </tr>
             </thead>
             <tbody>
+              {console.log('supplier lenth', suppliers.length)}
               {paginatedData.map((supplier) => (
                 <tr key={supplier._id}>
                   <td>
