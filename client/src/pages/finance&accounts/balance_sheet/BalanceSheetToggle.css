@@ -47,6 +47,14 @@
   justify-content: space-between;
   padding: 5px 0px
 }
+.li-balancesheet span input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+    
+}
+.li-balancesheet span input::placeholder{
+  color: black;
+  font-weight: 500;
+}
 
 .total-row-balancesheet {
   background-color: #dff0ff;
