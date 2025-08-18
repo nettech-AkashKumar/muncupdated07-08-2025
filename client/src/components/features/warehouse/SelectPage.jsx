@@ -17,7 +17,7 @@ const dummyData = [
 function SelectPage() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState('');
-  const [zoneName, setZoneName] = useState("Zone 04"); // Initialized to match zone header
+  const [zoneName, setZoneName] = useState("Zone 01"); // Initialized to match zone header
 
   const handleGridClick = (e, item) => {
     const style = window.getComputedStyle(e.target);
@@ -37,6 +37,7 @@ function SelectPage() {
   return (
     <div>
       <div style={{ padding: '20px' }}>
+
         {/* Header */}
         <div
           style={{
