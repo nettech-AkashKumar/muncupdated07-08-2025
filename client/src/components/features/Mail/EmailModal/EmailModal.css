@@ -1,4 +1,12 @@
 /* src/styles/modal.css */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+.nwemsfg {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  line-height: 14px;
+  font-size: 16px;
+  color: #262626;
+}
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -19,9 +27,15 @@
   font-family: Arial, sans-serif;
   margin: 20px;
 }
-
+.modal-header {
+  background-color: #e3f3ff;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 24px 8px 24px;
+  gap: 16px;
+}
 .modal-header1 {
-  background-color: #007AFF;
+  background-color: #007aff;
   color: white;
   padding: 12px 16px;
   display: flex;
@@ -63,12 +77,10 @@
   border: 1px solid rgb(151, 150, 150);
 }
 
-
 .cc-bcc {
   color: black;
   cursor: pointer;
 }
-
 
 .email-body {
   width: 100%;
@@ -89,7 +101,6 @@
   /* width: 100%; */
   outline: none;
   border: 1px solid rgb(151, 150, 150);
-
 }
 
 .email-body {
@@ -129,14 +140,13 @@
 }
 
 .send-btn {
-  background-color: #007AFF;
+  background-color: #0055d9;
   color: white;
   border: none;
-  padding: 8px 16px;
+  padding: 8px 12px 8px 12px;
   border-radius: 6px;
   cursor: pointer;
 }
-
 
 .email-modal.expanded-modal {
   width: 90vw;

@@ -70,6 +70,7 @@ const Users = () => {
       });
 
       setUsers(res.data);
+      console.log('usersss', res.data)
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch users");

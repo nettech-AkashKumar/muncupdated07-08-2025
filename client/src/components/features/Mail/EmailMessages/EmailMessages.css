@@ -1,245 +1,249 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 
 .mainemailmessage {
-    background-color: white;
-    padding: 10px 20px;
-    flex-grow: 1;
+  background-color: #ffffff;
+  height: 770px;
+  width: 250px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e6e6e6;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border-radius: 8px;
+  flex-grow: 1;
 }
 
 .header22 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .inbox {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .twothreemail {
-    font-size: 18px;
-    color: #676969;
-    display: flex;
-    align-items: center;
+  font-size: 18px;
+  color: #676969;
+  display: flex;
+  align-items: center;
 }
 
 .filter {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  /* align-items: center;
+    justify-content: center; */
+  gap: 20px;
 }
 
 .searchinputdiv {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 200px;
-    border: 1px solid #eff0f3;
-    cursor: pointer;
-    padding: 5px 5px;
-    border-radius: 5px;
-    color: #cbcbcc;
+  display: flex;
+  /* align-items: center;
+  justify-content: center; */
+  gap: 10px;
+  width: 100%;
+  border: 1px solid #eff0f3;
+  cursor: pointer;
+  padding: 5px 5px;
+  border-radius: 5px;
+  color: #676767;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .searchtext {
-    outline: none;
-    border: none;
+  outline: none;
+  border: none;
 }
 
 .searchtext::placeholder {
-    color: #cbcbcc;
+  color: #676767;
 }
 
 .settingrefreshdiv {
-    display: flex;
-    gap: 20px;
-    color: #676969;
-    cursor: pointer;
+  display: flex;
+  gap: 20px;
+  color: #676969;
+  cursor: pointer;
 }
 
 /* justinmaindiv */
 .justinmaindiv {
-    padding: 10px 20px;
-    /* background-color: #eff0f3; */
-    border-bottom: 1px solid #e8e9eb;
+  padding: 10px 20px;
+  /* background-color: #eff0f3; */
+  border-bottom: 1px solid #e8e9eb;
 }
 
 .justinleftrightmaindiv {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: "Poppins", sans-serif;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Roboto", sans-serif;
+  margin-top: 10px;
 }
 
 .justinmaindivleftdiv {
-    display: flex;
-    gap: 15px;
+  display: flex;
+  gap: 15px;
 }
 
 .justinmaindivrightdiv {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #676969;
-    font-family: "Poppins", sans-serif;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  font-size: 12px;
+  font-weight: 400;
+  color: #262626;
+  font-family: "Roboto", sans-serif;
+  margin-top: -40px;
 }
 
 .selection-toolbar {
-    padding: 8px 12px;
-    background: #C2DBFF;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    font-weight: bold;
+  padding: 8px 12px;
+  background: #c2dbff;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
 }
 
 .selected-email {
-    background-color: #C2DBFF;
-    border-left: 3px solid #4285f4;
-    transition: background-color 0.2s ease-in-out;
+  background-color: #c2dbff;
+  border-left: 3px solid #4285f4;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .selected-email .star-icon {
-    filter: drop-shadow(0 0 2px gold);
-    opacity: 1 !important;
+  filter: drop-shadow(0 0 2px gold);
+  opacity: 1 !important;
 }
 
 .dt-icon {
-    border: none;
-    font-size: 18px;
-    background-color: white;
-    cursor: pointer;
+  border: none;
+  font-size: 18px;
+  background-color: white;
+  cursor: pointer;
 }
 
 .selectdt {
-    margin-left: 20px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-
+  margin-left: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .three-dot-icon {
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .three-dot-icon:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .custom-popup-menu {
-    position: absolute;
-    top: 24px;
-    /* Just below the icon */
-    right: 0;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-    width: 140px;
-    z-index: 10;
-    overflow: hidden;
+  position: absolute;
+  top: 24px;
+  /* Just below the icon */
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+  width: 140px;
+  z-index: 10;
+  overflow: hidden;
 }
 
 .custom-popup-menu div {
-    padding: 10px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .custom-popup-menu div:hover {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
-
-
 
 /* folder gallery */
 .foldergallerydiv {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
 }
 
 .selection-toolbar {
-    padding: 8px 12px;
-    background: #f1f3f4;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    font-weight: bold;
+  padding: 8px 12px;
+  background: #f1f3f4;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
 }
 
 .selected-email {
-    background-color: #c2dbff;
-    border-left: 3px solid #4285f4;
-    transition: background-color 0.2s ease-in-out;
+  background-color: #c2dbff;
+  border-left: 3px solid #4285f4;
+  transition: background-color 0.2s ease-in-out;
 }
 
 .selected-email .star-icon {
-    filter: drop-shadow(0 0 2px gold);
-    opacity: 1 !important;
+  filter: drop-shadow(0 0 2px gold);
+  opacity: 1 !important;
 }
 
 .dt-icon {
-    border: none;
-    font-size: 18px;
-    background-color: white;
-    cursor: pointer;
+  border: none;
+  font-size: 18px;
+  background-color: white;
+  cursor: pointer;
 }
 
 .selectdt {
-    margin-left: 20px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-
+  margin-left: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .three-dot-icon {
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
 .three-dot-icon:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .custom-popup-menu {
-    position: absolute;
-    top: 24px;
-    /* Just below the icon */
-    right: 0;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
-    width: 140px;
-    z-index: 10;
-    overflow: hidden;
+  position: absolute;
+  top: 24px;
+  /* Just below the icon */
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
+  width: 140px;
+  z-index: 10;
+  overflow: hidden;
 }
 
 .custom-popup-menu div {
-    padding: 10px 14px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .custom-popup-menu div:hover {
-    background-color: #f5f5f5;
-    display: flex;
-    justify-content: space-between;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: space-between;
 }
-
-
-
 
 /* for custom checkbox */
 .custom-checkbox {
@@ -248,7 +252,7 @@
   padding-left: 24px;
   cursor: pointer;
   user-select: none;
-  margin-top: -20px;
+  margin-top: 4px;
 }
 
 .custom-checkbox .checkmarkinput {
@@ -298,10 +302,9 @@
   transform: rotate(45deg);
 }
 
-
 .justinmaindiv .delete-icon {
   display: none;
-    color: gray;
+  color: gray;
   font-size: 20px;
   cursor: pointer;
 }
@@ -323,9 +326,9 @@
 }
 
 .justinmaindivmap {
-    overflow-y: auto;
-    height: calc(100vh - 100px);
+  overflow-y: auto;
+  height: calc(100vh - 100px);
 }
-.justinmaindivmap::-webkit-scrollbar{
-    display: none;
+.justinmaindivmap::-webkit-scrollbar {
+  display: none;
 }

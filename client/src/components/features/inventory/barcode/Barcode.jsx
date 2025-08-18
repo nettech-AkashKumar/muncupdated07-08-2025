@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react';
 import JsBarcode from "jsbarcode";
 import { IoIosSearch } from "react-icons/io";
 import { AiFillProduct } from "react-icons/ai";
+import { FaFilePdf } from "react-icons/fa6";
 import axios from 'axios';
 import BASE_URL from '../../../../pages/config/config';
 import { toast } from 'react-toastify';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 function Barcode() {
   const [product, setProduct] = useState({
@@ -31,6 +34,7 @@ function Barcode() {
 
   const formRef = useRef(null);
   const searchRef = useRef(null);
+  const printRef = useRef(null);
 
   // Fetch products based on search query
   const searchProducts = async (query) => {
@@ -45,7 +49,6 @@ function Barcode() {
       const response = await axios.get(`${BASE_URL}/api/products/search?name=${encodeURIComponent(query)}`);
       setProducts(response.data || []);
       setShowDropdown(true);
-      // console.log('Products fetched:', response.data);
     } catch (error) {
       console.error('Error searching products:', error);
       toast.error('Failed to search products');
@@ -146,7 +149,7 @@ function Barcode() {
     }
 
     const barcodeNumber = selectedProduct.itemBarcode;
-    const barcodeValue = selectedProduct.itemBarcode; // 12-digit
+    const barcodeValue = selectedProduct.itemBarcode;
 
     setProduct((prev) => ({
       ...prev,
@@ -171,6 +174,162 @@ function Barcode() {
       }
     }, 100);
   };
+
+  const handlePrint = () => {
+    if (!selectedProduct) {
+      toast.error('Please select a product first');
+      return;
+    }
+
+    const printContent = printRef.current.innerHTML;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Barcodes</title>
+          <style>
+            @media print {
+              body {
+                margin: 0;
+                padding: 10mm;
+                font-family: Arial, sans-serif;
+              }
+              .barcode-row {
+                display: flex;
+                flex-wrap: wrap;
+                margin-bottom: 10mm;
+                page-break-inside: avoid;
+                gap: 10px;
+              }
+              .barcode-col {
+                flex: 0 0 calc(52% - 5mm);
+                max-width: calc(52% - 5mm);
+                box-sizing: border-box;
+                padding: 5mm;
+              }
+              .barcode-item {
+                border: 2px solid #E6E6E6;
+                border-radius: 8px;
+                padding: 16px 24px;
+                width: 320px;
+                height: 280px;
+                box-sizing: border-box;
+                page-break-inside: avoid;
+                text-align: left;
+                font-size: 14px;
+              }
+              .barcode-item svg {
+                width: 100%;
+                height: 60px;
+                margin-top: 10px;
+              }
+              .barcode-item span {
+                display: block;
+                margin-bottom: 5px;
+              }
+              @page {
+                size: A4;
+                margin: 10mm;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="barcode-container">
+            ${Array.from({ length: Math.ceil((numberOfBarcodes || 1) / 2) })
+              .map((_, rowIndex) => {
+                const startIndex = rowIndex * 2;
+                return `
+                  <div class="barcode-row">
+                    ${Array.from({ length: Math.min(2, (numberOfBarcodes || 1) - startIndex) })
+                      .map((_, colIndex) => {
+                        const index = startIndex + colIndex;
+                        const barcodeId = `barcode-print-${index}`;
+                        return `
+                          <div class="barcode-col">
+                            <div class="barcode-item">
+                              ${product.showProductName && product.productName ? `<span style="font-weight: 600; color: black;">${product.productName}</span>` : ''}
+                              ${product.showSku && product.sku ? `<span style="color: black;">SKU: ${product.sku}</span>` : ''}
+                              ${product.showPrice && product.price ? `<span style="font-weight: 500; color: black;">MRP: ₹${product.price}</span>` : ''}
+                              <div style="display: flex; justify-content: space-between;">
+                                ${product.showExpiryDate && product.expiryDate ? `<span style="color: black;">Expiry: ${new Date(product.expiryDate).toLocaleDateString()}</span>` : ''}
+                                ${product.showQuantity && product.quantity ? `<span style="color: black;">QTY: ${product.quantity}</span>` : ''}
+                              </div>
+                              <div style="text-align: center;">
+                                <svg id="${barcodeId}"></svg>
+                              </div>
+                            </div>
+                          </div>
+                        `;
+                      })
+                      .join('')}
+                  </div>
+                `;
+              })
+              .join('')}
+          </div>
+          <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+          <script>
+            ${Array.from({ length: numberOfBarcodes || 1 })
+              .map((_, index) => {
+                const barcodeId = `barcode-print-${index}`;
+                return `
+                  JsBarcode("#${barcodeId}", "${product.barcode}", {
+                    format: "CODE39",
+                    lineColor: "#000",
+                    width: 1,
+                    height: 60,
+                    displayValue: true
+                  });
+                `;
+              })
+              .join('')}
+            window.onload = function() {
+              window.print();
+              window.onafterprint = function() {
+                window.close();
+              };
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+
+      const handleDownloadPDF = async () => {
+        if (!selectedProduct) {
+          toast.error('Please select a product first');
+          return;
+        }
+
+        const element = printRef.current;
+        const doc = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4',
+        });
+
+        try {
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const imgProps = doc.getImageProperties(imgData);
+          const pdfWidth = doc.internal.pageSize.getWidth();
+          const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+          doc.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          doc.save('barcodes.pdf');
+        } catch (error) {
+          console.error('Error generating PDF:', error);
+          toast.error('Failed to generate PDF: ' + error.message);
+        }
+      };
 
   const closeForm = () => {
     setIsFormOpen(false);
@@ -209,7 +368,7 @@ function Barcode() {
 
       <div style={{maxWidth:'750px',margin:'auto',padding:'16px 32px',fontFamily:'sans-serif'}}>
         
-        <div className="" style={{backgroundColor:'#fff',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'20px',marginBottom:'24px',boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",}}>
+        <div style={{backgroundColor:'#fff',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'20px',marginBottom:'24px',boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)"}}>
             <strong>Estimate Amount</strong>
             
             <div style={{marginTop:'16px'}}>
@@ -281,37 +440,6 @@ function Barcode() {
 
             {/* Selected Product Display */}
             {selectedProduct && (
-              // <div style={{marginTop:'16px',padding:'15px',backgroundColor:'#f8f9fa',borderRadius:'8px',border:'1px solid #e9ecef'}}>
-              //   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
-              //     <div style={{fontWeight:'600',color:'#495057'}}>Selected Product:</div>
-              //     <button
-              //       onClick={clearSearch}
-              //       style={{
-              //         background:'#dc3545',
-              //         color:'white',
-              //         border:'none',
-              //         padding:'4px 8px',
-              //         borderRadius:'4px',
-              //         fontSize:'12px',
-              //         cursor:'pointer'
-              //       }}
-              //     >
-              //       Clear
-              //     </button>
-              //   </div>
-              //   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',fontSize:'14px'}}>
-              //     <div><strong>Name:</strong> {selectedProduct.productName}</div>
-              //     <div><strong>SKU:</strong> {selectedProduct.sku}</div>
-              //     <div><strong>Price:</strong> ₹{selectedProduct.sellingPrice || selectedProduct.retailPrice || '0'}</div>
-              //     <div><strong>Quantity:</strong> {selectedProduct.quantity || '0'}</div>
-              //     <div><strong>Expiry:</strong> {selectedProduct.variants.Expiry[0]
-              //     ? new Date(selectedProduct.variants.Expiry[0]).toLocaleDateString()
-              //     : ""}</div>
-              //     {selectedProduct.itemBarcode && (
-              //       <div><strong>Barcode:</strong> {selectedProduct.itemBarcode}</div>
-              //     )}
-              //   </div>
-              // </div>
               <div style={{marginTop:'16px',}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'8px'}}>
                   <div style={{fontWeight:'600',color:'#495057'}}>Selected Product Details :</div>
@@ -432,7 +560,6 @@ function Barcode() {
                         <span>Expiry Date</span>
                     </div>
 
-                    {/* Quantity */}
                     <div style={{display:'flex',gap:'6px'}}>
                         <input type='checkbox' 
                         name="showQuantity"
@@ -440,66 +567,52 @@ function Barcode() {
                         onChange={handleChange} />
                         <span>Quantity</span>
                     </div>
-
                 </div>
             </div>
         </div>
 
         <div
-        style={{
-          display: "flex",
-          justifyContent: "end",
-          gap: "10px",
-          maxWidth: "645px",
-          margin: "auto",
-          marginTop: "16px",
-        }}
-      >
-        <button
           style={{
-            padding: "6px 12px",
-            borderRadius: "5px",
-            border: "1px solid #E6E6E6",
-            backgroundColor: "#FFFFFF",
-            color: "#333",
-            cursor: "pointer",
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "10px",
+            maxWidth: "645px",
+            margin: "auto",
+            marginTop: "16px",
           }}
         >
-          Cancel
-        </button>
-        <button 
-          onClick={() => {
-            setIsFormOpen(true);
-            generateBarcode();
-          }}
-          disabled={!selectedProduct}
-          style={{
-            padding: "6px 12px",
-            borderRadius: "5px",
-            border: "1px solid #E6E6E6",
-            backgroundColor: selectedProduct ? "#FFFFFF" : "#f5f5f5",
-            color: selectedProduct ? "#333" : "#999",
-            cursor: selectedProduct ? "pointer" : "not-allowed",
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          {selectedProduct ? "Preview" : "Select Product First"}
-        </button>
-        
-        <button
-          disabled={!selectedProduct}
-          style={{
-            padding: "6px 12px",
-            borderRadius: "5px",
-            backgroundColor: selectedProduct ? "black" : "#f5f5f5",
-            color: selectedProduct ? "white" : "#999",
-            cursor: selectedProduct ? "pointer" : "not-allowed",
-            boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          Print
-        </button>
+          <button
+            style={{
+              padding: "6px 12px",
+              borderRadius: "5px",
+              border: "1px solid #E6E6E6",
+              backgroundColor: "#FFFFFF",
+              color: "#333",
+              cursor: "pointer",
+              boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+            }}
+            onClick={closeForm}
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={() => {
+              setIsFormOpen(true);
+              generateBarcode();
+            }}
+            disabled={!selectedProduct}
+            style={{
+              padding: "6px 12px",
+              borderRadius: "5px",
+              border: "1px solid #E6E6E6",
+              backgroundColor: selectedProduct ? "#FFFFFF" : "#f5f5f5",
+              color: selectedProduct ? "#333" : "#999",
+              cursor: selectedProduct ? "pointer" : "not-allowed",
+              boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+            }}
+          >
+            Preview
+          </button>
         </div>
 
         {/* Show Barcode SVG */}
@@ -517,65 +630,70 @@ function Barcode() {
             zIndex: '10',
             overflowY: 'auto',
           }}>
-            <div ref={formRef} style={{width:'700px',height:'auto',margin:'auto',marginTop:'80px',marginBottom:'80px',backgroundColor:'white',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'10px 16px',display:'flex',overflowY:'auto'}}>
-              <div className='row'>
+            <div ref={formRef} style={{width:'760px',height:'auto',margin:'auto',marginTop:'80px',marginBottom:'80px',backgroundColor:'white',border:'1px solid #E1E1E1',borderRadius:'8px',padding:'10px 16px',overflowY:'auto'}}>
+              <div style={{position:'fixed',width:'710px',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E1E1E1',backgroundColor:'#fff',zIndex:'100',marginTop:'-10px',padding:'10px 16px'}}>
+                <FaFilePdf style={{fontSize:'25px', color:'red',cursor:'pointer'}} onClick={handleDownloadPDF} />
+
+                <button
+                  onClick={handlePrint}
+                  disabled={!selectedProduct}
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: "5px",
+                    backgroundColor: selectedProduct ? "red" : "#f5f5f5",
+                    color: selectedProduct ? "white" : "#999",
+                    cursor: selectedProduct ? "pointer" : "not-allowed",
+                    boxShadow: "0px 0px 5px rgba(0, 0, 0, 0.3)",
+                    border: "none",
+                  }}
+                >
+                  Print
+                </button>
+              </div>
+
+              <div ref={printRef} className='row' style={{marginTop:'60px',marginLeft:'1px'}}>
                 {Array.from({ length: numberOfBarcodes || 1 }).map((_, index) => (
                   <div key={index} className='col-6' style={{height:'300px',}}>
                     <div style={{ marginTop: "10px",border:'2px solid #E6E6E6',borderRadius:'8px',width:'320px',padding:'16px 24px',height:'280px',marginBottom:'10px' }}>
-                      
                       {product.showProductName && product.productName && (
-                          <>
-                            <span style={{fontWeight:'600',color:'black'}}>{product.productName}</span>
-                          </>
+                        <span style={{fontWeight:'600',color:'black'}}>{product.productName}</span>
                       )}
-                      
                       {product.showSku && product.sku && (
-                          <>
-                            <br/>
-                            <span style={{color:'black'}}>SKU: {product.sku}</span>
-                          </>
+                        <>
+                          <br/>
+                          <span style={{color:'black'}}>SKU: {product.sku}</span>
+                        </>
                       )}
-                      
                       {product.showPrice && product.price && (
-                          <>
-                            <br/><br/>
-                            <span style={{fontWeight:'500',color:'black'}}>MRP: ₹{product.price}</span>
-                          </>
+                        <>
+                          <br/><br/>
+                          <span style={{fontWeight:'500',color:'black'}}>MRP: ₹{product.price}</span>
+                        </>
                       )}
                       <br/>
                       <div style={{display:'flex',justifyContent:'space-between'}}>
-                          {product.showExpiryDate && (
-                          <>
-                          <span style={{color:'black'}}>
-                          Expiry: {new Date(product.expiryDate).toLocaleDateString() || ""}
-                          </span>
-                          </>
-                          )}
-                          {product.showQuantity && product.quantity && (
-                          <>
-                              <span style={{color:'black'}}>QTY: {product.quantity}</span>
-                          </>
-                          )}
+                        {product.showExpiryDate && product.expiryDate && (
+                          <span style={{color:'black'}}>Expiry: {new Date(product.expiryDate).toLocaleDateString()}</span>
+                        )}
+                        {product.showQuantity && product.quantity && (
+                          <span style={{color:'black'}}>QTY: {product.quantity}</span>
+                        )}
                       </div>
                       <div style={{marginTop:'10px',textAlign:'center'}}>
-                        {/* <span style={{fontWeight:'600',color:'black'}}>Barcode: {product.barcode}</span> */}
                         {product.barcode && (
                           <svg id={`barcode-svg-${index}`}></svg>
                         )}
                       </div>
-                      
+                    </div>
                   </div>
-                  </div>
-                  
                 ))}
               </div>
             </div>
           </div>
         )}
-          
       </div>
     </div>
-  )
+  );
 }
 
-export default Barcode
+export default Barcode;
