@@ -9,13 +9,14 @@ import { RxDotFilled } from "react-icons/rx";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
-import "../../styles/role.css"
+import "../../styles/role.css";
 import { BiSearch } from "react-icons/bi";
 import { IoIosArrowDown } from "react-icons/io";
-import IConnie from "../../assets/images/IConnie.png"
-import Erdit from "../../assets/images/erdit.png"
+import IConnie from "../../assets/images/IConnie.png";
+import Erdit from "../../assets/images/erdit.png";
 import { LiaEditSolid } from "react-icons/lia";
-
+import { MdNavigateNext } from "react-icons/md";
+import { GrFormPrevious } from "react-icons/gr";
 
 const Role = () => {
   const navigate = useNavigate();
@@ -33,11 +34,10 @@ const Role = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
-
   const [editRolePermissions, setEditRolePermissions] = useState({});
 
-  const modules = ['Category', 'Inventory', 'Sales']; // customize as needed
-  const permissionTypes = ['read', 'write', 'update', 'delete', 'all'];
+  const modules = ["Category", "Inventory", "Sales"]; // customize as needed
+  const permissionTypes = ["read", "write", "update", "delete", "all"];
 
   const loadRoleForEdit = async (roleId) => {
     try {
@@ -135,7 +135,6 @@ const Role = () => {
     setEditRoleStatus(role.status === "Active");
   };
 
-
   const handleDeleteRole = async (id) => {
     if (window.confirm("Are you sure you want to delete this role?")) {
       try {
@@ -150,7 +149,6 @@ const Role = () => {
       }
     }
   };
-
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(roles);
@@ -189,7 +187,6 @@ const Role = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
 
   // const [roles, setRoles] = useState([]);
 
@@ -245,35 +242,44 @@ const Role = () => {
               data-bs-toggle="modal"
               data-bs-target="#add-role"
             >
-              +
-              Add Role
+              + Add Role
             </a>
           </div>
         </div>
-        <hr style={{ height: '1px', color: '#bbbbbb' }} />
+        <hr style={{ height: "1px", color: "#bbbbbb" }} />
         <div className="card crdrd">
           <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
             <div className="search-set">
-              <div className="search-input" style={{ position: 'relative' }}>
-                <BiSearch style={{ position: 'absolute', top: '50%', left: '10px', transform: "translateY(-50%)" }} />
+              <div className="search-input" style={{ position: "relative" }}>
+                <BiSearch
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "10px",
+                    transform: "translateY(-50%)",
+                  }}
+                />
                 <input
                   type="text"
                   placeholder="Search"
                   className="search-inputsrch"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ paddingLeft: '35px' }}
+                  style={{ paddingLeft: "35px" }}
                 />
               </div>
             </div>
 
             <div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
               <div className="dropdown me-2 alio">
-                <a href="#"
+                <a
+                  href="#"
                   className="dropdown-toggle btn btn-light btn-md d-inline-flex align-items-center"
-                  data-bs-toggle="dropdown" role="button"
+                  data-bs-toggle="dropdown"
+                  role="button"
                 >
-                  All<IoIosArrowDown style={{ marginLeft: '5px' }} />
+                  All
+                  <IoIosArrowDown style={{ marginLeft: "5px" }} />
                 </a>
                 <ul className="dropdown-menu  dropdown-menu-end p-3">
                   <li>
@@ -308,7 +314,8 @@ const Role = () => {
                   className="dropdown-toggle btn btn-light btn-md d-inline-flex align-items-center"
                   data-bs-toggle="dropdown"
                 >
-                  Latest <img src={IConnie} alt="" style={{ marginLeft: '5px' }} />
+                  Latest{" "}
+                  <img src={IConnie} alt="" style={{ marginLeft: "5px" }} />
                 </a>
                 <ul className="dropdown-menu  dropdown-menu-end p-3">
                   <li>
@@ -342,63 +349,166 @@ const Role = () => {
           <div className="card-body p-0">
             <div className="table-responsive">
               <table className="table datatable tblerole">
-                <thead className="thead-light tblerolethead" style={{ backgroundColor: '#F1F1F1' }}>
-                  <tr style={{ textAlign: 'center' }}>
+                <thead
+                  className="thead-light tblerolethead"
+                  style={{ backgroundColor: "#F1F1F1" }}
+                >
+                  <tr style={{ textAlign: "center" }}>
                     <th className="no-sort">
                       <div className="form-check form-check-md">
-                        <input style={{ border: "1px solid #676767" }}
+                        <input
+                          style={{ border: "1px solid #676767" }}
                           className="form-check-input"
                           type="checkbox"
                           id="select-all"
                         />
                       </div>
                     </th>
-                    <th style={{ color: '#676767', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>Role</th>
-                    <th style={{ color: '#676767', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>Created Date</th>
-                    <th style={{ color: '#676767', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>Status</th>
-                    <th style={{ color: '#676767', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>Action</th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Role
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Created Date
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Action
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="tbleroletbody">
                   {paginatedRoles.length > 0 ? (
                     paginatedRoles.map((role) => (
-                      <tr key={role._id} style={{ textAlign: 'center' }}>
-                        <td style={{ color: '#262626', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>
+                      <tr key={role._id} style={{ textAlign: "center" }}>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <div className="form-check form-check-md">
-                            <input style={{ border: '1px solid #676767' }}
+                            <input
+                              style={{ border: "1px solid #676767" }}
                               className="form-check-input"
                               type="checkbox"
                             />
                           </div>
                         </td>
-                        <td style={{ color: '#262626', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>{role.roleName}</td>
-                        <td style={{ color: '#262626', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>
-                          {new Date(role.createdAt).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
+                          {role.roleName}
+                        </td>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
+                          {new Date(role.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
                         </td>
 
-                        <td style={{ color: '#262626', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <span
-                            className={`badge table-badge fw-medium fs-10 ${role.status === "Active" ? "" : ""}`}
-                            style={role.status === "Active" ? { backgroundColor: "#DFFFE0", color: "#0F5132", padding: '6px 8px 6px 8px' } : { backgroundColor: "#FCE4E6", color: "#0F5132", padding: '6px 8px 6px 8px' }}
+                            className={`badge table-badge fw-medium fs-10 ${
+                              role.status === "Active" ? "" : ""
+                            }`}
+                            style={
+                              role.status === "Active"
+                                ? {
+                                    backgroundColor: "#DFFFE0",
+                                    color: "#0F5132",
+                                    padding: "6px 8px 6px 8px",
+                                  }
+                                : {
+                                    backgroundColor: "#FCE4E6",
+                                    color: "#0F5132",
+                                    padding: "6px 8px 6px 8px",
+                                  }
+                            }
                           >
                             {role.status}
                           </span>
-
                         </td>
 
-                        <td className="action-table-data" style={{ color: '#262626', fontSize: '16px', fontWeight: 400, lineHeight: '14px', fontFamily: 'Roboto", sans-serif' }}>
+                        <td
+                          className="action-table-data"
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <div className="edit-delete-action">
                             <a
                               className="me-2 p-2"
                               onClick={() =>
                                 navigate(`/permissions/${role._id}`)
                               }
-                            // onClick={() => handleViewPermissions(role.roleName)}
-
+                              // onClick={() => handleViewPermissions(role.roleName)}
                             >
                               <TbEye />
                             </a>
@@ -433,8 +543,17 @@ const Role = () => {
                 </tbody>
               </table>
             </div>
-            <div className="d-flex justify-content-end  align-items-center p-3" style={{ gap: '10px' }}>
-              <div className="d-flex justify-content-end align-items-center" style={{ backgroundColor: 'white', boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px' }}>
+            <div
+              className="d-flex justify-content-end  align-items-center p-3"
+              style={{ gap: "10px" }}
+            >
+              <div
+                className="d-flex justify-content-end align-items-center"
+                style={{
+                  backgroundColor: "white",
+                  boxShadow: "rgba #0000000a(0, 0, 0, 0.04) 0px 3px 8px",
+                }}
+              >
                 <select
                   value={itemsPerPage}
                   onChange={(e) => {
@@ -451,54 +570,45 @@ const Role = () => {
               </div>
 
               {/* Pagination buttons */}
-              <div className="d-flex align-items-center" style={{ backgroundColor: 'white', boxShadow: 'rgba(149, 157, 165, 0.2) 0px 8px 24px' }}>
-                <span className="me-3">
-                  {filteredRoles.length === 0
-                    ? "0 of 0"
-                    : `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
+              <span
+                style={{
+                  backgroundColor: "white",
+                  boxShadow: "rgb(0 0 0 / 4%) 0px 3px 8px",
+                  padding: "7px",
+                  borderRadius: "5px",
+                  border: "1px solid #e4e0e0ff",
+                  color: "gray",
+                }}
+              >
+                {filteredRoles.length === 0
+                  ? "0 of 0"
+                  : `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
                       currentPage * itemsPerPage,
                       filteredRoles.length
                     )} of ${filteredRoles.length}`}
-                </span>
                 <button
-                  className="btn btn-light btn-sm me-2"
+                  style={{
+                    border: "none",
+                    color: "grey",
+                    backgroundColor: "white",
+                  }}
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
                 >
-                  ‹
-                </button>
+                  <GrFormPrevious />
+                </button>{" "}
                 <button
-                  className="btn btn-light btn-sm"
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  disabled={currentPage === totalPages}
-                >
-                  ›
-                </button>
-
-                {/* {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    className={`btn btn-sm me-1 ${currentPage === i + 1
-                      ? "btn-primary"
-                      : "btn-outline-primary"
-                      }`}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  className="btn btn-light btn-sm"
+                  style={{ border: "none", backgroundColor: "white" }}
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
                 >
-                  Next
-                </button> */}
-              </div>
+                  <MdNavigateNext />
+                </button>
+              </span>
             </div>
           </div>
         </div>
@@ -511,13 +621,34 @@ const Role = () => {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h4 style={{ color: '#262626', fontSize: '14px', fontWeight: 400, lineHeight: '14px' }}>Create Role</h4>
-                <hr style={{ margin: "0", height: '1px', color: '#bdbdbdff' }} />
+                <h4
+                  style={{
+                    color: "#262626",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "14px",
+                  }}
+                >
+                  Create Role
+                </h4>
+                <hr
+                  style={{ margin: "0", height: "1px", color: "#bdbdbdff" }}
+                />
               </div>
               <form onSubmit={handleCreateRole}>
                 <div className="modal-body">
-                  <div className="mb-3" style={{ position: 'relative' }}>
-                    <label className="form-label" style={{ color: '#262626', fontSize: '14px', fontWeight: 400, lineHeight: '14px' }}>Role Name</label>
+                  <div className="mb-3" style={{ position: "relative" }}>
+                    <label
+                      className="form-label"
+                      style={{
+                        color: "#262626",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                      }}
+                    >
+                      Role Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -528,7 +659,7 @@ const Role = () => {
                   </div>
                   <div className="mb-0">
                     <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-                      <span className="status-label">Status</span>
+                      <span className="status-label" style={{fontSize:'16px', fontWeight:400, lineHeight:'14px', color:'#262626'}}>Status</span>
                       <div className="dropdown">
                         <button
                           className="btn btn-light dropdown-toggle"
@@ -539,33 +670,49 @@ const Role = () => {
                         >
                           {roleStatus ? "Active" : "Inactive"}
                         </button>
-                        <ul className="dropdown-menu" aria-labelledby="statusDropdown">
+                        <ul
+                          className="dropdown-menu"
+                          aria-labelledby="statusDropdown"
+                        >
                           <li>
-                            <a className="dropdown-item" onClick={() => setRoleStatus(true)}>Active</a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setRoleStatus(true)}
+                            >
+                              Active
+                            </a>
                           </li>
                           <li>
-                            <a className="dropdown-item" onClick={() => setRoleStatus(false)}>Inactive</a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setRoleStatus(false)}
+                            >
+                              Inactive
+                            </a>
                           </li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer"
-                style={{
+                <div
+                  className="modal-footer"
+                  style={{
                     display: "flex",
                     justifyContent: "end",
                     gap: "10px",
                     fontFamily: "Roboto, sans-serif",
                     fontWeight: 400,
-                    fontSize: '16px',
-                    lineHeight: '14px',
+                    fontSize: "16px",
+                    lineHeight: "14px",
                   }}
                 >
-                  <button className="btn btn-secondary" data-bs-dismiss="modal"
-                  style={{
+                  <button
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    style={{
                       border: "1px solid #E6E6E6",
-                      borderRadius: '4px',
+                      borderRadius: "4px",
                       padding: "8px",
                       backgroundColor: "#FFFFFF",
                       color: "#676767",
@@ -574,10 +721,12 @@ const Role = () => {
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary"
-                  style={{
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{
                       border: "1px solid #676767",
-                      borderRadius: '4px',
+                      borderRadius: "4px",
                       padding: "8px",
                       backgroundColor: "#262626",
                       color: "#FFFFFF",
@@ -598,13 +747,32 @@ const Role = () => {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="p-3">
-                <h4 style={{ color: '#262626', fontSize: '14px', fontWeight: 400, lineHeight: '14px' }}>Edit Role</h4>
+                <h4
+                  style={{
+                    color: "#262626",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "14px",
+                  }}
+                >
+                  Edit Role
+                </h4>
               </div>
-              <hr style={{ margin: "0", height: '1px', color: '#bdbdbdff' }} />
+              <hr style={{ margin: "0", height: "1px", color: "#bdbdbdff" }} />
               <form onSubmit={handleUpdateRole}>
                 <div className="modal-body">
-                  <div className="mb-3" style={{ position: 'relative' }}>
-                    <label style={{ color: '#262626', fontSize: '14px', fontWeight: 400, lineHeight: '14px' }} className="form-label">Role Name</label>
+                  <div className="mb-3" style={{ position: "relative" }}>
+                    <label
+                      style={{
+                        color: "#262626",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                      }}
+                      className="form-label"
+                    >
+                      Role Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -612,7 +780,15 @@ const Role = () => {
                       onChange={(e) => setEditRoleName(e.target.value)}
                       required
                     />
-                    <LiaEditSolid style={{ position: 'absolute', top: '70%', left: '430px', transform: "translateY(-50%)", fontSize: '20px' }} />
+                    <LiaEditSolid
+                      style={{
+                        position: "absolute",
+                        top: "70%",
+                        left: "430px",
+                        transform: "translateY(-50%)",
+                        fontSize: "20px",
+                      }}
+                    />
                   </div>
                   <div className="mb-0">
                     <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
@@ -627,33 +803,49 @@ const Role = () => {
                         >
                           {editRoleStatus ? "Active" : "Inactive"}
                         </button>
-                        <ul className="dropdown-menu" aria-labelledby="statusDropdown">
+                        <ul
+                          className="dropdown-menu"
+                          aria-labelledby="statusDropdown"
+                        >
                           <li>
-                            <a className="dropdown-item" onClick={() => setEditRoleStatus(true)}>Active</a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setEditRoleStatus(true)}
+                            >
+                              Active
+                            </a>
                           </li>
                           <li>
-                            <a className="dropdown-item" onClick={() => setEditRoleStatus(false)}>Inactive</a>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setEditRoleStatus(false)}
+                            >
+                              Inactive
+                            </a>
                           </li>
                         </ul>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer"
+                <div
+                  className="modal-footer"
                   style={{
                     display: "flex",
                     justifyContent: "end",
                     gap: "10px",
                     fontFamily: "Roboto, sans-serif",
                     fontWeight: 400,
-                    fontSize: '16px',
-                    lineHeight: '14px',
+                    fontSize: "16px",
+                    lineHeight: "14px",
                   }}
                 >
-                  <button className="btn btn-secondary" data-bs-dismiss="modal"
+                  <button
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
                     style={{
                       border: "1px solid #E6E6E6",
-                      borderRadius: '4px',
+                      borderRadius: "4px",
                       padding: "8px",
                       backgroundColor: "#FFFFFF",
                       color: "#676767",
@@ -662,10 +854,12 @@ const Role = () => {
                   >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary"
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
                     style={{
                       border: "1px solid #676767",
-                      borderRadius: '4px',
+                      borderRadius: "4px",
                       padding: "8px",
                       backgroundColor: "#262626",
                       color: "#FFFFFF",
