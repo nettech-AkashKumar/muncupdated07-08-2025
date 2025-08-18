@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import Popup from './Popup';
+import Popup from './popup';
 import { FaSearch, FaArrowRight } from 'react-icons/fa';
 import { MdArrowForwardIos } from 'react-icons/md';
 import { RiArrowUpDownLine } from 'react-icons/ri';
 import { IoFilter } from 'react-icons/io5';
+import { Link } from "react-router-dom";
 
 const dummyData = [
   { id: 1, category: 'Electronics', status: 'Active', skus: 15, products: 120 },
@@ -53,12 +54,18 @@ function SelectPage() {
               alignItems: 'center',
             }}
           >
+            <Link to='/warehouse' style={{ textDecoration: 'none', color: '#676767' }}>
             <span>Warehouse</span>
+            </Link>
             <MdArrowForwardIos style={{ color: '#b0afafff' }} />
+            <Link to='/warehouse' style={{ textDecoration: 'none', color: '#676767' }}>
             <span>All Warehouse</span>
+            </Link>
             <MdArrowForwardIos style={{ color: '#b0afafff' }} />
+
             <span>Wh-001</span>
             <MdArrowForwardIos style={{ color: '#b0afafff' }} />
+            <Link to='/Godown' style={{ textDecoration: 'none', color: '#676767' }}>
             <span
               style={{
                 fontFamily: 'Roboto',
@@ -69,6 +76,7 @@ function SelectPage() {
             >
               Godown
             </span>
+            </Link>
             <MdArrowForwardIos style={{ color: '#b0afafff' }} />
             <span
               style={{
@@ -98,11 +106,13 @@ function SelectPage() {
             style={{
               alignItems: 'center',
               display: 'flex',
-              backgroundColor: '#fff',
+              backgroundColor: '#f6f6f6',
               width: '90%',
               gap: '19px',
               justifyContent: 'space-between',
               padding: '4px 16px',
+              border: '1px solid #e6e6e6',
+              borderRadius: '8px',
             }}
           >
             <div
@@ -117,7 +127,7 @@ function SelectPage() {
               <input
                 type='search'
                 placeholder='Search Items'
-                style={{ border: 'none', outline: 'none' }}
+                style={{ border: 'none', outline: 'none', fontFamily: 'Roboto', fontWeight: '400', fontSize: '16px', color: '#fff', backgroundColor: '#f6f6f6' }}
               />
             </div>
             <div
@@ -244,13 +254,12 @@ function SelectPage() {
         >
           <span>{zoneName}</span>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
-            <select name='' id=''>
-              <option value=''>Assign Products</option>
-            </select>
-            <select name='' id=''>
+            <div style={{border:'1px solid #e6e6e6', padding:'8px', borderRadius:'4px', gap:'8px', color:'#676767', fontFamily:'Roboto', fontWeight:'400', fontSize:'16px' }}>Assign Product </div> 
+         
+            <select name='' id='' style={{border:'1px solid #e6e6e6', padding:'8px', borderRadius:'4px', gap:'8px', color:'#676767', fontFamily:'Roboto', fontWeight:'400', fontSize:'16px' }}>
               <option value=''>Rack A</option>
             </select>
-            <select name='' id=''>
+            <select name='' id='' style={{border:'1px solid #e6e6e6', padding:'8px', borderRadius:'4px', gap:'8px', color:'#676767', fontFamily:'Roboto', fontWeight:'400', fontSize:'16px' }}>
               <option value=''>A1</option>
             </select>
           </div>
@@ -408,16 +417,31 @@ function SelectPage() {
           </table>
         </div>
 
+        {/* Popup */}
+        {['A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'C4', 'A4', 'B4', 'C4', 'C5', 'A5', 'B5', 'C5', 'D5'].map((zone, idx) => (
+          <Popup 
+            key={idx} 
+            isOpen={isPopupOpen && selectedItem === zone} 
+            onClose={closePopup} 
+            selectedItem={zone} 
+            zoneName={zoneName} // Use state-managed zoneName
+          />
+        ))}
+
+      </div>
+      
         {/* Footer */}
         <div
           style={{
+            overflow: 'auto',
             display: 'flex',
             justifyContent: 'center',
             position: 'fixed',
             bottom: '0px',
-            width: '84%',
+            width: '100%',
             backgroundColor: '#f7f7f7',
             padding: '10px',
+            left:'1px'
           }}
         >
           <div style={{ display: 'flex', gap: '10px' }}>
@@ -454,17 +478,6 @@ function SelectPage() {
           </div>
         </div>
 
-        {/* Popup */}
-        {['A1', 'B1', 'C1', 'D1', 'A2', 'B2', 'C2', 'D2', 'A3', 'B3', 'C3', 'C4', 'A4', 'B4', 'C4', 'C5', 'A5', 'B5', 'C5', 'D5'].map((zone, idx) => (
-          <Popup 
-            key={idx} 
-            isOpen={isPopupOpen && selectedItem === zone} 
-            onClose={closePopup} 
-            selectedItem={zone} 
-            zoneName={zoneName} // Use state-managed zoneName
-          />
-        ))}
-      </div>
     </div>
   );
 }

@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { MdArrowForwardIos } from "react-icons/md";
-import { FaSearch, FaArrowRight, FaAngleLeft, FaChevronRight } from "react-icons/fa";
+import {
+  FaSearch,
+  FaArrowRight,
+  FaAngleLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import { RiArrowUpDownLine } from "react-icons/ri";
 // import "./Godown.css";
 import Popup from "./popup";
@@ -96,9 +101,19 @@ function Godown() {
           >
             <span>Warehouse</span>
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
-            <Link style={{ color: "#676767", textDecoration:"none" }} to={"/Warehouse"}>All Warehouse</Link>
+            <Link
+              style={{ color: "#676767", textDecoration: "none" }}
+              to={"/Warehouse"}
+            >
+              All Warehouse
+            </Link>
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
-            <Link style={{ color: "#676767", textDecoration:"none" }} to={"/WarehouseDetails"}>Wh-001</Link>  
+            <Link
+              style={{ color: "#676767", textDecoration: "none" }}
+              to={"/WarehouseDetails"}
+            >
+              Wh-001
+            </Link>
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
             <span
               style={{
@@ -149,7 +164,11 @@ function Godown() {
               <input
                 type="search"
                 placeholder="Search Items"
-                style={{ border: "none", outline: "none" , backgroundColor: "transparent"}}
+                style={{
+                  border: "none",
+                  outline: "none",
+                  backgroundColor: "transparent",
+                }}
               />
             </div>
             <div
@@ -174,7 +193,7 @@ function Godown() {
               name="zone"
               onChange={(e) => {
                 if (e.target.value) {
-                  window.location.href = `/${e.target.value
+                  window.location.href = `http://localhost:3000${e.target.value
                     .toLowerCase()
                     .replace(" ", "")}`;
                 }
@@ -234,6 +253,7 @@ function Godown() {
             </span>
           </div>
         </div>
+
         <main
           style={{
             width: "40%",
@@ -301,15 +321,17 @@ function Godown() {
           }}
         >
           {/* Zone 03 */}
-          <div style={{ 
-            transform: "rotate(-90deg)", 
-            // marginBottom: "100px",
-            width: "300px", 
-            marginTop: "40px",
-            }}>
+          <div
+            style={{
+              transform: "rotate(-90deg)",
+              // marginBottom: "100px",
+              width: "300px",
+              marginTop: "40px",
+            }}
+          >
             <div
               style={{
-               transform: "rotate(0deg)",
+                transform: "rotate(0deg)",
                 backgroundColor: "#3f99e1",
                 padding: "24px",
                 color: "#FFF",
@@ -324,10 +346,11 @@ function Godown() {
             >
               <span className="invisible">hg</span>
               <span className="zone-text">Zone 03</span>
-              <span 
-              style={{ 
-                transform: "rotate(0deg)"
-               }}>
+              <span
+                style={{
+                  transform: "rotate(0deg)",
+                }}
+              >
                 <FaArrowRight />
               </span>
             </div>
@@ -478,19 +501,24 @@ function Godown() {
                       borderRadius: "8px",
                     }}
                   >
-                    <th style={{padding:'8px', borderTopLeftRadius:'8px'}}>Product</th>
+                    <th style={{ padding: "8px", borderTopLeftRadius: "8px" }}>
+                      Product
+                    </th>
                     <th style={{}}>SKU</th>
-                    <th style={{padding:'8px', borderTopRightRadius:'8px',}}>Quantity</th>
+                    <th style={{ padding: "8px", borderTopRightRadius: "8px" }}>
+                      Quantity
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedProducts.map((product, index) => (
-                    <tr
-                      key={index}
-                      style={{ borderTop: "1px solid #e6e6e6",
-                       }}
-                    >
-                      <td style={{borderBottomLeftRadius:'8px', padding:'8px'}}>
+                    <tr key={index} style={{ borderTop: "1px solid #e6e6e6" }}>
+                      <td
+                        style={{
+                          borderBottomLeftRadius: "8px",
+                          padding: "8px",
+                        }}
+                      >
                         <img
                           src={product.img}
                           style={{
@@ -503,8 +531,15 @@ function Godown() {
                         />
                         {product.name}
                       </td>
-                      <td style={{ }}>{product.sku}</td>
-                      <td style={{ borderBottomRightRadius:'8px', padding:'8px'}}>{product.qty}</td>
+                      <td style={{}}>{product.sku}</td>
+                      <td
+                        style={{
+                          borderBottomRightRadius: "8px",
+                          padding: "8px",
+                        }}
+                      >
+                        {product.qty}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -548,12 +583,13 @@ function Godown() {
           </div>
 
           {/* Zone 05 */}
-          <div 
-          style={{ 
-            transform: "rotate(90deg)", 
-            // marginBottom: "100px", 
-            marginTop: "40px",
-            }}>
+          <div
+            style={{
+              transform: "rotate(90deg)",
+              // marginBottom: "100px",
+              marginTop: "40px",
+            }}
+          >
             <div
               style={{
                 transform: "rotate(0deg)",
@@ -567,7 +603,6 @@ function Godown() {
                 marginTop: "150px",
                 marginBottom: "20px",
                 width: "300px",
-                
               }}
             >
               <span className="invisible">hg</span>
@@ -765,52 +800,6 @@ function Godown() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            position: "fixed",
-            bottom: "0px",
-            width: "84%",
-            backgroundColor: "#f7f7f7",
-            padding: "10px",
-          }}
-        >
-          <div style={{ display: "flex", gap: "10px" }}>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#fff",
-                  padding: "5px 15px",
-                  borderRadius: "5px",
-                }}
-              ></div>
-              <span>Available</span>
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#e3f3ff",
-                  padding: "5px 15px",
-                  borderRadius: "5px",
-                }}
-              ></div>
-              <span>Occupied</span>
-            </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <div
-                style={{
-                  backgroundColor: "#1368ec",
-                  padding: "5px 15px",
-                  borderRadius: "5px",
-                }}
-              ></div>
-              <span>Selected</span>
-            </div>
-          </div>
-        </div>
-
         {/* Popup */}
         <Popup
           isOpen={isPopupOpen}
@@ -818,6 +807,54 @@ function Godown() {
           selectedItem={selectedItem.grid}
           zoneName={selectedItem.zone}
         />
+      </div>
+
+      {/* Footer */}
+      <div
+        style={{
+          overflow: "auto",
+          display: "flex",
+          justifyContent: "center",
+          position: "fixed",
+          bottom: "0px",
+          width: "100%",
+          backgroundColor: "#f7f7f7",
+          padding: "10px",
+          left: "1px",
+        }}
+      >
+        <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div
+              style={{
+                backgroundColor: "#fff",
+                padding: "5px 15px",
+                borderRadius: "5px",
+              }}
+            ></div>
+            <span>Available</span>
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div
+              style={{
+                backgroundColor: "#e3f3ff",
+                padding: "5px 15px",
+                borderRadius: "5px",
+              }}
+            ></div>
+            <span>Occupied</span>
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <div
+              style={{
+                backgroundColor: "#1368ec",
+                padding: "5px 15px",
+                borderRadius: "5px",
+              }}
+            ></div>
+            <span>Selected</span>
+          </div>
+        </div>
       </div>
     </div>
   );
