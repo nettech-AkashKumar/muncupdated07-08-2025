@@ -341,7 +341,7 @@ function AddWarehouse() {
                 display: "block",
               }}
             >
-              Warehouse Owner
+              Warehouse Contact Person(Manager)
             </label>
             <input
               type="text"
