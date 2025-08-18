@@ -114,6 +114,9 @@ import Godown from "../components/features/warehouse/Godown.jsx";
 import SelectPage from "../components/features/warehouse/SelectPage.jsx";
 import StockMovementLog from "../components/features/warehouse/StockMovementLog.jsx";
 
+//pos
+import Pos from "../pages/pos/Pos.jsx";
+
 const AppRoutes = () => {
   return (
 
@@ -187,6 +190,7 @@ const AppRoutes = () => {
         <Route path="/activities" element={<Activities />} />
         <Route path="/ViewAllNotifications" element={<ViewAllNotifications />} />
         <Route path="/barcode" element={<Barcode />} />
+        <Route path="/pos" element={<Pos />} />
         
         {/* purchase */}
         <Route path="/purchase-list" element={<Purchase />} />
