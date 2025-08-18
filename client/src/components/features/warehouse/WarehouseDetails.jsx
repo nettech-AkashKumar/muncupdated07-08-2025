@@ -151,7 +151,34 @@ function WarehouseDetails() {
         <style>
         {
           `
-          
+          .three-box {
+  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* add gap between boxes */
+  box-shadow: 0px 0px 8px 3px #d7d2d2;
+  margin-top: 20px;
+}
+
+.money-bag,
+.radio-active,
+.Circle-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1; /* makes them all equal width */
+  gap: 15px;
+}
+
+.money-bag,
+.radio-active {
+  border-right: 1px solid #ccc;
+  padding-right: 20px; /* small space before border */
+}
+
           `
         }
       </style>
@@ -554,7 +581,7 @@ function WarehouseDetails() {
 
       {/* Table */}
 
-      <div
+      {/* <div
         style={{
           backgroundColor: "#fff",
           marginTop: "20px",
@@ -633,7 +660,7 @@ function WarehouseDetails() {
           </span>
         </div>
 
-        {/* Table */}
+       
         <div>
           <table className="customer-table">
             <thead>
@@ -674,6 +701,193 @@ function WarehouseDetails() {
                   <td>{wholeseller.available}</td>
                   <td>{wholeseller.unit}</td>
                   <td>{wholeseller.revenue}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div> */}
+
+        <div
+        style={{
+          backgroundColor: "#fff",
+          marginTop: "20px",
+          borderRadius: "8px",
+          gap: "8px",
+        }}
+      >
+        <div
+          style={{
+            padding: "16px 24px",
+            borderBottom: "1px solid #e6e6e6",
+            font: "robot",
+            fontWeight: "500",
+            fontSize: "18px",
+            color: "#262626",
+          }}
+        >
+          <span>Top Selling Products</span>
+        </div>
+
+        <div style={{ padding: "8px 24px", gap: "18px" }}>
+          <span
+            style={{
+              font: "Robot",
+              fontWeight: "400",
+              fontSize: "16px",
+              color: "#262626",
+              padding: "8px",
+            }}
+          >
+            All
+          </span>
+          <span
+            style={{
+              font: "Robot",
+              fontWeight: "400",
+              fontSize: "16px",
+              color: "#262626",
+              padding: "8px",
+            }}
+          >
+            Stock In
+          </span>
+          <span
+            style={{
+              font: "Robot",
+              fontWeight: "400",
+              fontSize: "16px",
+              color: "#262626",
+              padding: "8px",
+            }}
+          >
+            Stock Out
+          </span>
+          <span
+            style={{
+              font: "Robot",
+              fontWeight: "400",
+              fontSize: "16px",
+              color: "#262626",
+              padding: "8px",
+            }}
+          >
+            Transfer
+          </span>
+          <span
+            style={{
+              font: "Robot",
+              fontWeight: "400",
+              fontSize: "16px",
+              color: "#262626",
+              padding: "8px",
+            }}
+          >
+            Processing
+          </span>
+        </div>
+
+        {/* Table */}
+        <div>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              backgroundColor: "#fff",
+              padding: "16px 24px",
+            }}
+          >
+            <thead style={{ backgroundColor: "#f1f1f1" }}>
+              <tr
+                style={{
+                  color: "#676767",
+                  fontFamily: "roboto",
+                  fontSize: "16px",
+                  fontWeight: "400",
+                }}
+              >
+                <th style={{ padding: "12px 24px" }}>
+                  <input type="checkbox" />
+                </th>
+                <th style={{ padding: "12px 24px" }}>Product</th>
+                <th style={{ padding: "12px 24px" }}>SKU</th>
+                <th style={{ padding: "12px 24px" }}>MRP</th>
+                <th style={{ padding: "12px 24px" }}>Available QTY</th>
+                <th style={{ padding: "12px 24px" }}>Unit Sold</th>
+                <th style={{ padding: "12px 24px" }}>Revenue</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {sellingProducts.map((wholeseller, i) => (
+                <tr
+                  key={wholeseller.id}
+                  onClick={() => handleCustomerClick(wholeseller)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    <input type="checkbox" />
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    <div className="customer-info">
+                      <img
+                        src="https://via.placeholder.com/32"
+                        alt="avatar"
+                        className="avatar"
+                      />
+                      {wholeseller.product}
+                    </div>
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {wholeseller.sku}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {wholeseller.mrp}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {wholeseller.available}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {wholeseller.unit}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {wholeseller.revenue}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -989,7 +1203,7 @@ function WarehouseDetails() {
 
         {/* Table */}
         <div>
-          <table className="customer-table">
+          <table >
             <thead>
               <tr style={{ backgroundColor: "#e6e6e6" }}>
                 <th>
