@@ -4,6 +4,7 @@ import { FaSearch, FaArrowRight, FaAngleLeft, FaChevronRight } from "react-icons
 import { RiArrowUpDownLine } from "react-icons/ri";
 // import "./Godown.css";
 import Popup from "./popup";
+import { Link } from "react-router-dom";
 
 function Godown() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -95,9 +96,9 @@ function Godown() {
           >
             <span>Warehouse</span>
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
-            <span>All Warehouse</span>
+            <Link style={{ color: "#676767", textDecoration:"none" }} to={"/Warehouse"}>All Warehouse</Link>
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
-            <span>Wh-001</span>
+            <Link style={{ color: "#676767", textDecoration:"none" }} to={"/WarehouseDetails"}>Wh-001</Link>  
             <MdArrowForwardIos style={{ color: "#b0afafff" }} />
             <span
               style={{

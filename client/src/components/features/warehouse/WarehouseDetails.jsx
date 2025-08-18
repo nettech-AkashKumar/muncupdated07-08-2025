@@ -148,38 +148,7 @@ function WarehouseDetails() {
 
   return (
     <div>
-      <style>
-        {`
-          .three-box {
-  padding: 15px;
-  background-color: #ffffff;
-  border: 1px solid #e6e6e6;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px; /* add gap between boxes */
-  box-shadow: 0px 0px 8px 3px #d7d2d2;
-  margin-top: 20px;
-}
-
-.money-bag,
-.radio-active,
-.Circle-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1; /* makes them all equal width */
-  gap: 15px;
-}
-
-.money-bag,
-.radio-active {
-  border-right: 1px solid #ccc;
-  padding-right: 20px; /* small space before border */
-}
-
-          `}
-      </style>
+    
       {/* Header */}
       <div
         style={{
@@ -207,7 +176,7 @@ function WarehouseDetails() {
               gap: "10px", // Moved gap here to work with flex
             }}
           >
-            Warehouse <MdArrowForwardIos /> All Warehouse
+            Warehouse <MdArrowForwardIos /> <Link  style={{ color: "#676767", textDecoration:"none" }} to={"/warehouse"}>All Warehouse</Link> 
           </h2>
           <span
             style={{
@@ -221,6 +190,7 @@ function WarehouseDetails() {
           </span>
         </div>
         <div>
+          <Link to="/Godown">
           <button
             style={{
               backgroundColor: "#1368EC",
@@ -233,6 +203,7 @@ function WarehouseDetails() {
           >
             Assign Product
           </button>
+          </Link>
         </div>
       </div>
 
@@ -922,7 +893,7 @@ function WarehouseDetails() {
               cursor: "pointer",
             }}
           >
-            <Link to="/Godown">
+            <Link to="/Godown" style={{ textDecoration: "none", color: "#1368EC" }}>
               View All <FaArrowRight />
             </Link>
           </span>
