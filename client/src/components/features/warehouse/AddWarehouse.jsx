@@ -516,6 +516,7 @@ function AddWarehouse() {
       {/* Layout Section */}
       <div
         style={{
+          overflow:'auto',
           margin: "30px auto",
           width: "100%",
           maxWidth: "900px",
