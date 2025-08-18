@@ -128,11 +128,13 @@ function Godown() {
             style={{
               alignItems: "center",
               display: "flex",
-              backgroundColor: "#fff",
+              backgroundColor: "#f9f9f9",
               width: "90%",
               gap: "19px",
               justifyContent: "space-between",
               padding: "4px 16px",
+              border: "1px solid #e6e6e6",
+              borderRadius: "8px",
             }}
           >
             <div
@@ -147,7 +149,7 @@ function Godown() {
               <input
                 type="search"
                 placeholder="Search Items"
-                style={{ border: "none", outline: "none" }}
+                style={{ border: "none", outline: "none" , backgroundColor: "transparent"}}
               />
             </div>
             <div
@@ -191,7 +193,7 @@ function Godown() {
               >
                 All Zones
               </option>
-              <option value="/LocalHost:5173/SelectPage">Zone 1</option>
+              <option value="/SelectPage">Zone 1</option>
               <option value="/zone2">Zone 2</option>
               <option value="/zone3">Zone 3</option>
               <option value="/zone4">Zone 4</option>
@@ -461,13 +463,14 @@ function Godown() {
                 borderRadius: "8px",
                 border: "1px solid #e6e6e6",
                 marginTop: "10px",
+                // backgroundColor: "#f7f7f7",
               }}
             >
-              <table>
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr
                     style={{
-                      backgroundColor: "#e6e6e6",
+                      backgroundColor: "#f7f7f7",
                       color: "#676767",
                       fontSize: "16px",
                       fontWeight: "400",
@@ -475,18 +478,19 @@ function Godown() {
                       borderRadius: "8px",
                     }}
                   >
-                    <th style={{ padding: "8px" }}>Product</th>
-                    <th style={{ padding: "8px" }}>SKU</th>
-                    <th style={{ padding: "8px" }}>Quantity</th>
+                    <th style={{padding:'8px', borderTopLeftRadius:'8px'}}>Product</th>
+                    <th style={{}}>SKU</th>
+                    <th style={{padding:'8px', borderTopRightRadius:'8px',}}>Quantity</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedProducts.map((product, index) => (
                     <tr
                       key={index}
-                      style={{ borderBottom: "1px solid #e6e6e6" }}
+                      style={{ borderTop: "1px solid #e6e6e6",
+                       }}
                     >
-                      <td style={{ padding: "8px" }}>
+                      <td style={{borderBottomLeftRadius:'8px', padding:'8px'}}>
                         <img
                           src={product.img}
                           style={{
@@ -494,12 +498,13 @@ function Godown() {
                             height: "40px",
                             marginRight: "10px",
                             border: "none",
+                            // marginLeft: "5px",
                           }}
                         />
                         {product.name}
                       </td>
-                      <td style={{ padding: "8px" }}>{product.sku}</td>
-                      <td style={{ padding: "8px" }}>{product.qty}</td>
+                      <td style={{ }}>{product.sku}</td>
+                      <td style={{ borderBottomRightRadius:'8px', padding:'8px'}}>{product.qty}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -624,7 +629,7 @@ function Godown() {
           style={{
             display: "flex",
             justifyContent: "space-between",
-            marginLeft: "70px",
+            marginLeft: "110px",
             marginRight: "70px",
           }}
         >
@@ -700,6 +705,7 @@ function Godown() {
               height: "345px",
               marginTop: "0px",
               transform: "rotate(90deg)",
+              marginLeft: "50px",
             }}
           >
             <div
@@ -712,12 +718,12 @@ function Godown() {
                 display: "flex",
                 border: "1px solid #e6e6e6",
                 borderRadius: "8px",
-                marginTop: "150px",
+                marginTop: "195px",
                 marginBottom: "20px",
               }}
             >
               <span className="invisible">hg</span>
-              <span className="zone-text">Zone 77</span>
+              <span className="zone-text">Zone 07</span>
               <span style={{ transform: "rotate(0deg)" }}>
                 <FaArrowRight />
               </span>
