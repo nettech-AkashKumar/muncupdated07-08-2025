@@ -110,6 +110,9 @@ import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
 import Dashboards from "../pages/dashboard/Dashboards.jsx";
 import AddWarehouse from "../components/features/warehouse/AddWarehouse.jsx";
 import WarehouseDetails from "../components/features/warehouse/WarehouseDetails.jsx";
+import Godown from "../components/features/warehouse/Godown.jsx";
+import SelectPage from "../components/features/warehouse/SelectPage.jsx";
+import StockMovementLog from "../components/features/warehouse/StockMovementLog.jsx";
 
 const AppRoutes = () => {
   return (
@@ -201,6 +204,8 @@ const AppRoutes = () => {
         <Route path="/warehouse" element={<Warehouse />} />
         <Route path="/addwarehouse" element={<AddWarehouse />} />
         <Route path="/WarehouseDetails" element={<WarehouseDetails/>} />
+        <Route path="/Godown" element={<Godown/>} />
+        <Route path="/selectpage" element={<SelectPage/>} />
 
         {/* customer */}
         <Route path="/customers" element={<AllCustomer />} />
@@ -211,6 +216,7 @@ const AppRoutes = () => {
         <Route path="/Purchase-settings" element={<PurchaseSettings />} />
         <Route path="/warehouse-settings" element={<RackSettings />} />
         <Route path="/sidebar-settings" element={<SidebarSettings />} />
+        <Route path="/stock-movement-log" element={<StockMovementLog />} />
 
 
 

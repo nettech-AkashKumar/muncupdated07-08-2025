@@ -1357,7 +1357,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1452,7 +1452,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1559,7 +1559,7 @@ function Warehouse() {
           paddingBottom: "4px",
         }}
       >
-        <span>Favouite</span>
+        <span>Owened</span>
 
         {/* Cards */}
 
@@ -1568,7 +1568,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1663,7 +1663,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1759,7 +1759,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1852,7 +1852,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1957,7 +1957,7 @@ function Warehouse() {
           paddingBottom: "4px",
         }}
       >
-        <span>Favouite</span>
+        <span>Third-Party warehouse</span>
 
         {/* Cards */}
 
@@ -1966,7 +1966,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -2061,7 +2061,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",

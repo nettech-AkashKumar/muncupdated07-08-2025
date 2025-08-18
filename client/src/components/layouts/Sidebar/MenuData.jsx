@@ -201,9 +201,20 @@ export const getMenuData = () => {
           icon: <TbHomeBolt className="icons" />,
         },
         {
-          label: t("warehouses"),
+          
           path: "/warehouse",
           icon: <TbBuildingWarehouse className="icons" />,
+          title: t("Warehouse"),
+          subItems:[
+            {
+              label: t("All warehouse"),
+              path:"/warehouse",
+            },
+            {
+              label : t("Stock Movement Log"),
+              path:"/stock-movement-log"
+            },
+          ]
         },
       ],
     },
