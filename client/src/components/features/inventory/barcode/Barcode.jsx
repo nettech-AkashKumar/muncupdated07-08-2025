@@ -80,7 +80,7 @@ function Barcode() {
       ...prev,
       productName: selectedProduct.productName || '',
       sku: selectedProduct.sku || '',
-      price: selectedProduct.sellingPrice || selectedProduct.retailPrice || '',
+      price: selectedProduct.sellingPrice || '',
       quantity: selectedProduct.quantity || '',
       img: selectedProduct.images[0].url || '',
       expiryDate: selectedProduct.variants.Expiry[0] || '0',
@@ -148,13 +148,126 @@ function Barcode() {
       return;
     }
 
-    const barcodeNumber = selectedProduct.itemBarcode;
+    const barcodeNaming = (product, selectedProduct) => {
+      if (product.showProductName && product.showQuantity && product.showSku && product.showPrice && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        var quantity = selectedProduct.quantity;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},SKU:${sku},Price:${price},QTY:${quantity},Exp:${expiry}`;
+      } else if (product.showProductName && product.showQuantity && product.showSku && product.showPrice) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        var quantity = selectedProduct.quantity;
+        return `Name:${name},SKU:${sku},Price:${price},QTY:${quantity}`;
+      } else if (product.showProductName && product.showQuantity && product.showSku && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var quantity = selectedProduct.quantity;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},SKU${sku},QTY:${quantity},Exp:${expiry}`;
+      } else if (product.showProductName && product.showQuantity && product.showPrice && product.showExpiryDate) {  
+        var name = selectedProduct.productName;
+        var price = selectedProduct.sellingPrice;
+        var quantity = selectedProduct.quantity;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},Price:${price},QTY:${quantity},Exp:${expiry}`;
+      } else if (product.showProductName && product.showSku && product.showPrice && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},SKU:${sku},Price:${price},Exp:${expiry}`;
+      } else if (product.showProductName && product.showSku && product.showPrice) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        return `Name:${name},SKU:${sku},Price:${price}`;
+      } else if (product.showProductName && product.showSku && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},SKU:${sku},Exp:${expiry}`;
+      } else if (product.showProductName && product.showQuantity && product.showPrice) {
+        var name = selectedProduct.productName;
+        var price = selectedProduct.sellingPrice;
+        var quantity = selectedProduct.quantity;
+        return `Name:${name},Price:${price},QTY:${quantity}`;
+      } else if (product.showProductName && product.showQuantity && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var quantity = selectedProduct.quantity;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},QTY:${quantity},Exp:${expiry}`;
+      } else if (product.showProductName && product.showSku) {
+        var name = selectedProduct.productName;
+        var sku = selectedProduct.sku;
+        return `Name:${name},SKU:${sku}`;
+      } else if (product.showProductName && product.showPrice) {
+        var name = selectedProduct.productName;
+        var price = selectedProduct.sellingPrice;
+        return `Name:${name},Price:${price}`;
+      } else if (product.showProductName && product.showExpiryDate) {
+        var name = selectedProduct.productName;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Name:${name},Exp:${expiry}`;
+      } else if (product.showProductName && product.showQuantity) {
+        var name = selectedProduct.productName;
+        var quantity = selectedProduct.quantity;
+        return `Name:${name},QTY:${quantity}`;
+      } else if (product.showSku && product.showPrice && product.showExpiryDate) {
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `SKU:${sku},Price:${price},Exp:${expiry}`;
+      } else if (product.showSku && product.showPrice) {
+        var sku = selectedProduct.sku;
+        var price = selectedProduct.sellingPrice;
+        return `SKU:${sku},Price:${price}`;
+      } else if (product.showSku && product.showExpiryDate) {
+        var sku = selectedProduct.sku;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `SKU:${sku},Exp:${expiry}`;
+      } else if (product.showSku && product.showQuantity) {
+        var sku = selectedProduct.sku;
+        var quantity = selectedProduct.quantity;
+        return `SKU:${sku},QTY:${quantity}`;
+      } else if (product.showPrice && product.showExpiryDate) {
+        var price = selectedProduct.sellingPrice;
+        var expiry = selectedProduct.variants.Expiry[0];
+        return `Price:${price},Exp:${expiry}`;
+      } else if (product.showPrice && product.showQuantity) {
+        var price = selectedProduct.sellingPrice;
+        var quantity = selectedProduct.quantity;
+        return `Price:${price},QTY:${quantity}`;
+      } else if (product.showExpiryDate && product.showQuantity) {
+        var expiry = selectedProduct.variants.Expiry[0];
+        var quantity = selectedProduct.quantity;
+        return `Exp:${expiry},QTY:${quantity}`;
+      } else if (product.showProductName) {
+        return "Name:"+selectedProduct.productName;
+      } else if (product.showSku) {
+        return "SKU:"+selectedProduct.sku;
+      } else if (product.showPrice) {
+        return "Price:"+selectedProduct.sellingPrice;
+      } else if (product.showExpiryDate) {
+        return "Exp:"+selectedProduct.variants.Expiry[0];
+      } else if (product.showQuantity) {
+        return "QTY:"+selectedProduct.quantity;
+      } else {
+        return "Name:"+selectedProduct.productName || "SKU:"+selectedProduct.sku || "Price:"+selectedProduct.sellingPrice || "Exp:"+selectedProduct.variants.Expiry[0] || "QTY:"+selectedProduct.quantity || '';
+      }
+    }
+
+    // const barcodeValue =  barcodeNaming(product, selectedProduct);
+    // const barcodeValue =  Math.floor(100000000000 + Math.random() * 900000000000).toString();
     const barcodeValue = selectedProduct.itemBarcode;
 
     setProduct((prev) => ({
       ...prev,
-      barcode: barcodeNumber,
-      barcodeImg: barcodeNumber,
+      barcode: barcodeValue,
+      barcodeImg: barcodeValue,
     }));
 
     setTimeout(() => {
@@ -164,7 +277,7 @@ function Barcode() {
         const barcodeElement = document.getElementById(barcodeId);
         if (barcodeElement) {
           JsBarcode(barcodeElement, barcodeValue, {
-            format: "CODE39",
+            format: "CODE128",
             lineColor: "#000",
             width: 1,
             height: 60,
@@ -473,7 +586,7 @@ function Barcode() {
                     <tbody>
                       <tr>
                         <td style={{padding:'8px'}}><input type="checkbox" /> <img src={selectedProduct.images[0].url} style={{width:'30px',height:'30px',borderRadius:'6px'}} /> {selectedProduct.productName}</td>
-                        <td>₹{selectedProduct.sellingPrice || selectedProduct.retailPrice || '0'}.00</td>
+                        <td>₹{selectedProduct.sellingPrice || '0'}.00</td>
                         <td>{selectedProduct.quantity || '0'}</td>
                       </tr>
                     </tbody>
@@ -576,7 +689,7 @@ function Barcode() {
             display: "flex",
             justifyContent: "space-between",
             gap: "10px",
-            maxWidth: "645px",
+            maxWidth: "690px",
             margin: "auto",
             marginTop: "16px",
           }}
