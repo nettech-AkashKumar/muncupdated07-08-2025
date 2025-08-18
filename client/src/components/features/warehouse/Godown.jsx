@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MdArrowForwardIos } from "react-icons/md";
 import { FaSearch, FaArrowRight, FaAngleLeft, FaChevronRight } from "react-icons/fa";
 import { RiArrowUpDownLine } from "react-icons/ri";
-
+// import "./Godown.css";
 import Popup from "./popup";
 
 function Godown() {
@@ -697,7 +697,7 @@ function Godown() {
             style={{
               width: "303px",
               height: "345px",
-              marginTop: "-30px",
+              marginTop: "0px",
               transform: "rotate(90deg)",
             }}
           >
