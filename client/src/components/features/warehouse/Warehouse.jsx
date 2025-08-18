@@ -1076,16 +1076,66 @@
 
 
 
- import React from "react";
+ import React, { useCallback, useEffect, useState } from "react";
 import { MdArrowForwardIos } from "react-icons/md";
 import { PiWarehouseFill } from "react-icons/pi";
 import { FaHeart } from "react-icons/fa";
 import { FaArrowRight } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import BASE_URL from "../../../pages/config/config";
+import AddWarehouseModal from "../../../pages/Modal/warehouse/AddWarehouseModal";
+import axios from "axios";
 
 
 
 function Warehouse() {
+  const [warehouses, setWarehouses] = useState([]);
+     const [loading, setLoading] = useState(false);
+        const [error, setError] = useState(null);
+
+
+  const fetchWarehouses = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${BASE_URL}/api/warehouse`); // <- endpoint
+            
+            
+            setWarehouses(res.data.data); // backend: { success, data }
+            
+        } catch (err) {
+            setError(err);
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+      useEffect(() => {
+        fetchWarehouses();
+//         const listener = () => fetchWarehouses();
+//         window.addEventListener("warehouse-added", listener);
+//         return () => window.removeEventListener("warehouse-added", listener);
+    }, [fetchWarehouses]);
+
+
+
+
+
+    const warehousedata = [
+      {
+        wname :"Warehouse Delhi",
+        adrress :"Delhi",
+        ownername :"Ram prashad",
+        worth :"$76,986",
+      },
+      {
+        wname :"Warehouse patna",
+        adrress :"patna",
+        ownername :"Devi prashad",
+        worth :"$76,986",
+      },
+      
+    ]
 
   return (
     <div>
@@ -1141,15 +1191,18 @@ function Warehouse() {
 
         <div style={{ marginTop: "2px" }}>
           <div className="row">
-            <div className="col">
+            {console.log('wre', warehouses)}
+          {warehouses.map((item)=>(
+            <div className="col-3">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "flex-start",
+                  marginBottom:'30px',
                   height: "150px", // Set a fixed or min height
                   position: "relative", // for absolute positioning inside
                 }}
@@ -1181,7 +1234,8 @@ function Warehouse() {
                           fontWeight: "bold",
                         }}
                       />{" "}
-                      Warehouse Delhi
+                      {/* Warehouse Delhi */}
+                      {item.contactPerson.firstName} {item.contactPerson.lastName}
                     </span>
                   </div>
 
@@ -1219,9 +1273,10 @@ function Warehouse() {
                   {/* Address */}
                   <div>
                     <p style={{ margin: "0", fontWeight: "500" }}>
-                      Delhi - Ram Prashad
+                      {/* Delhi - Ram Prashad */}
+                      {item.city.cityName}&nbsp;-&nbsp;{item.contactPerson.firstName} {item.contactPerson.lastName}
                     </p>
-                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ color: "#1368EC" }}>$76,000</span>
                     <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
                   </div>
 
@@ -1234,103 +1289,7 @@ function Warehouse() {
                 </div>
               </div>
             </div>
-
-            {/* Other Columns (2nd) */}
-            <div className="col">
-              <div
-                style={{
-                  backgroundColor: "#ffffff",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  height: "150px", // Set a fixed or min height
-                  position: "relative", // for absolute positioning inside
-                }}
-              >
-                {/* WH-006 and Heart - Left Side */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    marginBottom: "10px",
-                  }}
-                >
-                  {/* Left: WH-001 */}
-                  <div
-                    style={{
-                      backgroundColor: "#f1f1f1",
-                      border: "1px solid #e6e6e6",
-                      borderRadius: "8px",
-                      padding: "10px ",
-                      alignItems: "center",
-                    }}
-                  >
-                    <span>
-                      <PiWarehouseFill
-                        style={{
-                          color: "#1368EC",
-                          fontSize: "20px",
-                          fontWeight: "bold",
-                        }}
-                      />{" "}
-                      WareHouse Ranchi
-                    </span>
-                  </div>
-
-                  {/* Right: Heart icon */}
-                  <div
-                    style={{
-                      padding: "10px",
-                      backgroundColor: "#f1f1f1",
-                      borderRadius: "8px",
-                      width: "fit-content",
-                    }}
-                  >
-                    <FaHeart
-                      style={{
-                        color: "#1368EC",
-                        fontWeight: "500",
-                        fontSize: "26px",
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Bottom Section (Address + Arrow) */}
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "10px",
-                    left: "10px",
-                    right: "10px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-end",
-                  }}
-                >
-                  {/* Address */}
-                  <div>
-                    <p style={{ margin: "0", fontWeight: "500" }}>
-                      Ranchi - Abhay Kumar
-                    </p>
-                    <span style={{ color: "#1368EC" }}>$76,986 </span>
-                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
-                  </div>
-
-                  {/* Arrow */}
-                  <div>
-                    <Link to="/WarehouseDetails">
-                      <FaArrowRight />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col"></div>
-            <div className="col"></div>
+          ))}
           </div>
         </div>
       </div>
@@ -1357,7 +1316,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1452,7 +1411,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1559,7 +1518,7 @@ function Warehouse() {
           paddingBottom: "4px",
         }}
       >
-        <span>Favouite</span>
+        <span>Owened</span>
 
         {/* Cards */}
 
@@ -1568,7 +1527,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1663,7 +1622,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1759,7 +1718,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1852,7 +1811,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1957,7 +1916,7 @@ function Warehouse() {
           paddingBottom: "4px",
         }}
       >
-        <span>Favouite</span>
+        <span>Third-Party warehouse</span>
 
         {/* Cards */}
 
@@ -1966,7 +1925,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -2061,7 +2020,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",

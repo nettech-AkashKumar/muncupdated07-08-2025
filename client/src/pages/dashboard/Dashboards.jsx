@@ -51,7 +51,8 @@ const styles = {
     display:"flex",
     flexDirection:"column",
     gap:"20px",
-    height:"451px"
+    height:"451px",
+    width:"100%"
     
   },
   header: {
@@ -390,6 +391,7 @@ const Dashboards = () => {
         }}
       >
         <div
+           className="dahsbaord-head-title"
           style={{
             borderBottom: "1px solid #C2C9D1",
             paddingBottom: "20px",
@@ -399,6 +401,7 @@ const Dashboards = () => {
           }}
         >
           <h1
+          
             style={{
               color: "#0E101A",
               fontFamily: '"Poppins", sans-serif',
@@ -409,7 +412,7 @@ const Dashboards = () => {
           >
             Dashboard
           </h1>
-          <div>
+          <div className="dahsbaord-select-time-period">
             <div
               style={{
                 position: "relative",
@@ -510,7 +513,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -544,7 +548,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -578,7 +583,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -612,7 +618,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -648,7 +655,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -682,7 +690,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -716,7 +725,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -750,7 +760,8 @@ const Dashboards = () => {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                width: "330px",
+                 width:"100%",
+                maxWidth: "330px",
                 height: "80px",
                 padding: "15px 5px",
               }}
@@ -777,7 +788,7 @@ const Dashboards = () => {
         </div>
         <div className="graph-container d-flex flex-column gap-3">
           <div className="d-flex justify-content-between">
-            <div className="graph-1-dash" style={{width:"525px",}}>
+            <div className="graph-1-dash" style={{width:"100%",maxWidth:"525px",}}>
             <div style={styles.card}>
                <div style={{borderBottom:"1px solid #C2C9D1"}}>
                  <div style={styles.header}>
@@ -818,7 +829,7 @@ const Dashboards = () => {
               </div>
             </div>
           </div>
-           <div className="graph-2-dash" style={{width:"525px",}}>
+           <div className="graph-2-dash"  style={{width:"100%",maxWidth:"525px",}}>
             <div style={styles.card}>
                <div style={{borderBottom:"1px solid #C2C9D1"}}>
                  <div style={styles.header}>
@@ -859,12 +870,12 @@ const Dashboards = () => {
               </div>
             </div>
           </div>
-           <div className="image-graph-dash" >
-               <img style={{width:"525px",}} src={advertisment_dash} alt="advertisment_dash" />
+           <div className="image-graph-dash"  style={{width:"100%",maxWidth:"525px",}}>
+               <img style={{width:"100%",height:"451px"}}  src={advertisment_dash} alt="advertisment_dash" />
            </div>
           </div>
            <div className="d-flex justify-content-between">
-             <div className="graph-3-dash" style={{width:"525px",}}>
+             <div className="graph-3-dash" style={{width:"100%",maxWidth:"525px",}}>
             <div style={styles.card}>
                <div style={{borderBottom:"1px solid #C2C9D1"}}>
                  <div style={styles.header}>
@@ -905,7 +916,7 @@ const Dashboards = () => {
               </div>
             </div>
           </div>
-            <div className="graph-4-dash" style={{width:"525px",}}>
+            <div className="graph-4-dash" style={{width:"100%",maxWidth:"525px",}}>
             <div style={styles.card}>
                <div style={{borderBottom:"1px solid #C2C9D1"}}>
                  <div style={styles.header}>
@@ -947,7 +958,7 @@ const Dashboards = () => {
             </div>
           </div>
           
-            <div className="top-selling-dash" style={{width:"525px",}}>
+            <div className="top-selling-dash" style={{width:"100%",maxWidth:"525px",}}>
             <div style={styles.card}>
                <div >
                  <div style={styles.header}>
