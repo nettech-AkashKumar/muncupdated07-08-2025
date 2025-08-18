@@ -5,8 +5,8 @@ import { MdArrowForwardIos } from "react-icons/md";
 import DonutChart from "react-donut-chart";
 
 import { FaSackDollar } from "react-icons/fa6";
-import {  RiAlertFill} from "react-icons/ri";
-import {  FaStopCircle} from "react-icons/fa";
+import { RiAlertFill } from "react-icons/ri";
+import { FaStopCircle } from "react-icons/fa";
 // import { LineChart } from "@mui/x-charts/LineChart";
 import { Box, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts";
@@ -148,9 +148,8 @@ function WarehouseDetails() {
 
   return (
     <div>
-        <style>
-        {
-          `
+      <style>
+        {`
           .three-box {
   padding: 15px;
   background-color: #ffffff;
@@ -179,8 +178,7 @@ function WarehouseDetails() {
   padding-right: 20px; /* small space before border */
 }
 
-          `
-        }
+          `}
       </style>
       {/* Header */}
       <div
@@ -245,7 +243,7 @@ function WarehouseDetails() {
         <div className="radio-active">
           <div>
             {/* <img src={RiAlertFill} alt="money" /> */}
-            <RiAlertFill/>
+            <RiAlertFill />
           </div>
           <div className="bag-content">
             <span style={{ color: "#676767", marginTop: "50px" }}>
@@ -276,7 +274,7 @@ function WarehouseDetails() {
         <div className="radio-active">
           <div>
             {/* <img src={FaStopCircle} alt="money" /> */}
-            <FaStopCircle/>
+            <FaStopCircle />
           </div>
           <div className="bag-content">
             <span style={{ color: "#676767", marginTop: "50px" }}>
@@ -524,7 +522,7 @@ function WarehouseDetails() {
               ₹ 76,986.00
             </Typography>
 
-            {/* Chart */}
+          
             {/* Chart */}
             <LineChart
               xAxis={[
@@ -709,7 +707,7 @@ function WarehouseDetails() {
         </div>
       </div> */}
 
-        <div
+      <div
         style={{
           backgroundColor: "#fff",
           marginTop: "20px",
@@ -925,7 +923,6 @@ function WarehouseDetails() {
             }}
           >
             <Link to="/Godown">
-              {" "}
               View All <FaArrowRight />
             </Link>
           </span>
@@ -986,38 +983,6 @@ function WarehouseDetails() {
             <span style={tagStyle}>Sunmica</span>
           </div>
         </div>
-
-        {/* godown 2 */}
-        {/* <div
-          style={{
-            marginTop: "20px",
-            backgroundColor: "#red",
-            borderRadius: "8px",
-            boxShadow: "0px 0px 8px 3px #0000001A",
-            padding: "16px",
-          }}
-        > */}
-        {/* Header */}
-        {/* <div
-            style={{
-              padding: "16px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <span>Godown</span>
-            <span
-              style={{
-                color: "#1368EC",
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                cursor: "pointer",
-              }}
-            >
-             
-            </span>
-          </div> */}
 
         {/* Content */}
         <div
@@ -1092,7 +1057,7 @@ function WarehouseDetails() {
         <div
           style={{
             padding: "16px 24px",
-            borderBottom: "1px solid #e6e6e6", 
+            borderBottom: "1px solid #e6e6e6",
             fontWeight: "500",
             fontSize: "18px",
             color: "#262626",
@@ -1132,71 +1097,96 @@ function WarehouseDetails() {
           </div>
         </div>
 
-        <div style={{ padding: "8px 24px", gap: "18px", display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <div
+          style={{
+            padding: "8px 24px",
+            gap: "18px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <div>
             <span
-            style={{
-              font: "Robot",
-              fontWeight: "400",
-              fontSize: "16px",
-              color: "#262626",
-              padding: "8px",
-            }}
-          >
-            All
-          </span>
-          <span
-            style={{
-              font: "Robot",
-              fontWeight: "400",
-              fontSize: "16px",
-              color: "#262626",
-              padding: "8px",
-            }}
-          >
-            Stock In
-          </span>
-          <span
-            style={{
-              font: "Robot",
-              fontWeight: "400",
-              fontSize: "16px",
-              color: "#262626",
-              padding: "8px",
-            }}
-          >
-            Stock Out
-          </span>
-          <span
-            style={{
-              font: "Robot",
-              fontWeight: "400",
-              fontSize: "16px",
-              color: "#262626",
-              padding: "8px",
-            }}
-          >
-            Transfer
-          </span>
-          <span
-            style={{
-              font: "Robot",
-              fontWeight: "400",
-              fontSize: "16px",
-              color: "#262626",
-              padding: "8px",
-            }}
-          >
-            Processing
-          </span>
+              style={{
+                font: "Robot",
+                fontWeight: "400",
+                fontSize: "16px",
+                color: "#262626",
+                padding: "8px",
+              }}
+            >
+              All
+            </span>
+            <span
+              style={{
+                font: "Robot",
+                fontWeight: "400",
+                fontSize: "16px",
+                color: "#262626",
+                padding: "8px",
+              }}
+            >
+              Stock In
+            </span>
+            <span
+              style={{
+                font: "Robot",
+                fontWeight: "400",
+                fontSize: "16px",
+                color: "#262626",
+                padding: "8px",
+              }}
+            >
+              Stock Out
+            </span>
+            <span
+              style={{
+                font: "Robot",
+                fontWeight: "400",
+                fontSize: "16px",
+                color: "#262626",
+                padding: "8px",
+              }}
+            >
+              Transfer
+            </span>
+            <span
+              style={{
+                font: "Robot",
+                fontWeight: "400",
+                fontSize: "16px",
+                color: "#262626",
+                padding: "8px",
+              }}
+            >
+              Processing
+            </span>
           </div>
+
           {/* three icon */}
-          <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
-            <div style={{display:'flex',border:'1px solid #f1f1f1', padding:'6px', borderRadius:'4px', gap:'4px', color:'#676767' }}>
-              <CiSearch style={{fontSize:'20px'}} />
-              <IoFilter style={{fontSize:'20px'}} />
+          <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                border: "1px solid #f1f1f1",
+                padding: "6px",
+                borderRadius: "4px",
+                gap: "4px",
+                color: "#676767",
+              }}
+            >
+              <CiSearch style={{ fontSize: "20px" }} />
+              <IoFilter style={{ fontSize: "20px" }} />
             </div>
-            <div style={{color:'#676767', border:'1px solid #f1f1f1', padding:'4px', borderRadius:'4px' }}>
+            <div
+              style={{
+                color: "#676767",
+                border: "1px solid #f1f1f1",
+                padding: "4px",
+                borderRadius: "4px",
+              }}
+            >
               <LuArrowUpDown />
             </div>
           </div>
@@ -1204,32 +1194,138 @@ function WarehouseDetails() {
 
         {/* Table */}
         <div>
-          <table >
-            <thead>
-              <tr style={{ backgroundColor: "#e6e6e6" }}>
-                <th>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              backgroundColor: "#fff",
+            }}
+          >
+            <thead style={{ backgroundColor: "#f1f1f1" }}>
+              <tr
+                style={{
+                  color: "#676767",
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: "16px",
+                  fontWeight: "400",
+                }}
+              >
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
                   <input type="checkbox" />
                 </th>
-                <th>Product</th>
-                <th>Time</th>
-                <th>QTY</th>
-                <th>Movement type</th>
-                <th>Source/Destination</th>
-                <th>Reference/Note</th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
+                  Product
+                </th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
+                  Time
+                </th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>QTY</th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
+                  Movement type
+                </th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
+                  Source/Destination
+                </th>
+                <th style={{ padding: "12px 24px", textAlign: "left" }}>
+                  Reference/Note
+                </th>
               </tr>
             </thead>
+
             <tbody>
               {dummyData.map((item, index) => (
-                <tr key={index}>
-                  <td>
+                <tr key={index} style={{ cursor: "pointer" }}>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
                     <input type="checkbox" />
                   </td>
-                  <td>{item.product}</td>
-                  <td>{item.time}</td>
-                  <td>{item.qty}</td>
-                  <td><span className={`status ${item.movementType.toLowerCase()}`}>{item.movementType}</span></td>
-                  <td>{item.sourceDest}</td>
-                  <td>{item.reference}</td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {item.product}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {item.time}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {item.qty}
+                  </td>
+                  <td
+                    style={{ borderBottom: "1px solid #ddd", padding: "8px" }}
+                  >
+                    {(() => {
+                      const type = item.movementType.trim().toLowerCase(); // normalize
+
+                      if (type === "stock in") {
+                        return (
+                          <span
+                            style={{
+                              padding: "4px 12px",
+                              borderRadius: "20px",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              backgroundColor: "#DFFFE0", // green shade
+                            }}
+                          >
+                            {item.movementType}
+                          </span>
+                        );
+                      }
+
+                      if (type === "stock out") {
+                        return (
+                          <span
+                            style={{
+                              padding: "4px 12px",
+                              borderRadius: "20px",
+                              fontSize: "13px",
+                              fontWeight: "500",
+                              backgroundColor: "#FCE4E6", // red shade
+                            }}
+                          >
+                            {item.movementType}
+                          </span>
+                        );
+                      }
+
+                      // fallback (no color)
+                      return <span>{item.movementType}</span>;
+                    })()}
+                  </td>
+
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {item.sourceDest}
+                  </td>
+                  <td
+                    style={{
+                      padding: "12px 24px",
+                      borderBottom: "1px solid #e6e6e6",
+                    }}
+                  >
+                    {item.reference}
+                  </td>
                 </tr>
               ))}
             </tbody>
