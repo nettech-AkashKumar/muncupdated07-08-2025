@@ -525,6 +525,7 @@ function WarehouseDetails() {
             </Typography>
 
             {/* Chart */}
+            {/* Chart */}
             <LineChart
               xAxis={[
                 {
