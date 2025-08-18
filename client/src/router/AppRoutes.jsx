@@ -112,6 +112,7 @@ import AddWarehouse from "../components/features/warehouse/AddWarehouse.jsx";
 import WarehouseDetails from "../components/features/warehouse/WarehouseDetails.jsx";
 import Godown from "../components/features/warehouse/Godown.jsx";
 import SelectPage from "../components/features/warehouse/SelectPage.jsx";
+import StockMovementLog from "../components/features/warehouse/StockMovementLog.jsx";
 
 const AppRoutes = () => {
   return (
@@ -215,6 +216,7 @@ const AppRoutes = () => {
         <Route path="/Purchase-settings" element={<PurchaseSettings />} />
         <Route path="/warehouse-settings" element={<RackSettings />} />
         <Route path="/sidebar-settings" element={<SidebarSettings />} />
+        <Route path="/stock-movement-log" element={<StockMovementLog />} />
 
 
 
