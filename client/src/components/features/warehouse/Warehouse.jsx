@@ -1144,7 +1144,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
@@ -1239,7 +1239,7 @@ function Warehouse() {
             <div className="col">
               <div
                 style={{
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#f9f9f9",
                   padding: "10px",
                   borderRadius: "8px",
                   display: "flex",
