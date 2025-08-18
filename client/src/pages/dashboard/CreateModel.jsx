@@ -38,7 +38,7 @@ const ModelItem = styled.span`
 `;
 const CreateModel = () => {
   return (
-     <ModelWrapper>
+     <ModelWrapper className="dashboard-create-model">
       <ModelItem>
         <img src={cr_invoice} alt="cr_invoice" />
         Create Invoice
