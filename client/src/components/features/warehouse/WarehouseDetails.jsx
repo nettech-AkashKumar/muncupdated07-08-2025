@@ -212,7 +212,7 @@ function WarehouseDetails() {
       <div className="three-box">
         {/*total spent */}
         <div className="radio-active">
-          <div>
+          <div style={{background:"#f1f3f5",height:"45px", width:"45px",borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"24px", color:"#007bff"}}>
             {/* <img src={RiAlertFill} alt="money" /> */}
             <RiAlertFill />
           </div>
@@ -243,7 +243,7 @@ function WarehouseDetails() {
 
         {/* Initial Purchase Date */}
         <div className="radio-active">
-          <div>
+          <div style={{background:"#f1f3f5",height:"45px", width:"45px",borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px", color:"#007bff"}}>
             {/* <img src={FaStopCircle} alt="money" /> */}
             <FaStopCircle />
           </div>
@@ -269,8 +269,9 @@ function WarehouseDetails() {
             justifyContent: "center",
           }}
         >
-          <div>
-            <img src={RiAlertFill} alt="money" />
+          <div style={{background:"#f1f3f5",height:"45px", width:"45px",borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px", color:"#007bff"}}>
+            {/* <img src={RiAlertFill} alt="money" /> */}
+            <FaSackDollar />
           </div>
 
           <div className="bag-content">
