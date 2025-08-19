@@ -482,28 +482,32 @@ function Navbar() {
               <div className="dropdown-menu menu-drop-user">
                 <div className="profileset d-flex align-items-center">
                   <span className="user-img me-2">
+  {user && user.profileImage && user.profileImage.length > 0 ? (
+    <img
+      src={user.profileImage[0].url}
+      alt="Profile"
+      style={{
+        width: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  ) : userData && userData.profileImage && userData.profileImage.url ? (
+    <img
+      src={userData.profileImage.url}
+      alt="Profile"
+      style={{
+        width: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  ) : (
+    
+  
 
-                     {user.profileImage &&
-                    user.profileImage.length > 0 ? (
-                    <img
-                      src={user.profileImage[0].url}
-                      alt="Profile"
-                    
-                    />
-                  ) : (
-=======
-                    {userData?.profileImage?.url  ? (
-                      <img
-                        src={userData.profileImage.url}
-                        alt="Profile"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          objectFit: "cover"
-                        }}
-                      />
-                    ) : (
                       <div
                         className="bg-secondary text-white d-flex justify-content-center align-items-center"
                         style={{ 
