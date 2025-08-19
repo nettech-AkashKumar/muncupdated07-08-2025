@@ -14,7 +14,6 @@ import { GrFormPrevious } from "react-icons/gr";
 import { MdNavigateNext } from "react-icons/md";
 import Iconss from "../../../assets/images/Iconss.png";
 
-
 const Users = () => {
   const [activeRoles, setActiveRoles] = useState([]);
   const [selectedRole, setSelectedRole] = useState(null);
@@ -1151,12 +1150,12 @@ const Users = () => {
                                 control: (base) => ({
                                   ...base,
                                   backgroundColor: "#FBFBFB",
-                                   border: "1px solid #C2C2C2",
+                                  border: "1px solid #C2C2C2",
                                   borderRadius: "8px",
                                   fontSize: "14px",
                                   fontWeight: 400,
                                   color: "#676767",
-                                  outline:"none"
+                                  outline: "none",
                                 }),
                               }}
                             />
@@ -1332,29 +1331,30 @@ const Users = () => {
                               data-bs-toggle="dropdown"
                               aria-expanded="false"
                             >
-                              {status ? "Active" : "Inactive"}<BiChevronDown/>
+                              {status ? "Active" : "Inactive"}
+                              <BiChevronDown />
                             </button>
-                             <ul
-                          className="dropdown-menu"
-                          aria-labelledby="statusDropdown"
-                        >
-                          <li>
-                            <a
-                              className="dropdown-item"
-                              onClick={() => setStatus(true)}
+                            <ul
+                              className="dropdown-menu"
+                              aria-labelledby="statusDropdown"
                             >
-                              Active
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="dropdown-item"
-                              onClick={() => setStatus(false)}
-                            >
-                              Inactive
-                            </a>
-                          </li>
-                        </ul>
+                              <li>
+                                <a
+                                  className="dropdown-item"
+                                  onClick={() => setStatus(true)}
+                                >
+                                  Active
+                                </a>
+                              </li>
+                              <li>
+                                <a
+                                  className="dropdown-item"
+                                  onClick={() => setStatus(false)}
+                                >
+                                  Inactive
+                                </a>
+                              </li>
+                            </ul>
                           </div>
                           {/* <input
                             type="checkbox"
@@ -1390,7 +1390,6 @@ const Users = () => {
                           color: "#676767",
                           borderRadius: "5px",
                         }}
-                        
                       >
                         Cancel
                       </button>
@@ -1424,26 +1423,31 @@ const Users = () => {
 
         {/* Edit User */}
         <div className="modal" id="edit-user">
-          <div className="modal-dialog modal-dialog-centered"
-          style={{ maxWidth: "970px", height: "540px" }}
+          <div
+            className="modal-dialog modal-dialog-centered"
+            style={{ maxWidth: "970px", height: "540px" }}
           >
-            <div className="modal-content"  style={{
+            <div
+              className="modal-content"
+              style={{
                 height: "100%",
                 padding: "10px",
               }}
->
+            >
               <div className="page-wrapper-new p-0">
                 <div className="content">
                   <div className="">
                     <div className="page-title">
-                      <h4 
-                      style={{
+                      <h4
+                        style={{
                           color: "#262626",
                           fontSize: "14px",
                           fontWeight: 400,
                           lineHeight: "14px",
                         }}
-                      >Edit User</h4>
+                      >
+                        Edit User
+                      </h4>
                     </div>
                     <hr style={{ height: "1px", color: "#bbbbbb" }} />
                     {/* <button
@@ -1456,219 +1460,326 @@ const Users = () => {
                       <span aria-hidden="true">×</span>
                     </button> */}
                   </div>
-                  <form onSubmit={handleUpdate}
-                  style={{ padding: "0px 20px" }}
-                  >
-                    <div className="modal-body">
-                      <div className="row">
-                        <div className="col-lg-12">
-                          <div className="new-employee-field">
-                            <div className="profile-pic-upload image-field">
-                              <div className="profile-pic p-2">
-                                <img
-                                  src={
-                                    typeof editUserData.profileImage ===
-                                    "string"
-                                      ? editUserData.profileImage
-                                      : editUserData.profileImage
-                                      ? URL.createObjectURL(
-                                          editUserData.profileImage
-                                        ) //newly selected file
-                                      : "assets/img/users/user-49.png"
-                                  }
-                                  className="object-fit-cover h-100 rounded-1"
-                                  alt="user"
-                                  style={{
-                                    height: "120px",
-                                    width: "120px",
-                                    borderRadius: "13px",
-                                  }}
-                                />
-                              </div>
-                              <div className="mb-3">
-                                <div className="image-upload mb-0">
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    ref={editFileInputRef}
-                                    onChange={(e) =>
-                                      setEditUserData({
-                                        ...editUserData,
-                                        profileImage: e.target.files[0],
-                                      })
-                                    }
-                                  />
-                                  <div className="image-uploads">
-                                    <h4
-                                      style={{ cursor: "pointer" }}
-                                      onClick={editHandleIconClick}
-                                    >
-                                      Change Image
-                                    </h4>
-                                  </div>
-                                </div>
-                                <p className="mt-2">JPEG, PNG up to 2 MB</p>
-                              </div>
-                            </div>
+                  <form onSubmit={handleUpdate} style={{ padding: "0px 20px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        border: "2px dashed #dadadaff",
+                        padding: "10px",
+                        borderRadius: "8px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <img
+                        src={
+                          typeof editUserData.profileImage === "string"
+                            ? editUserData.profileImage
+                            : editUserData.profileImage
+                            ? URL.createObjectURL(editUserData.profileImage) //newly selected file
+                            : "assets/img/users/user-49.png"
+                        }
+                        className="object-fit-cover h-100 rounded-1"
+                        alt="user"
+                        style={{
+                          height: "120px",
+                          width: "120px",
+                          borderRadius: "13px",
+                        }}
+                      />
+
+                      <div className="mb-3">
+                        <div className="image-upload mb-0">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            ref={editFileInputRef}
+                            onChange={(e) =>
+                              setEditUserData({
+                                ...editUserData,
+                                profileImage: e.target.files[0],
+                              })
+                            }
+                          />
+                          <div className="image-uploads">
+                            <h4
+                              style={{ cursor: "pointer" }}
+                              onClick={editHandleIconClick}
+                            >
+                              Change Image
+                            </h4>
                           </div>
                         </div>
+                        <p className="mt-2">JPEG, PNG up to 2 MB</p>
+                      </div>
+                    </div>
 
-                        {/* First Name */}
-                        <div className="col-lg-6">
-                          <div className="mb-3">
-                            <label className="form-label">First Name *</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={editUserData.firstName}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  firstName: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
+                    {/* First Name Last Name */}
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "20px",
+                        marginBottom: "20px",
+                      }}
+                    >
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "100%",
+                            gap: "5px",
+                          }}
+                        >
+                          <label
+                            className="ffrrstname"
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "14px",
+                              lineHeight: "14px",
+                            }}
+                          >
+                            First Name 
+                          </label>
+                          <input
+                            type="text"
+                            className="ffrrstnameinput"
+                            value={editUserData.firstName}
+                            onChange={(e) =>
+                              setEditUserData({
+                                ...editUserData,
+                                firstName: e.target.value,
+                              })
+                            }
+                          />
                         </div>
+                      </div>
 
-                        {/* Last Name */}
-                        <div className="col-lg-6">
-                          <div className="mb-3">
-                            <label className="form-label">Last Name *</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={editUserData.lastName}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  lastName: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
+                      {/* Last Name */}
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "100%",
+                            gap: "5px",
+                          }}
+                        >
+                          <label
+                            className="ffrrstname"
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "14px",
+                              lineHeight: "14px",
+                            }}
+                          >
+                            Last Name 
+                          </label>
+                          <input
+                            type="text"
+                            className="ffrrstnameinput"
+                            value={editUserData.lastName}
+                            onChange={(e) =>
+                              setEditUserData({
+                                ...editUserData,
+                                lastName: e.target.value,
+                              })
+                            }
+                          />
                         </div>
+                      </div>
+                    </div>
 
-                        {/* Role */}
-                        <div className="col-lg-12">
-                          <div className="mb-3">
-                            <label className="form-label">
-                              Role<span className="text-danger ms-1">*</span>
-                            </label>
-                            <Select
-                              options={activeRoles}
-                              value={editUserData.role}
-                              isDisabled={
-                                editUserData.role.label === "Unknown Role"
-                              }
-                              onChange={(selectedOption) => {
-                                setEditUserData({
-                                  ...editUserData,
-                                  role: selectedOption,
-                                });
+                    {/* Role */}
+                    <div
+                        style={{
+                          display: "flex",
+                          gap: "20px",
+                          marginBottom: "20px",
+                        }}
+                      >
+
+                      <div
+                          style={{
+                            flex: "0 0 50%",
+                            display: "flex",
+                            gap: "20px",
+                          }}
+                        >
+                        <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              width: "100%",
+                              gap: "5px",
+                            }}
+                          >
+
+                        <label  className="ffrrstname"
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "14px",
+                                lineHeight: "14px",
                               }}
-                              placeholder="Search or select a role..."
-                              isSearchable
-                            />
-                          </div>
+>
+                          Role
+                        </label>
+                        <Select
+                          options={activeRoles}
+                          value={editUserData.role}
+                          isDisabled={
+                            editUserData.role.label === "Unknown Role"
+                          }
+                          onChange={(selectedOption) => {
+                            setEditUserData({
+                              ...editUserData,
+                              role: selectedOption,
+                            });
+                          }}
+                          placeholder="Search or select a role..."
+                          isSearchable
+                           styles={{
+                                control: (base) => ({
+                                  ...base,
+                                  backgroundColor: "#FBFBFB",
+                                   border: "1px solid #C2C2C2",
+                                  borderRadius: "8px",
+                                  fontSize: "14px",
+                                  fontWeight: 400,
+                                  color: "#676767",
+                                  outline:"none"
+                                }),
+                              }}
+                        />
                         </div>
+                        </div>
+                      {/* Email */}
+                    <div
+                          style={{
+                            flex: "0 0 48%",
+                            display: "flex",
+                            gap: "20px",
+                          }}
+                        >
 
-                        {/* Email */}
-                        <div className="col-lg-12">
-                          <div className="mb-3">
-                            <label className="form-label">Email *</label>
-                            <input
-                              type="email"
-                              className="form-control"
-                              value={editUserData.email}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  email: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
+                      <div style={{ flex: 1 }}>
+                        <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                width: "100%",
+                                gap: "5px",
+                              }}
+                            >
 
-                        {/* Phone */}
-                        <div className="col-lg-12">
-                          <div className="mb-3">
-                            <label className="form-label">Phone *</label>
-                            <input
-                              type="tel"
-                              className="form-control"
-                              value={editUserData.phone}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  phone: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
+                        <label  className="ffrrstname"
+                                style={{
+                                  fontWeight: "400",
+                                  fontSize: "14px",
+                                  lineHeight: "14px",
+                                }}
+>Email </label>
+                        <input
+                          type="email"
+                           className="ffrrstnameinput"
+                          value={editUserData.email}
+                          onChange={(e) =>
+                            setEditUserData({
+                              ...editUserData,
+                              email: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
 
-                        {/* Password */}
-                        <div className="col-lg-6">
-                          <div className="mb-3">
-                            <label className="form-label">Password *</label>
-                            <input
-                              type="password"
-                              className="form-control"
-                              value={editUserData.password}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  password: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
+                    {/* Phone */}
+                     <div style={{ flex: 1 }}>
+                     <div
+                              style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                width: "100%",
+                                gap: "5px",
+                              }}
+                            >
+                        <label className="ffrrstname"
+                                style={{
+                                  fontWeight: "400",
+                                  fontSize: "14px",
+                                  lineHeight: "14px",
+                                }}
+>Phone </label>
+                        <input
+                          type="tel"
+                           className="ffrrstnameinput"
+                          value={editUserData.phone}
+                          onChange={(e) =>
+                            setEditUserData({
+                              ...editUserData,
+                              phone: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                      </div>
+                    </div>
 
-                        {/* Confirm Password */}
-                        <div className="col-lg-6">
-                          <div className="mb-3">
-                            <label className="form-label">
-                              Confirm Password *
-                            </label>
-                            <input
-                              type="password"
-                              className="form-control"
-                              value={editUserData.confirmPassword}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  confirmPassword: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
+                    {/* Password */}
+                    <div className="col-lg-6">
+                      <div className="mb-3">
+                        <label className="form-label">Password *</label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          value={editUserData.password}
+                          onChange={(e) =>
+                            setEditUserData({
+                              ...editUserData,
+                              password: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
 
-                        {/* Status */}
-                        <div className="col-lg-12">
-                          <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-                            <span className="status-label">Status</span>
-                            <input
-                              type="checkbox"
-                              id="user-status"
-                              className="check"
-                              checked={editUserData.status}
-                              onChange={(e) =>
-                                setEditUserData({
-                                  ...editUserData,
-                                  status: e.target.checked,
-                                })
-                              }
-                            />
-                            <label
-                              htmlFor="user-status"
-                              className="checktoggle"
-                            />
-                          </div>
-                        </div>
+                    {/* Confirm Password */}
+                    <div className="col-lg-6">
+                      <div className="mb-3">
+                        <label className="form-label">Confirm Password *</label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          value={editUserData.confirmPassword}
+                          onChange={(e) =>
+                            setEditUserData({
+                              ...editUserData,
+                              confirmPassword: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div className="col-lg-12">
+                      <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
+                        <span className="status-label">Status</span>
+                        <input
+                          type="checkbox"
+                          id="user-status"
+                          className="check"
+                          checked={editUserData.status}
+                          onChange={(e) =>
+                            setEditUserData({
+                              ...editUserData,
+                              status: e.target.checked,
+                            })
+                          }
+                        />
+                        <label htmlFor="user-status" className="checktoggle" />
                       </div>
                     </div>
 
