@@ -14,7 +14,7 @@ const {
 
   getPurchaseReturnStock,
 
-  importProducts, // ✅ Add import controller
+  
   scanProducts
 
 } = require("../controllers/productController");
