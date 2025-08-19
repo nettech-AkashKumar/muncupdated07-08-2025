@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { MdArrowForwardIos } from "react-icons/md";
 // import RadioActive from "../images/Radioactive.png";
 // import CircleLogo from "../images/Circlelogo.png";
@@ -16,11 +16,18 @@ import { Link } from "react-router-dom";
 import { CiSearch } from "react-icons/ci";
 import { IoFilter } from "react-icons/io5";
 import { LuArrowUpDown } from "react-icons/lu";
+import BASE_URL from "../../../pages/config/config";
+import AddWarehouseModal from "../../../pages/Modal/warehouse/AddWarehouseModal";
+import axios from "axios";
 
 // import { style } from './../../../node_modules/@mui/system/esm/Stack/createStack';
 
 function WarehouseDetails() {
   const [bgColor, setBgColor] = useState("");
+   const [warehousesDetails, setWarehousesDetails] = useState([]);
+
+      const [loading, setLoading] = useState(false);
+      const [error, setError] = useState(null);
 
   const chartData = [
     {
@@ -146,7 +153,38 @@ function WarehouseDetails() {
     },
   ];
 
+ 
+  
+  
+    const detailsWarehouses = useCallback(async () => {
+          setLoading(true);
+          try {
+              const res = await axios.get(`${BASE_URL}/api/warehouse`); // <- endpoint
+              
+              
+              setWarehousesDetails(res.data.data); // backend: { success, data }
+              
+          } catch (err) {
+              setError(err);
+              console.error(err);
+          } finally {
+              setLoading(false);
+          }
+      }, []);
+  
+        useEffect(() => {
+          detailsWarehouses();
+  //         const listener = () => fetchWarehouses();
+  //         window.addEventListener("warehouse-added", listener);
+  //         return () => window.removeEventListener("warehouse-added", listener);
+      }, [detailsWarehouses]);
+  
+
+
   return (
+
+
+
     <div>
     
       {/* Header */}
@@ -293,7 +331,7 @@ function WarehouseDetails() {
       </div>
 
       {/* basic detials of warehous */}
-
+              {console.log("data of detailware ",warehousesDetails)}
       <div
         style={{
           marginTop: "15px",
@@ -305,7 +343,11 @@ function WarehouseDetails() {
         <div style={{ gap: "10px", marginBottom: "20px" }}>
           <span>Warehouse Name</span>
           <br />
-          <span>Wh-001</span>
+          <span>
+            Wh-001
+            {/* {warehousesDetails.warehouseName} */}
+
+            </span>
         </div>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>

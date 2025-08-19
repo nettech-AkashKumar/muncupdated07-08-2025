@@ -1,4 +1,4 @@
-import React, { useState,useRef } from 'react';
+import React, { useState,useRef, useEffect } from 'react';
 import balancesheet_y from '../../../assets/img/balacesheet-y.png';
 import balancesheet_x from '../../../assets/img/balacesheet-x.png';
 import './BalanceSheetToggle.css';
@@ -46,27 +46,91 @@ const BalanceSheet = () => {
     const toggleCalendar = () => {
       setShowCalendar(!showCalendar);
     };
-     const [values, setValues] = useState({
+    const [values, setValues] = useState({
     bankBalance: 0,
     accountReceivable: 0,
     cashInHand: 0,
-    // prepaidExpenses: 0,
-    // property: 0,
-    // officeEquipment: 0,
-    // software: 0,
-    // deposit: 0,
+    prepaidExpenses: 0,
+    property: 0,
+    officeEquipment: 0,
+    software: 0,
+    deposit: 0,
   });
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setValues((prev) => ({
-    ...prev,
-    [name]: Number(value) || 0,
-  }));
-};
 
+  const [valuesSecond, setValuesSecond] = useState({
+    accountpayable: 0,
+    outstanding: 0,
+    shorttermLoan: 0,
+    longtermLoan: 0,
+    lease: 0,
+  });
 
-  // calculate total
-  const totalAssets = Object.values(values).reduce((a, b) => a + b, 0);
+  const [valuesThird, setValuesThird] = useState({
+    capital: 0,
+    retainedEarnings: 0,
+    withdrawl: 0,
+  });
+
+  const [totalAssets, setTotalAssets] = useState(0);
+  const [totalLiabilities, setTotalLiabilities] = useState(0);
+  const [totalequities, setTotalEquities] = useState(0);
+
+  // recalc totals
+  useEffect(() => {
+    setTotalAssets(Object.values(values).reduce((a, b) => a + b, 0));
+  }, [values]);
+
+  useEffect(() => {
+    setTotalLiabilities(Object.values(valuesSecond).reduce((a, b) => a + b, 0));
+  }, [valuesSecond]);
+
+  useEffect(() => {
+    setTotalEquities(Object.values(valuesThird).reduce((a, b) => a + b, 0));
+  }, [valuesThird]);
+
+  // input change handler
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const numericValue = Number(value) || 0;
+
+    if (name in values) {
+      setValues((prev) => ({ ...prev, [name]: numericValue }));
+    } else if (name in valuesSecond) {
+      setValuesSecond((prev) => ({ ...prev, [name]: numericValue }));
+    } else if (name in valuesThird) {
+      setValuesThird((prev) => ({ ...prev, [name]: numericValue }));
+    }
+  };
+
+  // ⏳ Debounce save to DB when data changes
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      saveToDB();
+    }, 800); // wait 0.8s after typing stops
+
+    return () => clearTimeout(timeout);
+  }, [values, valuesSecond, valuesThird, totalAssets, totalLiabilities, totalequities]);
+
+  const saveToDB = async () => {
+    try {
+      const payload = {
+        assets: values,
+        liabilities: valuesSecond,
+        equities: valuesThird,
+        totals: {
+          totalAssets,
+          totalLiabilities,
+          totalEquities: totalequities,
+        },
+      };
+      await axios.post("http://localhost:5000/api/balancesheet", payload);
+      console.log("✅ Auto-saved:", payload);
+    } catch (err) {
+      console.error("❌ Auto-save failed", err);
+    }
+  };
+  
+
 
   const renderTable = () => (
     <div className={`balance-sheet ${view}`} style={{padding:"5px 16px"}}>
@@ -83,15 +147,15 @@ const handleInputChange = (e) => {
                   onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
               <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Cash In Hand <span><input type="number"  name="cashInHand"
                   onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Prepaid Expenses <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Prepaid Expenses <span><input type="number" name="prepaidExpenses"  onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
               <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Advance to Suppliers <span>xxxx</span></li>
             </ul>
             <p className='m-0' style={{borderBottom:"1px solid #E6E6E6"}}><strong style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>2. Non-Current Assets</strong></p>
             <ul className='ul-balancesheet' style={{fontFamily:'"Roboto", sans-serif', fontWeight:"400", fontSize:"16px", color:"#262626"}}>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Property, Plant & Equipment <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Office Equipment <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(c) Software License / ERP Cost <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(d) Security Deposit <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Property, Plant & Equipment <span><input type="number" name='property' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Office Equipment <span><input type="number" name='officeEquipment' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(c) Software License / ERP Cost <span><input type="number" name='software' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(d) Security Deposit <span><input type="number" name='deposit' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
             </ul>
           </div>
           <div className="total-row-balancesheet" style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>Total Assets - <span>{totalAssets}</span></div>
@@ -104,31 +168,31 @@ const handleInputChange = (e) => {
           <div className="section-balancesheet">
             <p className='m-0' style={{borderBottom:"1px solid #E6E6E6"}}><strong style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>1. Current Liabilities</strong></p>
             <ul className='ul-balancesheet' style={{fontFamily:'"Roboto", sans-serif', fontWeight:"400", fontSize:"16px", color:"#262626"}}>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Account Payable <span><input type="number"  placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Outstanding Expenses <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Account Payable <span><input type="number" name='accountpayable' onChange={handleInputChange}  placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Outstanding Expenses <span><input type="number" name='outstanding' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
               <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) GST Payable <span>xxxx</span></li>
               <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) TDS Payable <span>xxxx</span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Short-Tern Loans <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Short-Term Loans <span><input type="number" name='shorttermLoan' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
             </ul>
             <p className='m-0' style={{borderBottom:"1px solid #E6E6E6"}}><strong style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>2. Non-Current Liabilities</strong></p>
             <ul className='ul-balancesheet' style={{fontFamily:'"Roboto", sans-serif', fontWeight:"400", fontSize:"16px", color:"#262626"}}>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Long-Term Loan <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Lease Liabilities <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(a) Long-Term Loan <span><input type="number" name='longtermLoan' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>(b) Lease Liabilities <span><input type="number" name='lease' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
             </ul>
           </div>
-          <div className="total-row-balancesheet" style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>Total Liabilities - <span>xxxx</span></div>
+          <div className="total-row-balancesheet" style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>Total Liabilities - <span>{totalLiabilities}</span></div>
         </div>
 
         <div className="boxbalancesheet">
           <h3 style={{fontFamily:'"Roboto", sans-serif', fontWeight:"400",fontSize:"16px", color:"#262626"}}>Equity</h3>
           <div className="section-balancesheet">
             <ul className='ul-balancesheet' style={{fontFamily:'"Roboto", sans-serif', fontWeight:"400", fontSize:"16px", color:"#262626"}}>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>1. Capital Invested <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>2. Retained Earnings / Reserves <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
-              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>3. Withdrawal <span><input type="number" placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>1. Capital Invested <span><input type="number" name='capital' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>2. Retained Earnings / Reserves <span><input type="number" name='retainedEarnings' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
+              <li className='li-balancesheet' style={{borderBottom:"1px solid #E6E6E6"}}>3. Withdrawal <span><input type="number" name='withdrawl' onChange={handleInputChange} placeholder='---' style={{textAlign:"right",border:"none", outline:"none",  backgroundColor: "transparent"}}/></span></li>
             </ul>
           </div>
-          <div className="total-row-balancesheet" style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>Total Equity - <span>xxxx</span></div>
+          <div className="total-row-balancesheet" style={{fontFamily:'"Roboto", sans-serif', fontWeight:"500", fontSize:"16px", color:"#262626"}}>Total Equity - <span>{totalequities}</span></div>
         </div>
       </div>
     </div>

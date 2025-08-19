@@ -40,6 +40,8 @@ const mobileverifyrouter = require("./routes/settings/mobileverifyroute.js");
 const devicemanagementrouter = require("./routes/settings/devicemanagementroute.js");
 const companysettingrouter = require("./routes/settings/companysettingroute.js");
 const localizationrouter = require("./routes/settings/Localizationroute.js");
+const balanceSheetRoutes = require("./routes/balanceSheetRoutes.js");
+
 
 const http = require('http');
 const emailrouter = require('./routes/emailroutes.js');
@@ -138,6 +140,9 @@ app.use("/api/localizationsetting", localizationrouter);
 app.use("/api/cloudinary-signature", require("./routes/file"));
 
 
+
+//balancesheet api
+app.use("/api/balancesheet", balanceSheetRoutes);
 
 
 app.use(express.json());

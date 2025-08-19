@@ -1090,8 +1090,8 @@ import axios from "axios";
 
 function Warehouse() {
   const [warehouses, setWarehouses] = useState([]);
-     const [loading, setLoading] = useState(false);
-        const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
 
   const fetchWarehouses = useCallback(async () => {
@@ -1121,21 +1121,7 @@ function Warehouse() {
 
 
 
-    const warehousedata = [
-      {
-        wname :"Warehouse Delhi",
-        adrress :"Delhi",
-        ownername :"Ram prashad",
-        worth :"$76,986",
-      },
-      {
-        wname :"Warehouse patna",
-        adrress :"patna",
-        ownername :"Devi prashad",
-        worth :"$76,986",
-      },
-      
-    ]
+   
 
   return (
     <div>
@@ -1235,7 +1221,8 @@ function Warehouse() {
                         }}
                       />{" "}
                       {/* Warehouse Delhi */}
-                      {item.contactPerson.firstName} {item.contactPerson.lastName}
+                      {/* {item.contactPerson.firstName} {item.contactPerson.lastName} */}
+                      {item.warehouseName}
                     </span>
                   </div>
 
