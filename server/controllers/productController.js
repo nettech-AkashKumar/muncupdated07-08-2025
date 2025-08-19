@@ -234,7 +234,6 @@ exports.searchProductsByName = async (req, res) => {
 };
 
 
-
 // GET /api/products/stock
 exports.getProductStock = async (req, res) => {
   try {
@@ -359,7 +358,8 @@ exports.getProductStock = async (req, res) => {
 
 
 
-
+=======
+>>>>>>> f6f3df5ac70cfe9b28f7c5f8236b4ab18cc96cca
 // Get Single Product
 exports.getProductById = async (req, res) => {
   try {
