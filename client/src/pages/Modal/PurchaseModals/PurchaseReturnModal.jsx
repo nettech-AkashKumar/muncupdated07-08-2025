@@ -1,322 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import Select from "react-select";
-// import axios from "axios";
-// import { TbTrash } from "react-icons/tb";
-// import { CiCirclePlus } from "react-icons/ci";
-// import BASE_URL from "../../config/config";
-
-// const PurchaseReturnModal = () => {
-//   const [suppliers, setSuppliers] = useState([]);
-//   const [products, setProducts] = useState([]);
-//   const [selectedSupplier, setSelectedSupplier] = useState(null);
-//   const [returnDate, setReturnDate] = useState("");
-//   const [referenceNumber, setReferenceNumber] = useState("");
-//   const [returnProducts, setReturnProducts] = useState([]);
-//   const [returnReason, setReturnReason] = useState("");
-//   const [totalRefund, setTotalRefund] = useState(0);
-//   const [images, setImages] = useState([]);
-
-//   useEffect(() => {
-//     fetchSuppliers();
-//     fetchProducts();
-//     getNextReturnReference();
-//   }, []);
-
-//   const fetchSuppliers = async () => {
-//     const res = await axios.get(`${BASE_URL}/api/user/status/active`);
-//     const options = res.data.map(s => ({
-//       label: `${s.firstName} ${s.lastName}`,
-//       value: s._id,
-//     }));
-//     setSuppliers(options);
-//   };
-
-//   const fetchProducts = async () => {
-//     const res = await axios.get(`${BASE_URL}/api/purchases/products`);
-//     const options = res.data.map(p => ({
-//       label: p.name,
-//       value: p._id,
-//       unit: p.unit,
-//       price: p.purchasePrice,
-//     }));
-//     setProducts(options);
-//   };
-
-//   const getNextReturnReference = async () => {
-//     const res = await axios.get(`${BASE_URL}/api/purchases/returns/reference/next`);
-//     setReferenceNumber(res.data.reference);
-//   };
-
-//   const handleAddProduct = () => {
-//     setReturnProducts([...returnProducts, {
-//       product: null,
-//       quantity: 1,
-//       returnPrice: 0,
-//       discount: 0,
-//       tax: 0,
-//       total: 0
-//     }]);
-//   };
-
-//   const handleProductChange = (index, selected) => {
-//     const updated = [...returnProducts];
-//     updated[index].product = selected;
-//     updated[index].returnPrice = selected?.price || 0;
-//     calculateTotal(index, updated);
-//   };
-
-//   const handleFieldChange = (index, field, value) => {
-//     const updated = [...returnProducts];
-//     updated[index][field] = parseFloat(value) || 0;
-//     calculateTotal(index, updated);
-//   };
-
-//   const calculateTotal = (index, arr) => {
-//     const item = arr[index];
-//     const taxAmt = (item.returnPrice * item.quantity * item.tax) / 100;
-//     const discountAmt = (item.returnPrice * item.quantity * item.discount) / 100;
-//     const total = (item.returnPrice * item.quantity) + taxAmt - discountAmt;
-//     item.total = parseFloat(total.toFixed(2));
-//     arr[index] = item;
-//     setReturnProducts(arr);
-//     updateTotalRefund(arr);
-//   };
-
-//   const updateTotalRefund = (list) => {
-//     const total = list.reduce((acc, item) => acc + item.total, 0);
-//     setTotalRefund(total.toFixed(2));
-//   };
-
-//   const handleRemoveProduct = (index) => {
-//     const updated = returnProducts.filter((_, i) => i !== index);
-//     setReturnProducts(updated);
-//     updateTotalRefund(updated);
-//   };
-
-//   const handleImageUpload = (e) => {
-//     setImages([...e.target.files]);
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     if (!selectedSupplier || returnProducts.length === 0) {
-//       alert("Please fill all required fields.");
-//       return;
-//     }
-
-//     const formData = new FormData();
-//     formData.append("supplier", selectedSupplier.value);
-//     formData.append("returnDate", returnDate);
-//     formData.append("referenceNumber", referenceNumber);
-//     formData.append("returnReason", returnReason);
-//     formData.append("totalRefund", totalRefund);
-
-//     returnProducts.forEach((item, index) => {
-//       formData.append(`products[${index}][productId]`, item.product.value);
-//       formData.append(`products[${index}][quantity]`, item.quantity);
-//       formData.append(`products[${index}][returnPrice]`, item.returnPrice);
-//       formData.append(`products[${index}][discount]`, item.discount);
-//       formData.append(`products[${index}][tax]`, item.tax);
-//     });
-
-//     images.forEach((img) => {
-//       formData.append("images", img);
-//     });
-
-//     try {
-//       await axios.post(`${BASE_URL}/api/returns/create`, formData);
-//       alert("Return created successfully!");
-//       document.getElementById("return-modal-close").click();
-//     } catch (error) {
-//       console.error(error);
-//       alert("Failed to create return.");
-//     }
-//   };
-
-//   return (
-//     <div className="modal fade" id="return-modal">
-//       <div className="modal-dialog modal-xl modal-dialog-centered">
-//         <div className="modal-content">
-//           <form onSubmit={handleSubmit} encType="multipart/form-data">
-//             <div className="modal-header">
-//               <h4 className="modal-title">Create Product Return</h4>
-//               <button
-//                 type="button"
-//                 id="return-modal-close"
-//                 className="btn-close"
-//                 data-bs-dismiss="modal"
-//               ></button>
-//             </div>
-
-//             <div className="modal-body row">
-//               <div className="col-md-6">
-//                 <label>Supplier</label>
-//                 <Select
-//                   options={suppliers}
-//                   value={selectedSupplier}
-//                   onChange={setSelectedSupplier}
-//                 />
-//               </div>
-//               <div className="col-md-3">
-//                 <label>Return Date</label>
-//                 <input
-//                   type="date"
-//                   className="form-control"
-//                   value={returnDate}
-//                   onChange={(e) => setReturnDate(e.target.value)}
-//                 />
-//               </div>
-//               <div className="col-md-3">
-//                 <label>Reference Number</label>
-//                 <input
-//                   type="text"
-//                   className="form-control"
-//                   value={referenceNumber}
-//                   readOnly
-//                 />
-//               </div>
-
-//               <div className="col-md-12 mt-3">
-//                 <div className="d-flex justify-content-between">
-//                   <h5>Return Products</h5>
-//                   <button
-//                     type="button"
-//                     className="btn btn-success"
-//                     onClick={handleAddProduct}
-//                   >
-//                     <CiCirclePlus /> Add Product
-//                   </button>
-//                 </div>
-//                 <div className="table-responsive mt-2">
-//                   <table className="table table-bordered">
-//                     <thead>
-//                       <tr>
-//                         <th>Product</th>
-//                         <th>Qty</th>
-//                         <th>Price</th>
-//                         <th>Discount (%)</th>
-//                         <th>Tax (%)</th>
-//                         <th>Total</th>
-//                         <th></th>
-//                       </tr>
-//                     </thead>
-//                     <tbody>
-//                       {returnProducts.map((item, index) => (
-//                         <tr key={index}>
-//                           <td>
-//                             <Select
-//                               options={products}
-//                               value={item.product}
-//                               onChange={(selected) =>
-//                                 handleProductChange(index, selected)
-//                               }
-//                             />
-//                           </td>
-//                           <td>
-//                             <input
-//                               type="number"
-//                               className="form-control"
-//                               value={item.quantity}
-//                               onChange={(e) =>
-//                                 handleFieldChange(index, "quantity", e.target.value)
-//                               }
-//                             />
-//                           </td>
-//                           <td>
-//                             <input
-//                               type="number"
-//                               className="form-control"
-//                               value={item.returnPrice}
-//                               onChange={(e) =>
-//                                 handleFieldChange(index, "returnPrice", e.target.value)
-//                               }
-//                             />
-//                           </td>
-//                           <td>
-//                             <input
-//                               type="number"
-//                               className="form-control"
-//                               value={item.discount}
-//                               onChange={(e) =>
-//                                 handleFieldChange(index, "discount", e.target.value)
-//                               }
-//                             />
-//                           </td>
-//                           <td>
-//                             <input
-//                               type="number"
-//                               className="form-control"
-//                               value={item.tax}
-//                               onChange={(e) =>
-//                                 handleFieldChange(index, "tax", e.target.value)
-//                               }
-//                             />
-//                           </td>
-//                           <td>₹{item.total}</td>
-//                           <td>
-//                             <button
-//                               className="btn btn-danger"
-//                               onClick={() => handleRemoveProduct(index)}
-//                               type="button"
-//                             >
-//                               <TbTrash />
-//                             </button>
-//                           </td>
-//                         </tr>
-//                       ))}
-//                     </tbody>
-//                   </table>
-//                 </div>
-//               </div>
-
-//               <div className="col-md-8">
-//                 <label>Return Reason</label>
-//                 <textarea
-//                   className="form-control"
-//                   rows="3"
-//                   value={returnReason}
-//                   onChange={(e) => setReturnReason(e.target.value)}
-//                 />
-//               </div>
-
-//               <div className="col-md-4">
-//                 <label>Total Refund</label>
-//                 <input
-//                   type="text"
-//                   className="form-control"
-//                   value={totalRefund}
-//                   readOnly
-//                 />
-//               </div>
-
-//               <div className="col-md-12 mt-2">
-//                 <label>Upload Images (optional)</label>
-//                 <input
-//                   type="file"
-//                   className="form-control"
-//                   multiple
-//                   onChange={handleImageUpload}
-//                 />
-//               </div>
-//             </div>
-
-//             <div className="modal-footer">
-//               <button type="submit" className="btn btn-primary">
-//                 Save Return
-//               </button>
-//               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-//                 Cancel
-//               </button>
-//             </div>
-//           </form>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default PurchaseReturnModal;
-
 
 
 import axios from "axios";
@@ -619,514 +300,514 @@ const ProductReturnModal = ({fetchReturns}) => {
   }, [paymentType, paidAmount, grandTotal]);
   return (
     <div className="modal fade" id="return-modal">
-      <div className="modal-dialog purchase modal-dialog-centered">
-        <div className="modal-content">
-          <div className="modal-header">
-            <div className="page-title">
-              <h4>Purchase Return & Exchange</h4>
-            </div>
-            <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
+    <div className="modal-dialog purchase modal-dialog-centered">
+      <div className="modal-content">
+        <div className="modal-header">
+          <div className="page-title">
+            <h4>Purchase Return & Exchange</h4>
           </div>
-          <form onSubmit={handleSubmit}>
-            <div className="modal-body">
-              <div className="row">
-                <div className="col-lg-4 col-md-6 col-sm-12">
-                  <div className="mb-3 add-product">
-                    <label className="form-label">
-                      Supplier Name<span className="text-danger ms-1">*</span>
-                    </label>
-                    <div className="row">
-                      <div className="col-lg-10 col-sm-10 col-10">
-                        <Select options={options} value={selectedUser} onChange={handleActiveUserChange} isSearchable
-                          placeholder="Search and select a user..." />
-                      </div>
-                      <div className="col-lg-2 col-sm-2 col-2 ps-0">
-                        <div className="add-icon tab">
-                          <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#add_customer">
-                            <i data-feather="plus-circle" className="feather-plus-circles" />
-                          </a>
-                        </div>
+          <button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="row">
+              <div className="col-lg-4 col-md-6 col-sm-12">
+                <div className="mb-3 add-product">
+                  <label className="form-label">
+                    Supplier Name<span className="text-danger ms-1">*</span>
+                  </label>
+                  <div className="row">
+                    <div className="col-lg-10 col-sm-10 col-10">
+                      <Select options={options} value={selectedUser} onChange={handleActiveUserChange} isSearchable
+                        placeholder="Search and select a user..." />
+                    </div>
+                    <div className="col-lg-2 col-sm-2 col-2 ps-0">
+                      <div className="add-icon tab">
+                        <a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#add_customer">
+                          <i data-feather="plus-circle" className="feather-plus-circles" />
+                        </a>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 col-md-6 col-sm-12">
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Return Date<span className="text-danger ms-1">*</span>
-                    </label>
-                    <div className="input-groupicon calender-input">
-                      <i data-feather="calendar" className="info-img" />
-                      <input type="text" className="datetimepicker form-control p-2" placeholder="dd/mm/yyyy"
-                        value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
-                    </div>
-                  </div>
-                </div>
-                <div className="col-lg-4 col-sm-12">
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Reference<span className="text-danger ms-1">*</span>
-                    </label>
-                    <input type="text" className="form-control" value={referenceNumber} readOnly />
                   </div>
                 </div>
               </div>
+              <div className="col-lg-4 col-md-6 col-sm-12">
+                <div className="mb-3">
+                  <label className="form-label">
+                    Return Date<span className="text-danger ms-1">*</span>
+                  </label>
+                  <div className="input-groupicon calender-input">
+                    <i data-feather="calendar" className="info-img" />
+                    <input type="text" className="datetimepicker form-control p-2" placeholder="dd/mm/yyyy"
+                      value={purchaseDate} onChange={(e) => setPurchaseDate(e.target.value)} />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-4 col-sm-12">
+                <div className="mb-3">
+                  <label className="form-label">
+                    Reference<span className="text-danger ms-1">*</span>
+                  </label>
+                  <input type="text" className="form-control" value={referenceNumber} readOnly />
+                </div>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-lg-12">
+                <div className="mb-3">
+                  <label className="form-label">
+                    Product<span className="text-danger ms-1">*</span>
+                  </label>
+                  <input type="text" className="form-control" placeholder="Search Product" value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)} />
+                </div>
+                {/* Search Result List */}
+                {products.length > 0 && (
+                  <div className="search-results border rounded p-3 mb-3">
+                    <h6 className="fw-semibold border-bottom pb-2 mb-3">
+                      <i className="bi bi-list me-2" />
+                      All Products
+                      <span className="float-end text-muted small">
+                        {products.length} Result{products.length > 1 ? "s" : ""}
+                      </span>
+                    </h6>
+
+                    {products.map((product) => (
+                      <div key={product._id} className="d-flex align-items-start justify-content-between py-2 border-bottom"
+                        onClick={() =>
+                          handleSelectProduct(product)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <div className="d-flex align-items-start gap-3">
+                          {product.images?.[0] && (
+                            <img src={product.images[0].url} alt={product.productName} className="media-image"
+                              style={{ width: "45px", height: "45px", borderRadius: "6px", objectFit: "cover" }} />
+                          )}
+                          <div>
+                            <h6 className="fw-bold mb-1">{product.productName}</h6>
+                            <p className="text-muted small mb-0">
+                              {product.category?.categoryName || "No Category"} •{" "}
+                              {product.subcategory?.subCategoryName || "No Sub"} • ₹{product.price}• Available Qty -{" "}
+                              {product.quantity || 0}/ {product.unit}
+                              {/* • {product.productCode || "N/A"} */}
+                            </p>
+                          </div>
+                        </div>
+
+                        <i className="bi bi-pencil text-primary" />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="col-lg-12">
+                <div className="modal-body-table mt-3">
+                  <div className="table-responsive">
+                    <table className="table datatable rounded-1">
+                      <thead>
+                        <tr>
+                          <th className="bg-secondary-transparent p-3">
+                            Product Name
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Qty
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Purchase Price
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Discount
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Tax(%)
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Tax Amount
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Unit Cost
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Total Cost
+                          </th>
+                          <th className="bg-secondary-transparent p-3">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedProducts.length > 0 ? (
+                          selectedProducts.map((product, index) => {
+                            const qty = product.quantity;
+                            const price = product.purchasePrice || 0;
+                            const discount = product.discount || 0;
+                            const tax = product.tax || 0;
+                            const subTotal = qty * price;
+                            const afterDiscount = subTotal - discount;
+                            const taxAmount = (afterDiscount * tax) / 100;
+                            const lineTotal = afterDiscount + taxAmount;
+
+                            // Proportion of this product's cost to the full product total
+                            const lineProportion = totalItemCost > 0 ? lineTotal / totalItemCost : 0;
+
+                            // Distribute global values proportionally
+                            const extraOrderTax = orderTax * lineProportion;
+                            const extraShipping = shippingCost * lineProportion;
+                            const discountShare = orderDiscount * lineProportion;
+
+                            const finalTotal = lineTotal + extraOrderTax + extraShipping - discountShare;
+                            const unitCost = finalTotal / qty;
+
+                            return (
+                              <tr key={index}>
+                                <td>
+                                  {product.productName}
+                                  <br />
+                                  <small className="text-muted">
+                                    Available: {product.availableQty} {product.unit}
+                                  </small>
+                                </td>
+
+                                <td>
+                                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                                    <input type="number" className="form-control form-control-sm"
+                                      style={{ width: "70px", textAlign: "center" }} min="1" max={product.availableQty}
+                                      value={product.quantity || 1} onChange={(e) => {
+                                        let val = parseInt(e.target.value, 10);
+                                        if (isNaN(val)) val = 1;
+                                        if (val < 1) val = 1; if (val > product.availableQty) val = product.availableQty;
+
+                                        setSelectedProducts((prev) =>
+                                          prev.map((item, i) =>
+                                            i === index ? { ...item, quantity: val } : item
+                                          )
+                                        );
+                                      }}
+                                    />
+                                    <span className="text-muted">{product.unit}</span>
+                                  </div>
+                                </td>
+
+                                <td>
+                                  <input type="number" className="form-control form-control-sm" style={{ width: "90px" }}
+                                    min="0" value={price} onChange={(e) => {
+                                      const val = parseFloat(e.target.value);
+                                      setSelectedProducts((prev) =>
+                                        prev.map((item, i) =>
+                                          i === index
+                                            ? { ...item, purchasePrice: isNaN(val) ? 0 : val }
+                                            : item
+                                        )
+                                      );
+                                    }}
+                                  />
+                                </td>
+
+                                <td>
+                                  <input type="number" className="form-control form-control-sm" style={{ width: "80px" }}
+                                    value={discount} onChange={(e) => {
+                                      const val = parseFloat(e.target.value);
+                                      setSelectedProducts((prev) =>
+                                        prev.map((item, i) =>
+                                          i === index
+                                            ? {
+                                              ...item,
+                                              discount: isNaN(val) ? 0 : val,
+                                            }
+                                            : item
+                                        )
+                                      );
+                                    }}
+                                  />
+                                </td>
+                                <td>
+                                  <input type="number" className="form-control form-control-sm" style={{ width: "60px" }}
+                                    value={tax} onChange={(e) => {
+                                      const val = parseFloat(e.target.value);
+                                      setSelectedProducts((prev) =>
+                                        prev.map((item, i) =>
+                                          i === index
+                                            ? { ...item, tax: isNaN(val) ? 0 : val }
+                                            : item
+                                        )
+                                      );
+                                    }}
+                                  />
+                                </td>
+
+                                <td>₹{taxAmount.toFixed(2)}</td>
+                                <td>₹{unitCost.toFixed(2)}</td>
+                                <td className="fw-semibold text-success">
+                                  ₹{finalTotal.toFixed(2)}
+                                </td>
+
+                                {/* DELETE BUTTON */}
+                                <td>
+                                  <button
+                                    className="btn btn-sm btn-danger"
+                                    onClick={() => handleRemoveProduct(product._id, product.productName)}
+                                  >
+                                    <TbTrash />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td colSpan="8" className="text-center text-muted">
+                              No products selected.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="row">
+                <div class="col-lg-12 float-md-right">
+                  <div class="total-order m-2 mb-3 ms-auto">
+                    <ul class="border-1 rounded-1">
+                      <li class="border-0 border-bottom">
+                        <h4 class="border-0">Order Tax</h4>
+                        <h5>₹ {orderTax.toFixed(2)}</h5>
+                      </li>
+                      <li class="border-0 border-bottom">
+                        <h4 class="border-0">Discount</h4>
+                        <h5>₹ {orderDiscount.toFixed(2)}</h5>
+                      </li>
+                      <li class="border-0 border-bottom">
+                        <h4 class="border-0">Shipping</h4>
+                        <h5>₹ {shippingCost.toFixed(2)}</h5>
+                      </li>
+                      <li class="total border-0">
+                        <h4 class="border-0">Grand Total</h4>
+                        <h5 className="fw-semibold text-success">₹ {grandTotal.toFixed(2)}</h5>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
               <div className="row">
-                <div className="col-lg-12">
+                <div className="col-lg-3 col-md-6 col-sm-12">
                   <div className="mb-3">
                     <label className="form-label">
-                      Product<span className="text-danger ms-1">*</span>
+                      Order Tax
                     </label>
-                    <input type="text" className="form-control" placeholder="Search Product" value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)} />
+                    <input type="text" className="form-control" value={orderTax} onChange={(e) =>
+                      setOrderTax(parseFloat(e.target.value) || 0)} />
                   </div>
-                  {/* Search Result List */}
-                  {products.length > 0 && (
-                    <div className="search-results border rounded p-3 mb-3">
-                      <h6 className="fw-semibold border-bottom pb-2 mb-3">
-                        <i className="bi bi-list me-2" />
-                        All Products
-                        <span className="float-end text-muted small">
-                          {products.length} Result{products.length > 1 ? "s" : ""}
+                </div>
+                <div className="col-lg-3 col-md-6 col-sm-12">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Discount
+                    </label>
+                    <input type="text" className="form-control" value={orderDiscount} onChange={(e) =>
+                      setOrderDiscount(parseFloat(e.target.value) || 0)} />
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6 col-sm-12">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Shipping
+                    </label>
+                    <input type="text" className="form-control" value={shippingCost} onChange={(e) =>
+                      setShippingCost(parseFloat(e.target.value) || 0)} />
+                  </div>
+                </div>
+                <div className="col-lg-3 col-md-6 col-sm-12">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Status<span className="text-danger ms-1">*</span>
+                    </label>
+                  <select className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+<option value="">Select Return Status</option>
+<option value="Returned">Returned</option>
+<option value="Exchanged">Exchanged</option>
+<option value="Partially Returned">Partially Returned</option>
+</select>
+                  </div>
+                </div>
+                <div className="profile-pic-upload mb-3">
+                  <div className="d-flex gap-2 flex-wrap">
+                    {imagePreviews.length > 0 ? (
+                      imagePreviews.map((preview, index) => (
+                        <img key={index} src={preview} alt={`Preview ${index}`} height="60" width="120pz" />
+                      ))
+                    ) : (
+                      <div className="profile-pic brand-pic">
+                        <span>
+                          <CiCirclePlus className="plus-down-add" /> Add Image
                         </span>
-                      </h6>
+                      </div>
+                    )}
+                  </div>
 
-                      {products.map((product) => (
-                        <div key={product._id} className="d-flex align-items-start justify-content-between py-2 border-bottom"
-                          onClick={() =>
-                            handleSelectProduct(product)}
-                          style={{ cursor: "pointer" }}
-                        >
-                          <div className="d-flex align-items-start gap-3">
-                            {product.images?.[0] && (
-                              <img src={product.images[0].url} alt={product.productName} className="media-image"
-                                style={{ width: "45px", height: "45px", borderRadius: "6px", objectFit: "cover" }} />
-                            )}
-                            <div>
-                              <h6 className="fw-bold mb-1">{product.productName}</h6>
-                              <p className="text-muted small mb-0">
-                                {product.category?.categoryName || "No Category"} •{" "}
-                                {product.subcategory?.subCategoryName || "No Sub"} • ₹{product.price}• Available Qty -{" "}
-                                {product.quantity || 0}/ {product.unit}
-                                {/* • {product.productCode || "N/A"} */}
-                              </p>
-                            </div>
-                          </div>
+                  <div>
+                    <div className="image-upload mb-0">
+                      <input type="file" multiple accept="image/png, image/jpeg" onChange={handleImageChange} />
+                      <div className="image-uploads">
+                        <h4>Upload Images</h4>
+                      </div>
+                    </div>
+                    <p className="mt-2">JPEG, PNG up to 2 MB</p>
+                  </div>
+                </div>
 
-                          <i className="bi bi-pencil text-primary" />
-                        </div>
-                      ))}
+              </div>
+            </div>
+
+            {/* payment */}
+            {/* <div className="row mt-3">
+              <div className="col-lg-4">
+                <label>Payment Type</label>
+                <select className="form-select" value={paymentType} onChange={e => {
+                  setPaymentType(e.target.value);
+                  setPaymentMethod(""); // reset payment method when payment type changes
+                }}
+                >
+                  <option value="Full">Full Payment</option>
+                  <option value="Partial">Partial Payment</option>
+                </select>
+              </div>
+
+              <div className="col-lg-4"><label>Payment Status</label>
+                <select className="form-select" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
+                  <option>Select</option>
+                  <option>Paid</option>
+                  <option>Unpaid</option>
+                  <option>Partial</option>
+                  <option>Pending</option>
+                </select>
+              </div>
+
+              {(paymentType === "Full" || paymentType === "Partial") && (
+                <>
+                  {paymentType === "Full" && (
+                    <div className="col-lg-4">
+                      <label>Total Amount</label>
+                      <input type="number" className="form-control" value={grandTotal} readOnly />
                     </div>
                   )}
-                </div>
 
-                <div className="col-lg-12">
-                  <div className="modal-body-table mt-3">
-                    <div className="table-responsive">
-                      <table className="table datatable rounded-1">
-                        <thead>
-                          <tr>
-                            <th className="bg-secondary-transparent p-3">
-                              Product Name
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Qty
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Purchase Price
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Discount
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Tax(%)
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Tax Amount
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Unit Cost
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Total Cost
-                            </th>
-                            <th className="bg-secondary-transparent p-3">
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {selectedProducts.length > 0 ? (
-                            selectedProducts.map((product, index) => {
-                              const qty = product.quantity;
-                              const price = product.purchasePrice || 0;
-                              const discount = product.discount || 0;
-                              const tax = product.tax || 0;
-                              const subTotal = qty * price;
-                              const afterDiscount = subTotal - discount;
-                              const taxAmount = (afterDiscount * tax) / 100;
-                              const lineTotal = afterDiscount + taxAmount;
-
-                              // Proportion of this product's cost to the full product total
-                              const lineProportion = totalItemCost > 0 ? lineTotal / totalItemCost : 0;
-
-                              // Distribute global values proportionally
-                              const extraOrderTax = orderTax * lineProportion;
-                              const extraShipping = shippingCost * lineProportion;
-                              const discountShare = orderDiscount * lineProportion;
-
-                              const finalTotal = lineTotal + extraOrderTax + extraShipping - discountShare;
-                              const unitCost = finalTotal / qty;
-
-                              return (
-                                <tr key={index}>
-                                  <td>
-                                    {product.productName}
-                                    <br />
-                                    <small className="text-muted">
-                                      Available: {product.availableQty} {product.unit}
-                                    </small>
-                                  </td>
-
-                                  <td>
-                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
-                                      <input type="number" className="form-control form-control-sm"
-                                        style={{ width: "70px", textAlign: "center" }} min="1" max={product.availableQty}
-                                        value={product.quantity || 1} onChange={(e) => {
-                                          let val = parseInt(e.target.value, 10);
-                                          if (isNaN(val)) val = 1;
-                                          if (val < 1) val = 1; if (val > product.availableQty) val = product.availableQty;
-
-                                          setSelectedProducts((prev) =>
-                                            prev.map((item, i) =>
-                                              i === index ? { ...item, quantity: val } : item
-                                            )
-                                          );
-                                        }}
-                                      />
-                                      <span className="text-muted">{product.unit}</span>
-                                    </div>
-                                  </td>
-
-                                  <td>
-                                    <input type="number" className="form-control form-control-sm" style={{ width: "90px" }}
-                                      min="0" value={price} onChange={(e) => {
-                                        const val = parseFloat(e.target.value);
-                                        setSelectedProducts((prev) =>
-                                          prev.map((item, i) =>
-                                            i === index
-                                              ? { ...item, purchasePrice: isNaN(val) ? 0 : val }
-                                              : item
-                                          )
-                                        );
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <input type="number" className="form-control form-control-sm" style={{ width: "80px" }}
-                                      value={discount} onChange={(e) => {
-                                        const val = parseFloat(e.target.value);
-                                        setSelectedProducts((prev) =>
-                                          prev.map((item, i) =>
-                                            i === index
-                                              ? {
-                                                ...item,
-                                                discount: isNaN(val) ? 0 : val,
-                                              }
-                                              : item
-                                          )
-                                        );
-                                      }}
-                                    />
-                                  </td>
-                                  <td>
-                                    <input type="number" className="form-control form-control-sm" style={{ width: "60px" }}
-                                      value={tax} onChange={(e) => {
-                                        const val = parseFloat(e.target.value);
-                                        setSelectedProducts((prev) =>
-                                          prev.map((item, i) =>
-                                            i === index
-                                              ? { ...item, tax: isNaN(val) ? 0 : val }
-                                              : item
-                                          )
-                                        );
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>₹{taxAmount.toFixed(2)}</td>
-                                  <td>₹{unitCost.toFixed(2)}</td>
-                                  <td className="fw-semibold text-success">
-                                    ₹{finalTotal.toFixed(2)}
-                                  </td>
-
-                                  {/* DELETE BUTTON */}
-                                  <td>
-                                    <button
-                                      className="btn btn-sm btn-danger"
-                                      onClick={() => handleRemoveProduct(product._id, product.productName)}
-                                    >
-                                      <TbTrash />
-                                    </button>
-                                  </td>
-                                </tr>
-                              );
-                            })
-                          ) : (
-                            <tr>
-                              <td colSpan="8" className="text-center text-muted">
-                                No products selected.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
-
-
-                <div class="row">
-                  <div class="col-lg-12 float-md-right">
-                    <div class="total-order m-2 mb-3 ms-auto">
-                      <ul class="border-1 rounded-1">
-                        <li class="border-0 border-bottom">
-                          <h4 class="border-0">Order Tax</h4>
-                          <h5>₹ {orderTax.toFixed(2)}</h5>
-                        </li>
-                        <li class="border-0 border-bottom">
-                          <h4 class="border-0">Discount</h4>
-                          <h5>₹ {orderDiscount.toFixed(2)}</h5>
-                        </li>
-                        <li class="border-0 border-bottom">
-                          <h4 class="border-0">Shipping</h4>
-                          <h5>₹ {shippingCost.toFixed(2)}</h5>
-                        </li>
-                        <li class="total border-0">
-                          <h4 class="border-0">Grand Total</h4>
-                          <h5 className="fw-semibold text-success">₹ {grandTotal.toFixed(2)}</h5>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="row">
-                  <div className="col-lg-3 col-md-6 col-sm-12">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Order Tax
-                      </label>
-                      <input type="text" className="form-control" value={orderTax} onChange={(e) =>
-                        setOrderTax(parseFloat(e.target.value) || 0)} />
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6 col-sm-12">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Discount
-                      </label>
-                      <input type="text" className="form-control" value={orderDiscount} onChange={(e) =>
-                        setOrderDiscount(parseFloat(e.target.value) || 0)} />
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6 col-sm-12">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Shipping
-                      </label>
-                      <input type="text" className="form-control" value={shippingCost} onChange={(e) =>
-                        setShippingCost(parseFloat(e.target.value) || 0)} />
-                    </div>
-                  </div>
-                  <div className="col-lg-3 col-md-6 col-sm-12">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Status<span className="text-danger ms-1">*</span>
-                      </label>
-                    <select className="form-select" value={status} onChange={(e) => setStatus(e.target.value)}>
-  <option value="">Select Return Status</option>
-  <option value="Returned">Returned</option>
-  <option value="Exchanged">Exchanged</option>
-  <option value="Partially Returned">Partially Returned</option>
-</select>
-                    </div>
-                  </div>
-                  <div className="profile-pic-upload mb-3">
-                    <div className="d-flex gap-2 flex-wrap">
-                      {imagePreviews.length > 0 ? (
-                        imagePreviews.map((preview, index) => (
-                          <img key={index} src={preview} alt={`Preview ${index}`} height="60" width="120pz" />
-                        ))
-                      ) : (
-                        <div className="profile-pic brand-pic">
-                          <span>
-                            <CiCirclePlus className="plus-down-add" /> Add Image
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <div className="image-upload mb-0">
-                        <input type="file" multiple accept="image/png, image/jpeg" onChange={handleImageChange} />
-                        <div className="image-uploads">
-                          <h4>Upload Images</h4>
-                        </div>
-                      </div>
-                      <p className="mt-2">JPEG, PNG up to 2 MB</p>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-              {/* payment */}
-              {/* <div className="row mt-3">
-                <div className="col-lg-4">
-                  <label>Payment Type</label>
-                  <select className="form-select" value={paymentType} onChange={e => {
-                    setPaymentType(e.target.value);
-                    setPaymentMethod(""); // reset payment method when payment type changes
-                  }}
-                  >
-                    <option value="Full">Full Payment</option>
-                    <option value="Partial">Partial Payment</option>
-                  </select>
-                </div>
-
-                <div className="col-lg-4"><label>Payment Status</label>
-                  <select className="form-select" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
-                    <option>Select</option>
-                    <option>Paid</option>
-                    <option>Unpaid</option>
-                    <option>Partial</option>
-                    <option>Pending</option>
-                  </select>
-                </div>
-
-                {(paymentType === "Full" || paymentType === "Partial") && (
-                  <>
-                    {paymentType === "Full" && (
+                  {paymentType === "Partial" && (
+                    <>
                       <div className="col-lg-4">
                         <label>Total Amount</label>
                         <input type="number" className="form-control" value={grandTotal} readOnly />
                       </div>
-                    )}
-
-                    {paymentType === "Partial" && (
-                      <>
-                        <div className="col-lg-4">
-                          <label>Total Amount</label>
-                          <input type="number" className="form-control" value={grandTotal} readOnly />
-                        </div>
-                        <div className="col-lg-4">
-                          <label>Paid Amount</label>
-                          <input type="number" className="form-control" value={paidAmount} max={grandTotal} onChange={e =>
-                            setPaidAmount(parseFloat(e.target.value) || 0)} />
-                        </div>
-                        <div className="col-lg-4">
-                          <label>Due Amount</label>
-                          <input type="number" className="form-control" value={dueAmount.toFixed(2)} readOnly />
-                        </div>
-                        <div className="col-lg-4 mt-2">
-                          <label>Due Date</label>
-                          <input type="date" className="form-control" value={dueDate} onChange={e => setDueDate(e.target.value)}
-                          />
-                        </div>
-                      </>
-                    )}
-
-                    <div className="col-lg-12 mt-3">
-                      <label>Payment Method</label>
-                      <div className="d-flex gap-4">
-                        {["Cash", "Online", "Cheque"].map((method) => (
-                          <div className="form-check" key={method}>
-                            <input type="radio" className="form-check-input" id={method} checked={paymentMethod === method}
-                              onChange={() => setPaymentMethod(method)}
-                            />
-                            <label className="form-check-label" htmlFor={method}>
-                              {method}
-                            </label>
-                          </div>
-                        ))}
+                      <div className="col-lg-4">
+                        <label>Paid Amount</label>
+                        <input type="number" className="form-control" value={paidAmount} max={grandTotal} onChange={e =>
+                          setPaidAmount(parseFloat(e.target.value) || 0)} />
                       </div>
+                      <div className="col-lg-4">
+                        <label>Due Amount</label>
+                        <input type="number" className="form-control" value={dueAmount.toFixed(2)} readOnly />
+                      </div>
+                      <div className="col-lg-4 mt-2">
+                        <label>Due Date</label>
+                        <input type="date" className="form-control" value={dueDate} onChange={e => setDueDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="col-lg-12 mt-3">
+                    <label>Payment Method</label>
+                    <div className="d-flex gap-4">
+                      {["Cash", "Online", "Cheque"].map((method) => (
+                        <div className="form-check" key={method}>
+                          <input type="radio" className="form-check-input" id={method} checked={paymentMethod === method}
+                            onChange={() => setPaymentMethod(method)}
+                          />
+                          <label className="form-check-label" htmlFor={method}>
+                            {method}
+                          </label>
+                        </div>
+                      ))}
                     </div>
+                  </div>
 
-                    {(paymentMethod === "Online") && (
-                      <>
-                        <div className="col-lg-4 mt-2">
-                          <label>Online Payment Method</label>
-                          <input type="text" className="form-control" value={onlineMod} onChange={e =>
-                            setOnlineMod(e.target.value)}
-                            placeholder="e.g. UPI, NEFT, RTGS"
-                          />
-                        </div>
+                  {(paymentMethod === "Online") && (
+                    <>
+                      <div className="col-lg-4 mt-2">
+                        <label>Online Payment Method</label>
+                        <input type="text" className="form-control" value={onlineMod} onChange={e =>
+                          setOnlineMod(e.target.value)}
+                          placeholder="e.g. UPI, NEFT, RTGS"
+                        />
+                      </div>
 
-                        <div className="col-lg-4 mt-2">
-                          <label>Transaction ID</label>
-                          <input type="text" className="form-control" value={transactionId} onChange={e =>
-                            setTransactionId(e.target.value)}
-                            placeholder="Enter Transaction ID"
-                          />
-                        </div>
+                      <div className="col-lg-4 mt-2">
+                        <label>Transaction ID</label>
+                        <input type="text" className="form-control" value={transactionId} onChange={e =>
+                          setTransactionId(e.target.value)}
+                          placeholder="Enter Transaction ID"
+                        />
+                      </div>
 
-                        <div className="col-lg-4 mt-2">
-                          <label>Transaction Date</label>
-                          <input type="date" className="form-control" value={transactionDate} onChange={e =>
-                            setTransactionDate(e.target.value)}
-                          />
-                        </div>
-                      </>
-                    )}
-                    {(paymentMethod === "Cheque") && (
-                      <>
-                        <div className="col-lg-4 mt-2">
-                          <label>Cheque No</label>
-                          <input type="text" className="form-control" value={transactionId} onChange={e =>
-                            setTransactionId(e.target.value)}
-                            placeholder="Enter Cheque No"
-                          />
-                        </div>
+                      <div className="col-lg-4 mt-2">
+                        <label>Transaction Date</label>
+                        <input type="date" className="form-control" value={transactionDate} onChange={e =>
+                          setTransactionDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {(paymentMethod === "Cheque") && (
+                    <>
+                      <div className="col-lg-4 mt-2">
+                        <label>Cheque No</label>
+                        <input type="text" className="form-control" value={transactionId} onChange={e =>
+                          setTransactionId(e.target.value)}
+                          placeholder="Enter Cheque No"
+                        />
+                      </div>
 
-                        <div className="col-lg-4 mt-2">
-                          <label>Transaction Date</label>
-                          <input type="date" className="form-control" value={transactionDate} onChange={e =>
-                            setTransactionDate(e.target.value)}
-                          />
-                        </div>
-                      </>
-                    )}
+                      <div className="col-lg-4 mt-2">
+                        <label>Transaction Date</label>
+                        <input type="date" className="form-control" value={transactionDate} onChange={e =>
+                          setTransactionDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
 
-                  </>
-                )}
-              </div> */}
-              {/* payment */}
-              <div className="col-lg-12 mt-3">
-                <div className="mb-3 summer-description-box">
-                  <label className="form-label">Return & Exchange Reason</label>
-                  <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={400} />
-                  <p className="mt-1">Maximum 60 Words</p>
-                </div>
+                </>
+              )}
+            </div> */}
+            {/* payment */}
+            <div className="col-lg-12 mt-3">
+              <div className="mb-3 summer-description-box">
+                <label className="form-label">Return & Exchange Reason</label>
+                <textarea className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={400} />
+                <p className="mt-1">Maximum 60 Words</p>
               </div>
             </div>
-            <div className="modal-footer">
-              <button type="button" className="btn me-2 btn-secondary" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button type="submit" className="btn btn-primary">
-                Submit
-              </button>
-            </div>
-          </form>
-        </div>
-      </div >
-
+          </div>
+          <div className="modal-footer">
+            <button type="button" className="btn me-2 btn-secondary" data-bs-dismiss="modal">
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
     </div >
+
+  </div >
   );
 };
 

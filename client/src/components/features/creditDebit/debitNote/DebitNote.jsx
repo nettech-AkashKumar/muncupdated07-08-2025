@@ -134,11 +134,11 @@ const DebitNote = () => {
                                         <td>{note.billTo?.name || note.billTo?.firstName || note.billTo || '-'}</td>
                                         <td className="text-dark">{note.total || note.total || '-'}</td>
                                         <td>{note.status}</td>
-                                        
+
                                         <td className="action-table-data">
                                             <div className="edit-delete-action">
                                                 <a
-                                                    className="me-2 p-2"  data-bs-toggle="modal"
+                                                    className="me-2 p-2" data-bs-toggle="modal"
                                                     data-bs-target="#view_notes"
                                                     onClick={() => setSelectedNote(note)}
                                                 >
@@ -224,11 +224,11 @@ const DebitNote = () => {
 
                 {/* Edit Modal trigger (hidden, for modal compatibility) */}
                 <div className="modal fade" id="edit_debit_note" tabIndex="-1" aria-labelledby="editDebitNoteLabel" aria-hidden="true">
-                  <div className="modal-dialog modal-lg">
-                    <div className="modal-content">
-                      <EditDebitNoteModals noteData={editNote} onEditSuccess={() => { setEditNote(null); fetchNotes(); }} />
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <EditDebitNoteModals noteData={editNote} onEditSuccess={() => { setEditNote(null); fetchNotes(); }} />
+                        </div>
                     </div>
-                  </div>
                 </div>
 
                 {/* Modal to show all data for selected debit note */}
@@ -251,7 +251,12 @@ const DebitNote = () => {
                                             <div className="col-md-6"><b>Amount:</b> {selectedNote.amount || selectedNote.total || '-'}</div>
                                         </div>
                                         <div className="row mb-2">
-                                            <div className="col-md-6"><b>Bill From:</b> {selectedNote.billFrom || '-'}</div>
+                                            <div className="col-md-6"><b>Bill From:</b> {
+                                                selectedNote.billFrom?.name
+                                                || [selectedNote.billFrom?.firstName, selectedNote.billFrom?.lastName].filter(Boolean).join(' ')
+                                                || selectedNote.billFrom?.email
+                                                || '-'
+                                            }</div>
                                             <div className="col-md-6"><b>Bill To:</b> {selectedNote.billTo?.name || selectedNote.billTo?.firstName || selectedNote.billTo || '-'}</div>
                                         </div>
                                         <div className="row mb-2">

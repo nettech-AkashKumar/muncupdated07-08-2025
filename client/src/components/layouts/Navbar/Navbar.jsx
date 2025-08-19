@@ -289,7 +289,7 @@ function Navbar() {
           </li>
 
           {/* Store Dropdown */}
-          <li className="nav-item dropdown has-arrow main-drop select-store-dropdown">
+          {/* <li className="nav-item dropdown has-arrow main-drop select-store-dropdown">
             <a className="dropdown-toggle nav-link select-store" data-bs-toggle="dropdown" href="#">
               <span className="user-info">
                 <span className="user-letter">
@@ -304,7 +304,7 @@ function Navbar() {
               <Link className="dropdown-item" to="#"><img src="/assets/img/store/store-01.png" alt="Store" /> Freshmart</Link>
               <Link className="dropdown-item" to="#"><img src="/assets/img/store/store-02.png" alt="Store" /> Grocery Apex</Link>
             </div>
-          </li>
+          </li> */}
 
           {/* Add New Dropdown */}
           <li className="nav-item dropdown link-nav">
@@ -482,18 +482,32 @@ function Navbar() {
               <div className="dropdown-menu menu-drop-user">
                 <div className="profileset d-flex align-items-center">
                   <span className="user-img me-2">
-                    {userData?.profileImage?.url  ? (
-                      <img
-                        src={userData.profileImage.url}
-                        alt="Profile"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "50%",
-                          objectFit: "cover"
-                        }}
-                      />
-                    ) : (
+  {user && user.profileImage && user.profileImage.length > 0 ? (
+    <img
+      src={user.profileImage[0].url}
+      alt="Profile"
+      style={{
+        width: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  ) : userData && userData.profileImage && userData.profileImage.url ? (
+    <img
+      src={userData.profileImage.url}
+      alt="Profile"
+      style={{
+        width: "40px",
+        height: "40px",
+        borderRadius: "50%",
+        objectFit: "cover",
+      }}
+    />
+  ) : (
+    
+  
+
                       <div
                         className="bg-secondary text-white d-flex justify-content-center align-items-center"
                         style={{ 
@@ -536,6 +550,7 @@ function Navbar() {
               <a className="nav-link userset" data-bs-toggle="dropdown" href="#">
                 <span className="user-info p-0">
                   <span className="user-letter">
+
                     <div
                       className="bg-secondary text-white d-flex justify-content-center align-items-center"
                       style={{ 

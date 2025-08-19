@@ -11,6 +11,8 @@ router.put("/:id", upload.array('images'), purchaseController.updatePurchase);
 router.put("/:id/return", purchaseController.updatePurchaseOnReturn); // 🔥 This is new
 router.delete("/:id", purchaseController.deletePurchase);
 
+// Purchase Report
+router.get("/report", purchaseController.getPurchaseReport);
 
 // 🔹 Purchase Return Routes
 // router.post("/return", purchaseController.createProductReturn); // create a new return

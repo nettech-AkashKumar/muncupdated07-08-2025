@@ -1,8 +1,9 @@
+
 const Product = require("../models/productModels");
 const Purchase = require("../models/purchaseModels");
 const StockHistory = require("../models/stockHistoryModels");
 const cloudinary = require("../utils/cloudinary/cloudinary");
-const Supplier = require('../models/usersModels');
+const Supplier = require('../models/supplierModel');
 const DebitNote  = require('../models/debitNoteModel');
 
 function parseDDMMYYYY(dateStr) {
@@ -247,7 +248,9 @@ exports.getAllPurchases = async (req, res) => {
         const total = await Purchase.countDocuments(query);
 
         const purchases = await Purchase.find(query)
-            .populate("supplier", "firstName lastName email phone")
+            // .populate("supplier", "firstName lastName email phone")
+                .populate("supplier", "supplierCode firstName lastName companyName companyWebsite businessType gstin email phone billing shipping status bank images")
+
             .populate("products.product")
             .sort({ createdAt: -1 })
             .skip((pageNum - 1) * limitNum)
@@ -1369,6 +1372,85 @@ exports.updatePurchaseOnReturn = async (req, res) => {
   } catch (err) {
     console.error("Error updating purchase on return:", err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+// Purchase Report API
+exports.getPurchaseReport = async (req, res) => {
+  try {
+    const { search = "", fromDate, toDate, page = 1, limit = 10 } = req.query;
+    const query = { $and: [] };
+
+    // Search by reference, supplier name, or product name
+    if (search) {
+      const matchingProductIds = await Product.find({
+        productName: { $regex: search, $options: "i" }
+      }).select("_id");
+      const matchingSupplierIds = await Supplier.find({
+        $or: [
+          { firstName: { $regex: search, $options: "i" } },
+          { lastName: { $regex: search, $options: "i" } },
+        ]
+      }).select("_id");
+      query.$and.push({
+        $or: [
+          { referenceNumber: { $regex: search, $options: "i" } },
+          { supplier: { $in: matchingSupplierIds.map(s => s._id) } },
+          { "products.product": { $in: matchingProductIds.map(p => p._id) } }
+        ]
+      });
+    }
+
+    // Date filter
+    if (fromDate || toDate) {
+      const dateQuery = {};
+      if (fromDate) dateQuery.$gte = new Date(fromDate);
+      if (toDate) dateQuery.$lte = new Date(toDate);
+      query.$and.push({ purchaseDate: dateQuery });
+    }
+    if (query.$and.length === 0) delete query.$and;
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+
+    const totalRecords = await Purchase.countDocuments(query);
+
+    const purchases = await Purchase.find(query)
+      .populate("supplier", "firstName lastName")
+      .populate("products.product", "productName")
+      .sort({ createdAt: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum);
+
+    // Totals
+    let totalPurchase = totalRecords;
+    let totalQuantity = 0;
+    let totalReturn = 0;
+    purchases.forEach(p => {
+      p.products.forEach(pr => {
+        totalQuantity += pr.quantity || 0;
+        totalReturn += pr.returnQty || 0;
+      });
+    });
+
+    res.status(200).json({
+      data: purchases,
+      totals: {
+        purchase: totalPurchase,
+        quantity: totalQuantity,
+        return: totalReturn,
+      },
+      pagination: {
+        totalRecords,
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalRecords / limitNum),
+        pageSize: limitNum,
+      },
+    });
+  } catch (error) {
+    console.error("Purchase Report Error:", error);
+    res.status(500).json({ message: "Failed to fetch report", error: error.message });
   }
 };
 

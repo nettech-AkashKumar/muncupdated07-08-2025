@@ -8,8 +8,8 @@ const DebitNoteSchema = new mongoose.Schema({
   status: { type: String, enum: ['Paid', 'Pending', 'Cancelled'], default: 'Pending' },
   currency: { type: String, default: 'USD' },
   enableTax: { type: Boolean, default: false },
-  billFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' },
-  billTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Vendor' },
+  billFrom: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' },
+  billTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Supplier' },
   products: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
