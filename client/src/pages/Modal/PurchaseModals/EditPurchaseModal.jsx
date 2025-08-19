@@ -9,7 +9,7 @@ import "../../../styles/purchase/purchase.css";
 
 const EditPurchaseModal = ({ editData, onUpdate }) => {
   const [options, setOptions] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
+  // const [selectedUser, setSelectedSupplier] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [purchaseDate, setPurchaseDate] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
@@ -20,7 +20,6 @@ const EditPurchaseModal = ({ editData, onUpdate }) => {
   const [description, setDescription] = useState("");
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
-  console.log(selectedUser);
 
   // Payment fields
   const [paymentType, setPaymentType] = useState("");
@@ -34,13 +33,14 @@ const EditPurchaseModal = ({ editData, onUpdate }) => {
   const [paymentStatus, setPaymentStatus] = useState("");
 
 
-  console.log(":", paymentMethod, ":", transactionDate, ":", transactionId, ":", onlineMod, paymentStatus, dueAmount);
+  // console.log(":", paymentMethod, ":", transactionDate, ":", transactionId, ":", onlineMod, paymentStatus, dueAmount);
 
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   // Load existing data
   useEffect(() => {
     if (editData) {
-      setSelectedUser({
+      setSelectedSupplier({
         value: editData.supplier?._id,
         label: `${editData.supplier?.firstName} ${editData.supplier?.lastName} (${editData.supplier?.email})`
       });
@@ -82,17 +82,45 @@ const EditPurchaseModal = ({ editData, onUpdate }) => {
 
   // Fetch suppliers
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/user/status/active`)
+    axios.get(`${BASE_URL}/api/suppliers/active`)
       .then(res => {
         setOptions(res.data.users.map(u => ({
           value: u._id,
-          label: `${u.firstName} ${u.lastName} (${u.email})`
+          label: `${u.firstName} ${u.lastName} (${u.supplierCode})`
         })));
       })
       .catch(err => console.error("Failed to fetch users:", err));
   }, []);
 
+
+
+  // useEffect(() => {
+  //   const fetchActiveSuppliers = async () => {
+  //     try {
+  //       const res = await axios.get(`${BASE_URL}/api/suppliers/active`);
+  //       const suppliers = res.data.suppliers;
+
+  //       const formattedOptions = suppliers.map((supplier) => ({
+  //         value: supplier._id,
+  //         label: `${supplier.firstName}${supplier.lastName} (${supplier.supplierCode})`,
+  //       }));
+
+  //       setOptions(formattedOptions);
+  //     } catch (err) {
+  //       console.error("Error fetching active suppliers:", err);
+  //     }
+  //   };
+
+  //   fetchActiveSuppliers();
+  // }, []);
+
+  // const handleSupplierChange = (selectedOption) => {
+  //   setSelectedSupplier(selectedOption);
+  // };
+
   // Calculate totals
+
+
   const totalItemCost = selectedProducts.reduce((acc, p) => {
     const subTotal = p.quantity * (p.purchasePrice || 0) - (p.discount || 0);
     const taxAmount = (subTotal * (p.tax || 0)) / 100;
@@ -121,13 +149,13 @@ const EditPurchaseModal = ({ editData, onUpdate }) => {
   // Submit
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!selectedUser || selectedProducts.length === 0 || !status) {
+    if (!selectedSupplier || selectedProducts.length === 0 || !status) {
       alert("Please fill required fields");
       return;
     }
 
     const formData = new FormData();
-    formData.append("supplier", selectedUser.value);
+    formData.append("supplier", selectedSupplier.value);
     formData.append("purchaseDate", purchaseDate);
     formData.append("referenceNumber", referenceNumber);
     formData.append("orderTax", orderTax);
@@ -200,8 +228,8 @@ const EditPurchaseModal = ({ editData, onUpdate }) => {
                 <div className="col-lg-4">
                   <label>Supplier<span className="text-danger">*</span></label>
                   <Select
-                    value={selectedUser}
-                    onChange={setSelectedUser}
+                    value={selectedSupplier}
+                    onChange={setSelectedSupplier}
                     options={options}
                     placeholder="Select supplier"
                     isClearable
@@ -588,7 +616,7 @@ export default EditPurchaseModal;
 
 // const EditPurchaseModal = ({ editData, onUpdate }) => {
 //   const [options, setOptions] = useState([]);
-//   const [selectedUser, setSelectedUser] = useState(null);
+//   const [selectedUser, setSelectedSupplier] = useState(null);
 //   const [selectedProducts, setSelectedProducts] = useState([]);
 //   const [purchaseDate, setPurchaseDate] = useState("");
 //   const [referenceNumber, setReferenceNumber] = useState("");
@@ -619,7 +647,7 @@ export default EditPurchaseModal;
 //   // Load existing data
 //   useEffect(() => {
 //     if (editData) {
-//       setSelectedUser({
+//       setSelectedSupplier({
 //         value: editData.supplier?._id,
 //         label: `${editData.supplier?.firstName} ${editData.supplier?.lastName} (${editData.supplier?.email})`
 //       });
@@ -839,7 +867,7 @@ export default EditPurchaseModal;
 //               <div className="row mb-3">
 //                 <div className="col-lg-4">
 //                   <label>Supplier<span className="text-danger">*</span></label>
-//                   <Select value={selectedUser} onChange={setSelectedUser} options={options} placeholder="Select supplier" />
+//                   <Select value={selectedUser} onChange={setSelectedSupplier} options={options} placeholder="Select supplier" />
 //                 </div>
 //                 <div className="col-lg-4">
 //                   <label>Date</label>

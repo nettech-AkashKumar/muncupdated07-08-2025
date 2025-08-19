@@ -62,10 +62,24 @@ exports.getAllWarehouses = async (req, res) => {
 // };
 
 // controllers/warehouse.controller.js
+// exports.getActiveWarehouses = async (req, res) => {
+//     try {
+//         const activeWarehouses = await Warehouse.find({ status: "Active" })
+//             .populate("contactPerson", "firstName lastName email")
+//             .populate("country", "name")
+//             .populate("state", "stateName")
+//             .populate("city", "cityName");
+
+//         res.json({ success: true, data: activeWarehouses });
+//     } catch (err) {
+//         res.status(500).json({ success: false, message: err.message });
+//     }
+// };
+
 exports.getActiveWarehouses = async (req, res) => {
     try {
         const activeWarehouses = await Warehouse.find({ status: "Active" })
-            .populate("contactPerson", "firstName lastName email")
+            .select("warehouseName") // fetch only warehouseName + _id
             .populate("country", "name")
             .populate("state", "stateName")
             .populate("city", "cityName");
@@ -75,6 +89,7 @@ exports.getActiveWarehouses = async (req, res) => {
         res.status(500).json({ success: false, message: err.message });
     }
 };
+
 
 
 

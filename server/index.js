@@ -31,6 +31,9 @@ const VarientRoutes = require('./routes/variantRoutes');
 const WarrantyRoutes = require('./routes/warrantyRoutes');
 const debitNoteRoutes = require('./routes/debitNoteRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+
+const salesRoutes = require('./routes/salesRoutes');
+
 const notificationRoutes = require('./routes/notificationRoutes');
 const userProfileRoutes = require("./routes/profileRoutes");
 
@@ -41,6 +44,7 @@ const devicemanagementrouter = require("./routes/settings/devicemanagementroute.
 const companysettingrouter = require("./routes/settings/companysettingroute.js");
 const localizationrouter = require("./routes/settings/Localizationroute.js");
 const balanceSheetRoutes = require("./routes/balanceSheetRoutes.js");
+
 
 
 const http = require('http');
@@ -110,6 +114,9 @@ app.use("/api/warehouse", warehouseRoutes);
 app.use("/api/variant-attributes", VarientRoutes);
 app.use("/api/warranty", WarrantyRoutes);
 app.use('/api/debit-notes', debitNoteRoutes);
+
+app.use('/api/sales', salesRoutes);
+=======
 app.use("/api/profile", userProfileRoutes);
 
 // api for mail 
@@ -126,6 +133,7 @@ app.use("/api/mobile", mobileverifyrouter);
 
 // device management api
 app.use("/api/devices", devicemanagementrouter);
+
 
 app.use('/uploads', express.static('uploads'));
 

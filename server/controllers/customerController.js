@@ -1,3 +1,4 @@
+
 const Customer = require('../models/customerModel');
 
 // Create new customer
@@ -58,7 +59,16 @@ exports.getCustomerById = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
+// Get all active customers (status: true)
+exports.getActiveCustomers = async (req, res) => {
+  try {
+    const customers = await Customer.find({ status: true })
+      .populate('billing.country billing.state billing.city shipping.country shipping.state shipping.city name email phone currency website notes');
+    res.json(customers);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 // Update customer
 exports.updateCustomer = async (req, res) => {
   try {

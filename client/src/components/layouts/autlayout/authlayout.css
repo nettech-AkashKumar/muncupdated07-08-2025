@@ -18,12 +18,11 @@
   }
   
   /* Main content area */
-  .main-content {
+  /* .main-content {
     flex: 1;
     padding: 20px;
-    margin-top: 65px; /* Make space for the header */
     transition: margin-left 0.3s ease;
-  }
+  } */
   
   /* Adjust main content when sidebar is collapsed */
   /* .sidebar.collapsed ~ .right-section .main-content {

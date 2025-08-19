@@ -274,10 +274,7 @@ const PurchaseOrder = () => {
                             </li>
                           </ul>
                         </td>
-
-
                       </tr>
-
                     ))
                   )}
 

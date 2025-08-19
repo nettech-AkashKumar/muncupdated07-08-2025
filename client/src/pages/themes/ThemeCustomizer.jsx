@@ -103,14 +103,15 @@ const ThemeCustomizer = () => {
 
     const handleReset = (e) => {
         e.preventDefault();
-        localStorage.clear();
+        // localStorage.clear();
         window.location.reload();
     };
 
     return (
         <div className="sidebar-contact">
             <div className="toggle-theme" data-bs-toggle="offcanvas" data-bs-target="#theme-setting">
-                <i className="fa fa-cog fa-w-16 fa-spin"></i>
+                <TbSettings />
+
             </div>
             <div className="sidebar-themesettings offcanvas offcanvas-end" id="theme-setting">
                 <div className="offcanvas-header d-flex align-items-center justify-content-between bg-dark">
@@ -140,7 +141,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="defaultLayout" value="default" checked={layout === 'default'} onChange={handleLayoutChange} />
                                                 <label htmlFor="defaultLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/default.svg" alt="img" />
+                                                        <img src={Default} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Default</span>
                                                 </label>
@@ -152,7 +153,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="miniLayout" value="mini" checked={layout === 'mini'} onChange={handleLayoutChange} />
                                                 <label htmlFor="miniLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/mini.svg" alt="img" />
+                                                        <img src={Mini} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Mini</span>
                                                 </label>
@@ -164,7 +165,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="twocolumnLayout" value="twocolumn" checked={layout === 'twocolumn'} onChange={handleLayoutChange} />
                                                 <label htmlFor="twocolumnLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/two-column.svg" alt="img" />
+                                                        <img src={TwoColumn} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Two Column</span>
                                                 </label>
@@ -176,7 +177,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="horizontalLayout" value="horizontal" checked={layout === 'horizontal'} onChange={handleLayoutChange} />
                                                 <label htmlFor="horizontalLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/horizontal.svg" alt="img" />
+                                                        <img src={Horizontal} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Horizontal</span>
                                                 </label>
@@ -188,7 +189,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="detachedLayout" value="detached" checked={layout === 'detached'} onChange={handleLayoutChange} />
                                                 <label htmlFor="detachedLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/detached.svg" alt="img" />
+                                                        <img src={Detached} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Detached</span>
                                                 </label>
@@ -200,7 +201,7 @@ const ThemeCustomizer = () => {
                                                 <input type="radio" name="LayoutTheme" id="without-headerLayout" value="without-header" checked={layout === 'without-header'} onChange={handleLayoutChange} />
                                                 <label htmlFor="without-headerLayout">
                                                     <span className="d-block mb-2 layout-img">
-                                                        <img src="assets/img/theme/without-header.svg" alt="img" />
+                                                        <img src={WithoutHeader} alt="img" />
                                                     </span>
                                                     <span className="layout-type">Without Header</span>
                                                 </label>
@@ -208,9 +209,9 @@ const ThemeCustomizer = () => {
                                         </div>
                                         {/* RTL Layout (link) */}
                                         <div className="col-4">
-                                            <a href="layout-rtl.html" className="theme-layout mb-3">
+                                            <a href="#" className="theme-layout mb-3">
                                                 <span className="d-block mb-2 layout-img">
-                                                    <img src="assets/img/theme/rtl.svg" alt="img" />
+                                                    <img src={RTL} alt="img" />
                                                 </span>
                                                 <span className="layout-type d-block">RTL</span>
                                             </a>
@@ -429,7 +430,7 @@ const ThemeCustomizer = () => {
                             </div>
                         </div> */}
                         {/* Sidebar Background */}
-                        <div className="accordion-item border px-3 layout-select">
+                        {/* <div className="accordion-item border px-3 layout-select">
                             <h2 className="accordion-header">
                                 <button className="accordion-button text-dark fs-16 px-0 py-3 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarbgsetting" aria-expanded="true">
                                     Sidebar Background
@@ -459,7 +460,7 @@ const ThemeCustomizer = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                         {/* Theme Mode */}
                         <div className="accordion-item border px-3">
                             <h2 className="accordion-header">
@@ -502,11 +503,11 @@ const ThemeCustomizer = () => {
                                 <i className="ti ti-restore me-1"></i>Reset
                             </a>
                         </div>
-                        <div className="col-6">
+                        {/* <div className="col-6">
                             <a href="#" className="btn btn-primary w-100" data-bs-dismiss="offcanvas">
                                 <i className="ti ti-shopping-cart-plus me-1"></i>Buy Product
                             </a>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>
