@@ -116,7 +116,7 @@ app.use("/api/warranty", WarrantyRoutes);
 app.use('/api/debit-notes', debitNoteRoutes);
 
 app.use('/api/sales', salesRoutes);
-=======
+
 app.use("/api/profile", userProfileRoutes);
 
 // api for mail 

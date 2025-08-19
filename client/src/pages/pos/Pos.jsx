@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
+import BASE_URL from "../../pages/config/config";
+import axios from "axios";
 import { IoSearch } from "react-icons/io5";
 import { SlHandbag } from "react-icons/sl";
 import { GoPersonAdd } from "react-icons/go";
@@ -29,6 +31,30 @@ function Pos() {
     };
   }, []);
 
+  const [products, setProducts] = useState([]);
+  
+  const [activeTabs, setActiveTabs] = useState({});
+  
+    useEffect(() => {
+      const fetchProducts = async () => {
+        try {
+          const res = await axios.get(`${BASE_URL}/api/products`);
+          setProducts(res.data);
+          console.log("Products right:", res.data);
+          // Initialize all to "general"
+          const initialTabs = res.data.reduce((acc, product) => {
+            acc[product._id] = "general";
+            return acc;
+          }, {});
+          setActiveTabs(initialTabs);
+        } catch (err) {
+          console.error("Failed to fetch products", err);
+        }
+      };
+      fetchProducts();
+    }, []);
+  
+
   return (
     <div style={{marginLeft:'-21px',backgroundColor:'#fff'}}>
 
@@ -45,13 +71,15 @@ function Pos() {
       {/* search & cart */}
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',border:'1px solid #ccc'}}>
 
+        {/* search bar */}
         <div style={{width:'70%',display:'flex',alignItems:'center',borderRight:'1px solid #ccc',}}>
           <IoSearch style={{fontSize:'24px',color:'#333',marginLeft:'10px',color:'#C2C2C2'}} />
           <input type="text" placeholder="Search by its name, sku, hsn code, mrp, sale price, purchase price..." style={{width:'95%',padding:'8px',fontSize:'16px',border:'none',outline:'none',color:'#C2C2C2'}} />
         </div>
 
+        {/* cart */}
         <div style={{width:'30%',display:'flex',justifyContent:'space-between',alignItems:'center',padding:'0px 20px',}}>
-          <div style={{}}>
+          <div style={{fontSize:'20px',fontWeight:'600'}}>
             Cart
           </div>
           <div style={{display:'flex',gap:'15px',alignItems:'center'}}>
@@ -73,12 +101,10 @@ function Pos() {
       </div>
 
       {/* products & customer billing */}
-      <div style={{display:'flex',justifyContent:'space-between',border:'1px solid white',height:'84vh'}}>
+      <div style={{display:'flex',justifyContent:'space-between',border:'1px solid white',height:'83vh'}}>
         
         {/* products */}
         <div style={{width:'70%',display:'flex',borderRight:'1px solid #ccc',}}>
-
-          <div style={{width:'100%',display:'flex',}}>
 
             {/* category */}
             <div style={{width:'20%',padding:'20px 50px 0px 20px',}}>
@@ -111,30 +137,57 @@ function Pos() {
             </div>
 
             {/* details */}
-            <div style={{width:'80%',backgroundColor:'#F1F1F1',padding:'20px'}}>
-              <div className='row'>
-                <div className='col-2'>
+            <div style={{width:'80%',backgroundColor:'#F1F1F1',height:'100%'}}>
+              
+              {/* products */}
+              <div style={{height:'78vh',marginTop:'20px'}}>
+              <div className='row' style={{gap:'30px',marginLeft:'30px',overflowY:'auto',}}>
+              {products.length === 0 ? (
+                <span>No Product Available</span>
+              ) : (
+              products.map((product) => (
+                <div className='col-2' style={{border:'2px solid #E6E6E6',backgroundColor:'white',borderRadius:'16px',padding:'10px'}}>
 
-                  <div>
-                    <img src="" alt="Product img" />
+                  <div style={{display:'flex',justifyContent:'center',backgroundColor:'white',width:'100%',height:'100px',alignItems:'center'}}>
+                    {product.images?.[0] && (
+                      <img
+                        src={product.images[0].url}
+                        alt={product.productName}
+                        style={{ height: "100%", width: "100%",objectFit:'contain' }}
+                      />
+                    )}
                   </div>
 
                   <div>
-                    <span>Category</span>
-                    <br/>
-                    <span>Product Name</span>
+                    <span style={{color:'#676767',fontSize:'10px'}}>{product.category?.categoryName}</span>
+                  </div>
+
+                  <div>
+                    <span style={{fontSize:'14px'}}>{product.productName}</span>
+                  </div>
+
+                  <div style={{marginTop:'8px',marginBottom:'8px'}}>
+                    <div style={{width:'100%',borderTop:'2px dotted #C2C2C2'}}></div>
                   </div>
 
                   <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span>Pcs</span>
-                    <span>Price</span>
+                    <span style={{fontSize:'14px'}}>{product.quantity}{product.unit}</span>
+                    <span style={{fontSize:'14px'}}>₹{product.sellingPrice}</span>
                   </div>
 
                 </div>
+              )))}
+              </div>
+              </div>
+
+              {/* footer */}
+              <div style={{position:'relative',bottom:'0px',backgroundColor:'white',padding:'10px',width:'100%',display:'flex',justifyContent:'space-around'}}>
+                <span>Hold</span>
+                <span>SCAN</span>
+                <span>Credit Scale</span>
+                <span>Transaction</span>
               </div>
             </div>
-
-          </div>
 
         </div>
       
