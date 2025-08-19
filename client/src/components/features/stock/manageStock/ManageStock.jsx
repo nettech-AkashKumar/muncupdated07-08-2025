@@ -23,9 +23,47 @@ const StockHistory = () => {
     totalRecords: 0,
   });
 
+  // Calculate total quantity, total price, and total return quantity for all stock history (not just current page)
+  const [allTotals, setAllTotals] = useState({ totalQuantity: 0, totalPrice: 0, totalReturnQty: 0, availableQty: 0, availablePrice: 0 });
+
   useEffect(() => {
     fetchStockHistory();
   }, [filters]);
+
+  useEffect(() => {
+    // Fetch all logs for global totals (ignore pagination)
+    const fetchAllTotals = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/stock-history`, {
+          params: { ...filters, page: 1, limit: 1000000 }, // large limit to get all
+        });
+        const allLogs = response.data.logs || [];
+        let totalQuantity = 0;
+        let totalPrice = 0;
+        let totalReturnQty = 0;
+        let totalReturnPrice = 0;
+        allLogs.forEach(log => {
+          const qty = Number(log.quantityChanged) || 0;
+          const price = Number(log.priceChanged) || 0;
+          if (log.type && log.type.toLowerCase() === 'return') {
+            totalReturnQty -= qty;
+            totalReturnPrice += price;
+          } else {
+            totalQuantity += qty;
+            totalPrice += price;
+          }
+        });
+        // Available = total - return
+        const availableQty = totalQuantity - totalReturnQty;
+        const availablePrice = totalPrice - totalReturnPrice;
+        setAllTotals({ totalQuantity, totalPrice, totalReturnQty, availableQty, availablePrice });
+      } catch (err) {
+        setAllTotals({ totalQuantity: 0, totalPrice: 0, totalReturnQty: 0, availableQty: 0, availablePrice: 0 });
+      }
+    };
+    fetchAllTotals();
+    // eslint-disable-next-line
+  }, [filters.productName, filters.startDate, filters.endDate]);
 
   const fetchStockHistory = async () => {
     try {
@@ -64,10 +102,77 @@ const StockHistory = () => {
     }
   };
 
+  // Calculate total quantity and total price
+  const totalQuantity = logs.reduce((sum, log) => sum + (Number(log.quantityChanged) || 0), 0);
+  const totalPrice = logs.reduce((sum, log) => sum + (Number(log.priceChanged) || 0), 0);
 
   return (
     <div className="container mt-4">
       <h4>Stock History</h4>
+
+      {/* Summary Cards for ALL stock history */}
+      <div className="row mb-4">
+        <div className="col-md-2">
+          <div className="card text-center border-primary">
+            <div className="card-body">
+              <h6 className="card-title">Total Quantity (All)</h6>
+              <h4 className="card-text text-primary">{allTotals.totalQuantity}</h4>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-2">
+          <div className="card text-center border-success">
+            <div className="card-body">
+              <h6 className="card-title">Total Price (All)</h6>
+              <h4 className="card-text text-success">₹{allTotals.totalPrice.toFixed(2)}</h4>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-2">
+          <div className="card text-center border-warning">
+            <div className="card-body">
+              <h6 className="card-title">Total Return Qty (All)</h6>
+              <h4 className="card-text text-warning">{allTotals.totalReturnQty}</h4>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card text-center border-info">
+            <div className="card-body">
+              <h6 className="card-title">Available Quantity (All)</h6>
+              <h4 className="card-text text-info">{allTotals.availableQty}</h4>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card text-center border-dark">
+            <div className="card-body">
+              <h6 className="card-title">Available Price (All)</h6>
+              <h4 className="card-text text-dark">₹{allTotals.availablePrice.toFixed(2)}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="row mb-4">
+        <div className="col-md-3">
+          <div className="card text-center border-primary">
+            <div className="card-body">
+              <h6 className="card-title">Total Quantity</h6>
+              <h4 className="card-text text-primary">{totalQuantity}</h4>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-3">
+          <div className="card text-center border-success">
+            <div className="card-body">
+              <h6 className="card-title">Total Price</h6>
+              <h4 className="card-text text-success">₹{totalPrice.toFixed(2)}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div className="row mb-3">
         <div className="col-md-3">
@@ -117,6 +222,7 @@ const StockHistory = () => {
             <th>Date</th>
             <th>Product Name</th>
             <th>Product Code</th>
+            <th>Status</th>
             <th>New Quantity</th>
             <th>new Purchase Price</th>
             <th>Action</th>
@@ -129,6 +235,7 @@ const StockHistory = () => {
               <td>{new Date(log.date).toLocaleDateString()}</td>
               <td>{log.product?.productName || "N/A"}</td>
               <td>{log.product?.itemBarcode || "N/A"}</td>
+              <td>{log.type || "N/A"}</td>
               <td>{log.quantityChanged}</td>
               <td>{log.priceChanged}</td>
               {/* <td>{log.action}</td> */}

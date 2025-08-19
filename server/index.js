@@ -31,6 +31,7 @@ const VarientRoutes = require('./routes/variantRoutes');
 const WarrantyRoutes = require('./routes/warrantyRoutes');
 const debitNoteRoutes = require('./routes/debitNoteRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const salesRoutes = require('./routes/salesRoutes');
 
 const http = require('http');
 const { Server } = require('socket.io');
@@ -97,6 +98,7 @@ app.use("/api/warehouse", warehouseRoutes);
 app.use("/api/variant-attributes", VarientRoutes);
 app.use("/api/warranty", WarrantyRoutes);
 app.use('/api/debit-notes', debitNoteRoutes);
+app.use('/api/sales', salesRoutes);
 
 
 

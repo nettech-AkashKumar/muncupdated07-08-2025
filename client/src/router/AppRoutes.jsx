@@ -74,6 +74,16 @@ import CreditNote from "../components/features/creditDebit/creditNote/CreditNote
 import Sales from "../components/features/sales/Sales.jsx";
 import AllCustomer from "../components/features/customers/AllCustomers.jsx";
 import AllSuppliers from "../components/features/suppliers/AllSuppliers.jsx";
+import ViewSupplierModal from "../pages/Modal/suppliers/ViewSupplierModal.jsx";
+import ViewPurchase from "../pages/Modal/PurchaseModals/ViewPurchase.jsx";
+import LowStock from "../components/features/stock/lowstock/LowStock.jsx";
+import PurchaseReport from "../components/features/inventory/report/PurchaseReport.jsx";
+import InvoiceTemplate from "../pages/Invoices/Invoice.jsx";
+import Invoice7 from "../pages/Invoices/Invoice7.JSX";
+import ProductEdit from "../components/features/inventory/product/ProductEdit";
+import ProductStock from "../components/features/inventory/product/ProductStock.jsx";
+import ViewProductStock from "../pages/ViewProductStock.jsx";
+import ViewReturnProduct from "../pages/ViewReturnProduct.jsx";
 
 const AppRoutes = () => {
   return (
@@ -101,7 +111,7 @@ const AppRoutes = () => {
         <Route path="/general-settings" element={<Setting />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/product" element={<Product />} />
-        <Route path="/choose-adproduct" element={<ChooseToAddProduct/>}/>
+        <Route path="/choose-adproduct" element={<ChooseToAddProduct />} />
         <Route path="/add-product" element={<ProductCreate />} />
         <Route path="/expired-products" element={<ExpriedProduct />} />
         <Route path="/category-list" element={<Category />} />
@@ -134,22 +144,29 @@ const AppRoutes = () => {
         <Route path="/purchase-list" element={<Purchase />} />
         <Route path="/purchase-order" element={<PurchaseOrder />} />
         <Route path="/purchase-returns" element={<PurchaseReturn />} />
+        {/* <Route path="/purchase-report" element={<ViewPurchase />} /> */}
+        <Route path="/purchase-report" element={<PurchaseReport />} />
 
         {/* sales */}
-        <Route path="/online-orders" element={<Sales />} />
+        <Route path="/sales" element={<Sales />} />
 
         {/* stock */}
+        <Route path="/stock" element={<ViewProductStock />} />
+        <Route path="/return-stock" element={<ViewReturnProduct />} />
         <Route path="/manage-stocks" element={<ManageStock />} />
         <Route path="/stock-adjustment" element={<StockAdujestment />} />
         <Route path="/stock-transfer" element={<StockTransfer />} />
+        <Route path="/low-stocks" element={<LowStock />} />
         <Route path="/hsn" element={<Hsn />} />
         <Route path="/warehouse" element={<Warehouse />} />
+        <Route path="/invoice" element={<InvoiceTemplate />} />
+        <Route path="/invoice7" element={<Invoice7 />} />
 
         {/* customer */}
         <Route path="/customers" element={<AllCustomer />} />
         {/* suppplier */}
         <Route path="/suppliers" element={<AllSuppliers />} />
-
+        <Route path="/viewsupplier/:id" element={<ViewSupplierModal />} />
         {/* settings */}
         <Route path="/Purchase-settings" element={<PurchaseSettings />} />
         <Route path="/warehouse-settings" element={<RackSettings />} />
@@ -170,6 +187,7 @@ const AppRoutes = () => {
           <Route path="spam" element={<Spam />} />
           <Route path="deleted" element={<Deleted />} />
         </Route>
+        <Route path="/product/edit/:id" element={<ProductEdit />} />
       </Route>
 
     </Routes>

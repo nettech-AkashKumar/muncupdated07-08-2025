@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from "react";
 import { FaFileExcel, FaFilePdf } from "react-icons/fa";
-import { TbChevronUp, TbEdit, TbRefresh, TbTrash } from "react-icons/tb";
+import { TbChevronUp, TbEdit, TbRefresh, TbTrash, TbEye } from "react-icons/tb";
 import { Link, useNavigate } from "react-router-dom";
 import AddPurchaseModal from "../../../../pages/Modal/PurchaseModals/AddPurchaseModal";
 import { CiCirclePlus } from "react-icons/ci";
@@ -9,6 +8,7 @@ import EditPurchaseModal from "../../../../pages/Modal/PurchaseModals/EditPurcha
 import axios from "axios";
 import BASE_URL from "../../../../pages/config/config";
 import { useSettings } from "../../../../Context/purchase/PurchaseContext";
+import ViewPurchase from "../../../../pages/Modal/PurchaseModals/ViewPurchase";
 // import { useSettings } from "../../../../Context/purchase/PurchaseContext";
 // import "../../../../styles/purchase/product.css"
 import "../../../../styles/product/product.css"
@@ -16,6 +16,11 @@ import "../../../../styles/product/product.css"
 
 const Purchase = () => {
   const [purchases, setPurchases] = useState([]);
+  const [viewPurchaseId, setViewPurchaseId] = useState(null);
+
+  
+
+  console.log("Purchase component rendered", purchases);
   const [filters, setFilters] = useState({
     search: "",
     startDate: "",
@@ -257,6 +262,7 @@ const Purchase = () => {
 
                           <div className="edit-delete-action">
                             <a className="me-2 p-2" data-bs-toggle="modal" data-bs-target="#edit-purchase" onClick={() => handleEditClick(purchase)}><TbEdit /></a>
+                            <a className="me-2 p-2" data-bs-toggle="modal" data-bs-target="#view-purchase" onClick={() => setViewPurchaseId(purchase._id)}><TbEye /></a>
                             <a className="p-2"><TbTrash /></a>
                           </div>
                         </td>
@@ -280,6 +286,22 @@ const Purchase = () => {
         <AddPurchaseModal />
         {/* <EditPurchaseModal /> */}
         <EditPurchaseModal editData={selectedPurchase} onUpdate={fetchPurchases} />
+
+        <div className="modal fade" id="view-purchase" tabIndex="-1" aria-labelledby="viewPurchaseLabel" aria-hidden="true">
+          <div className="modal-dialog modal-xl modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="viewPurchaseLabel">View Purchase Details</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                {viewPurchaseId && (
+                  <ViewPurchase purchase={purchases.find(p => p._id === viewPurchaseId)} purchaseId={viewPurchaseId} />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>

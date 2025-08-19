@@ -8,11 +8,20 @@ const {
   updateProduct,
   deleteProduct,
   searchProductsByName,
-  importProducts, // ✅ Add import controller
+  importProducts,
+  getProductStock,
+
+  getPurchaseReturnStock,
 } = require("../controllers/productController");
+
 
 const upload = require("../middleware/Multer/multer"); // ✅ fix double slash
 const path = require("path");
+
+// Product stock API
+router.get("/stock", getProductStock);
+// Purchase return stock API (must be above /:id)
+
 
 router.post("/create", upload.array("images", 10), createProduct);
 

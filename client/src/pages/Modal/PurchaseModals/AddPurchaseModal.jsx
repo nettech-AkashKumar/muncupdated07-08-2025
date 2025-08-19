@@ -9,9 +9,11 @@ import "../../../styles/category/category.css";
 import { TbTrash } from "react-icons/tb";
 import DeleteAlert from "../../../utils/sweetAlert/DeleteAlert";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 
 const AddPurchaseModal = () => {
+  const navigate = useNavigate();
   const [options, setOptions] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,6 +42,9 @@ const AddPurchaseModal = () => {
   const [transactionDate, setTransactionDate] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
 
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  // console.log("Selected Supplier:", options);
+  // console.log("Selected Supplier:", selectedSupplier);
 
   useEffect(() => {
     const today = new Date();
@@ -51,24 +56,27 @@ const AddPurchaseModal = () => {
   }, []);
 
   useEffect(() => {
-    const fetchActiveUsers = async () => {
+    const fetchActiveSuppliers = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/user/status/active`);
-        const users = res.data.users;
-        const formattedOptions = users.map((user) => ({
-          value: user._id,
-          label: `${user.firstName} ${user.lastName} (${user.email})`,
+        const res = await axios.get(`${BASE_URL}/api/suppliers/active`);
+        const suppliers = res.data.suppliers;
+
+        const formattedOptions = suppliers.map((supplier) => ({
+          value: supplier._id,
+          label: `${supplier.firstName}${supplier.lastName} (${supplier.supplierCode})`,
         }));
+
         setOptions(formattedOptions);
       } catch (err) {
-        console.error("Error fetching active users:", err);
+        console.error("Error fetching active suppliers:", err);
       }
     };
-    fetchActiveUsers();
+
+    fetchActiveSuppliers();
   }, []);
 
-  const handleActiveUserChange = (selectedOption) => {
-    setSelectedUser(selectedOption);
+  const handleSupplierChange = (selectedOption) => {
+    setSelectedSupplier(selectedOption);
   };
 
   useEffect(() => {
@@ -127,8 +135,8 @@ const AddPurchaseModal = () => {
   //   );
   // };
   // This function removes a product from the selected list with confirmation
- 
- 
+
+
   const handleRemoveProduct = async (productId, productName) => {
     const confirmed = await Swal.fire({
       title: "Are you sure?",
@@ -168,7 +176,7 @@ const AddPurchaseModal = () => {
 
 
   const resetForm = () => {
-    setSelectedUser(null);
+    setSelectedSupplier(null);
     setReferenceNumber("");
     setSearchTerm("");
     setSelectedProducts([]);
@@ -197,13 +205,14 @@ const AddPurchaseModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedUser || selectedProducts.length === 0 || !status) {
+    if (!selectedSupplier || selectedProducts.length === 0 || !status) {
       alert("Please fill all required fields.");
       return;
     }
 
     const formData = new FormData();
-    formData.append("supplier", selectedUser.value);
+    // formData.append("supplier", selectedUser.value);
+    formData.append("supplier", selectedSupplier.value);
     formData.append("referenceNumber", referenceNumber);
     formData.append("purchaseDate", purchaseDate);
     formData.append("orderTax", orderTax);
@@ -251,6 +260,7 @@ const AddPurchaseModal = () => {
       resetForm();
 
       window.$(`#add-purchase`).modal("hide");
+      navigate("/purchases");
 
     } catch (error) {
       console.error("Failed to create purchase:", error);
@@ -343,8 +353,15 @@ const AddPurchaseModal = () => {
                     </label>
                     <div className="row">
                       <div className="col-lg-10 col-sm-10 col-10">
-                        <Select options={options} value={selectedUser} onChange={handleActiveUserChange} isSearchable
-                          placeholder="Search and select a user..." />
+                        {/* <Select options={options} value={selectedUser} onChange={handleActiveUserChange} isSearchable
+                          placeholder="Search and select a user..." /> */}
+                        <Select
+                          options={options}
+                          value={selectedSupplier}
+                          onChange={handleSupplierChange}
+                          placeholder="Choose a supplier..."
+                          isClearable
+                        />
                       </div>
                       <div className="col-lg-2 col-sm-2 col-2 ps-0">
                         <div className="add-icon tab">
@@ -498,7 +515,39 @@ const AddPurchaseModal = () => {
                                   </td>
 
                                   <td>
-                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
+                                    <td>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          gap: "8px",
+                                        }}
+                                      >
+                                        <input
+                                          type="number"
+                                          className="form-control form-control-sm"
+                                          style={{ width: "70px", textAlign: "center" }}
+                                          min="1"
+                                          value={product.quantity || 1}
+                                          onChange={(e) => {
+                                            let val = parseInt(e.target.value, 10);
+                                            if (isNaN(val)) val = 1;
+                                            if (val < 1) val = 1;
+
+                                            // bas yahan se availableQty check hata diya
+                                            setSelectedProducts((prev) =>
+                                              prev.map((item, i) =>
+                                                i === index ? { ...item, quantity: val } : item
+                                              )
+                                            );
+                                          }}
+                                        />
+                                        <span className="text-muted">{product.unit}</span>
+                                      </div>
+                                    </td>
+
+                                    {/* <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}>
                                       <input type="number" className="form-control form-control-sm"
                                         style={{ width: "70px", textAlign: "center" }} min="1" max={product.availableQty}
                                         value={product.quantity || 1} onChange={(e) => {
@@ -514,7 +563,7 @@ const AddPurchaseModal = () => {
                                         }}
                                       />
                                       <span className="text-muted">{product.unit}</span>
-                                    </div>
+                                    </div> */}
                                   </td>
 
                                   <td>

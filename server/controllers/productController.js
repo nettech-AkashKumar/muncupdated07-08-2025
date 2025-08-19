@@ -1,5 +1,3 @@
-
-
 const Product = require("../models/productModels");
 const cloudinary = require("../utils/cloudinary/cloudinary");
 
@@ -8,11 +6,10 @@ exports.createProduct = async (req, res) => {
   try {
     const {
       productName,
-      slug,
       sku,
       brand,
       category,
-      subcategory,
+      subCategory,
       supplier,
       itemBarcode,
       store,
@@ -31,7 +28,6 @@ exports.createProduct = async (req, res) => {
       description,
       seoTitle,
       seoDescription,
-      // Other
       itemType,
       isAdvanced,
       trackType,
@@ -43,6 +39,7 @@ exports.createProduct = async (req, res) => {
       batchNumber,
       returnable,
       expirationDate,
+      hsn,
     } = req.body;
 
     // Parse variants if provided
@@ -62,14 +59,30 @@ exports.createProduct = async (req, res) => {
       }));
     }
 
+    // Validate required ObjectId fields
+    if (!brand || brand === "undefined") {
+      return res.status(400).json({ message: "Brand is required and must be selected." });
+    }
+    if (!category || category === "undefined") {
+      return res.status(400).json({ message: "Category is required and must be selected." });
+    }
+    const subCatValue = subCategory || req.body.subcategory || req.body.subCatogery || req.body.subcatogery;
+    if (!subCatValue || subCatValue === "undefined") {
+      return res.status(400).json({ message: "Subcategory is required and must be selected." });
+    }
+    const hsnValue = hsn || req.body.hsnm;
+    if (!hsnValue || hsnValue === "undefined") {
+      return res.status(400).json({ message: "HSN is required and must be selected." });
+    }
+   
+    const supplierValue = (supplier && typeof supplier === 'string' && supplier.trim() !== '') ? supplier : undefined;
     const newProduct = new Product({
       productName,
-      slug,
       sku,
       brand,
       category,
-      subcategory,
-      supplier,
+      subcategory: subCatValue,
+      supplier: supplierValue,
       itemBarcode,
       store,
       warehouse,
@@ -100,6 +113,7 @@ exports.createProduct = async (req, res) => {
       batchNumber,
       returnable,
       expirationDate,
+      hsn: hsnValue,
     });
 
     const savedProduct = await newProduct.save();
@@ -115,8 +129,47 @@ exports.getAllProducts = async (req, res) => {
       .populate("brand")
       .populate("category")
       .populate("subcategory")
+      .populate("hsn")
+      .populate("supplier")
+      .populate("warehouse")
       .sort({ createdAt: -1 }); // Optional: latest first
-    res.status(200).json(products);
+
+    // Ensure hsnCode, supplierName, warehouseName are always present for frontend
+    const productsWithDetails = products.map(prod => {
+      let hsnCode = "";
+      if (prod.hsn) {
+        if (typeof prod.hsn === "object" && prod.hsn !== null) {
+          hsnCode = prod.hsn.code || prod.hsn.hsnCode || prod.hsn.name || prod.hsn._id || "";
+        } else {
+          hsnCode = prod.hsn;
+        }
+      } else if (prod.hsnCode) {
+        hsnCode = prod.hsnCode;
+      }
+
+      let supplierName = "";
+      if (prod.supplier) {
+        if (typeof prod.supplier === "object" && prod.supplier !== null) {
+          supplierName = prod.supplier.name || prod.supplier.supplierName || prod.supplier.companyName || prod.supplier.firstName || prod.supplier._id || "";
+        } else {
+          supplierName = prod.supplier;
+        }
+      }
+
+      let warehouseName = "";
+      if (prod.warehouse) {
+        if (typeof prod.warehouse === "object" && prod.warehouse !== null) {
+          warehouseName = prod.warehouse.name || prod.warehouse.warehouseName || prod.warehouse._id || "";
+        } else {
+          warehouseName = prod.warehouse;
+        }
+      }
+
+      // Remove full supplier and warehouse objects from response, only send names
+      const { supplier, warehouse, ...rest } = prod._doc;
+      return { ...rest, hsnCode, supplierName, warehouseName };
+    });
+    res.status(200).json(productsWithDetails);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -136,11 +189,164 @@ exports.searchProductsByName = async (req, res) => {
       .populate("brand")
       .populate("category")
       .populate("subcategory")
+      .populate("hsn")
       .sort({ createdAt: -1 });
 
-    res.status(200).json(products);
+    // Add hsnCode and availableQty logic for frontend
+    const productsWithDetails = products.map(prod => {
+      let hsnCode = "";
+      if (prod.hsn) {
+        if (typeof prod.hsn === "object" && prod.hsn !== null) {
+          hsnCode = prod.hsn.code || prod.hsn.hsnCode || prod.hsn.name || prod.hsn._id || "";
+        } else {
+          hsnCode = prod.hsn;
+        }
+      } else if (prod.hsnCode) {
+        hsnCode = prod.hsnCode;
+      }
+      // Calculate availableQty as quantity + sum(newQuantity array)
+      const qty = Number(prod.quantity) || 0;
+      let newQuantitySum = 0;
+      if (Array.isArray(prod.newQuantity)) {
+        newQuantitySum = prod.newQuantity.reduce((acc, n) => {
+          const num = Number(n);
+          return acc + (isNaN(num) ? 0 : num);
+        }, 0);
+      } else if (typeof prod.newQuantity === 'number') {
+        newQuantitySum = Number(prod.newQuantity);
+      }
+      // availableQty is always latest DB value after sale subtraction
+      const availableQty = qty + newQuantitySum;
+      // Add availableStock field for frontend
+      const availableStock = availableQty;
+      return { ...prod._doc, hsnCode, availableQty, availableStock };
+    });
+    res.status(200).json(productsWithDetails);
   } catch (err) {
     console.error("Search error:", err);
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+// GET /api/products/stock
+exports.getProductStock = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate("brand")
+      .populate("category")
+      .populate("subcategory")
+      .populate("hsn")
+        .populate("supplier")
+      .populate("warehouse")
+      .sort({ createdAt: -1 });
+
+    // GET /api/products/purchase-return-stock
+    exports.getPurchaseReturnStock = async (req, res) => {
+      try {
+        const products = await Product.find()
+          .populate("brand")
+          .populate("category")
+          .populate("subcategory")
+          .populate("hsn")
+            .populate("supplier")
+      .populate("warehouse")
+          .sort({ createdAt: -1 });
+
+        const productsWithReturnStock = products.map(prod => {
+          let hsnCode = "";
+          if (prod.hsn) {
+            if (typeof prod.hsn === "object" && prod.hsn !== null) {
+              hsnCode = prod.hsn.code || prod.hsn.hsnCode || prod.hsn.name || prod.hsn._id || "";
+            } else {
+              hsnCode = prod.hsn;
+            }
+          } else if (prod.hsnCode) {
+            hsnCode = prod.hsnCode;
+          }
+          // Calculate availableReturnStock as purchaseReturnQuantity - sum(newPurchaseReturnQuantity)
+          const qty = Number(prod.purchaseReturnQuantity) || 0;
+          let newQuantitySum = 0;
+          if (Array.isArray(prod.newPurchaseReturnQuantity)) {
+            newQuantitySum = prod.newPurchaseReturnQuantity.reduce((acc, n) => {
+              const num = Number(n);
+              return acc + (isNaN(num) ? 0 : num);
+            }, 0);
+          } else if (typeof prod.newPurchaseReturnQuantity === 'number') {
+            newQuantitySum = Number(prod.newPurchaseReturnQuantity);
+          }
+          const availableReturnStock = qty - newQuantitySum;
+          const purchasePrice = Number(prod.purchasePrice) || 0;
+          const stockValue = availableReturnStock * purchasePrice;
+          return {
+            _id: prod._id,
+            productName: prod.productName,
+            hsnCode,
+            availableReturnStock,
+            unit: prod.unit,
+            purchasePrice,
+            stockValue
+          };
+        });
+        res.status(200).json(productsWithReturnStock);
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
+    };
+    const productsWithStock = products.map(prod => {
+      let hsnCode = "";
+      if (prod.hsn) {
+        if (typeof prod.hsn === "object" && prod.hsn !== null) {
+          hsnCode = prod.hsn.code || prod.hsn.hsnCode || prod.hsn.name || prod.hsn._id || "";
+        } else {
+          hsnCode = prod.hsn;
+        }
+      } else if (prod.hsnCode) {
+        hsnCode = prod.hsnCode;
+      }
+      const qty = Number(prod.quantity) || 0;
+      let newQuantitySum = 0;
+      if (Array.isArray(prod.newQuantity)) {
+        newQuantitySum = prod.newQuantity.reduce((acc, n) => {
+          const num = Number(n);
+          return acc + (isNaN(num) ? 0 : num);
+        }, 0);
+      } else if (typeof prod.newQuantity === 'number') {
+        newQuantitySum = Number(prod.newQuantity);
+      }
+      const availableStock = qty + newQuantitySum;
+           const purchasePrice = Number(prod.purchasePrice) || 0;
+           const stockValue = availableStock * purchasePrice;
+          let warehouseName = '';
+          if (prod.warehouse) {
+            if (typeof prod.warehouse === 'object' && prod.warehouse !== null) {
+              warehouseName = prod.warehouse.name || prod.warehouse.warehouseName || prod.warehouse._id || '';
+            } else {
+              warehouseName = prod.warehouse;
+            }
+          }
+          let supplierName = '';
+          if (prod.supplier) {
+            if (typeof prod.supplier === 'object' && prod.supplier !== null) {
+              supplierName = prod.supplier.name || prod.supplier.supplierName || prod.supplier.companyName || prod.supplier.firstName || prod.supplier._id || '';
+            } else {
+              supplierName = prod.supplier;
+            }
+          }
+          return {
+            _id: prod._id,
+            productName: prod.productName,
+            hsnCode,
+            availableStock,
+            unit: prod.unit,
+            purchasePrice,
+            stockValue,
+            warehouseName,
+            supplierName
+          };
+    });
+    res.status(200).json(productsWithStock);
+  } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
@@ -161,71 +367,19 @@ exports.getProductById = async (req, res) => {
 // Update Product
 exports.updateProduct = async (req, res) => {
   try {
-    const {
-      productName,
-      slug,
-      sku,
-      brand,
-      category,
-      subcategory,
-      supplier,
-      itemBarcode,
-      store,
-      warehouse,
-      purchasePrice,
-      sellingPrice,
-      wholesalePrice,
-      retailPrice,
-      quantity,
-      unit,
-      taxType,
-      tax,
-      discountType,
-      discountValue,
-      quantityAlert,
-      images,
-      description,
-      seoTitle,
-      seoDescription,
-      variants,
-    } = req.body;
-
+    // Only update fields present in req.body
+    const updateFields = { ...req.body };
+    // If files are present (e.g. images), handle them here
+    if (req.files && req.files.length > 0) {
+      updateFields.images = req.files.map(file => file.path);
+    }
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      {
-        productName,
-        slug,
-        sku,
-        brand,
-        category,
-        subcategory,
-        supplier,
-        itemBarcode,
-        store,
-        warehouse,
-        purchasePrice,
-        sellingPrice,
-        wholesalePrice,
-        retailPrice,
-        quantity,
-        unit,
-        taxType,
-        tax,
-        discountType,
-        discountValue,
-        quantityAlert,
-        images,
-        description,
-        seoTitle,
-        seoDescription,
-        variants,
-      },
+      { $set: updateFields },
       { new: true }
     );
-
     if (!updatedProduct)
       return res.status(404).json({ message: "Product not found" });
-
     res.status(200).json(updatedProduct);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -256,7 +410,6 @@ exports.importProducts = async (req, res) => {
     for (const row of data) {
       const product = new Product({
         productName: row.productName,
-        slug: row.slug,
         sku: row.sku,
         brand: row.brand, // Make sure this is an ObjectId if using ref
         category: row.category,

@@ -1,3 +1,4 @@
+
 // controllers/hsnController.js
 const xlsx = require('xlsx');
 const HSN = require('../models/hsnModels');
@@ -24,6 +25,18 @@ exports.getPaginatedHSN = async (req, res) => {
         res.json({ items, page, limit, total, pages: Math.ceil(total / limit) });
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+};
+// Get all HSN records 
+exports.getAllHSN = async (req, res) => {
+    try {
+        const items = await HSN.find()
+            .select("hsnCode description") // select only fields needed
+            .sort({ hsnCode: 1 });
+
+        res.json({ success: true, data: items });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
     }
 };
 

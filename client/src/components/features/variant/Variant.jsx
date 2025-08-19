@@ -19,6 +19,9 @@ import * as XLSX from "xlsx";
 
 
 import dayjs from "dayjs";
+import BASE_URL from "../../../pages/config/config";
+import { TbEdit, TbTrash } from "react-icons/tb";
+import Pagination from "../../../utils/pagination/Pagination";
 // import "../../../styles/varient/varient.css";
 
 const Variant = ({ show, handleClose }) => {
@@ -36,7 +39,7 @@ const Variant = ({ show, handleClose }) => {
 
     const fetchVariants = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/variant-attributes/");
+            const res = await fetch(`${BASE_URL}/api/variant-attributes/`);
             if (!res.ok) {
                 throw new Error("Failed to fetch variant data");
             }
@@ -83,7 +86,7 @@ const Variant = ({ show, handleClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:5000/api/variant-attributes/", {
+            const response = await fetch(`${BASE_URL}/api/variant-attributes/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
@@ -127,7 +130,7 @@ const Variant = ({ show, handleClose }) => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:5000/api/variant-attributes/${editFormData.id}`, {
+            const response = await fetch(`${BASE_URL}/api/variant-attributes/${editFormData.id}`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(editFormData),
@@ -148,7 +151,7 @@ const Variant = ({ show, handleClose }) => {
 
     const handleDelete = async (id) => {
         try {
-            const response = await fetch(`http://localhost:5000/api/variant-attributes/${id}`, {
+            const response = await fetch(`${BASE_URL}/api/variant-attributes/${id}`, {
                 method: "DELETE",
             });
             if (!response.ok) {
@@ -239,307 +242,228 @@ const Variant = ({ show, handleClose }) => {
 
 
     return (
-        <div className="fn-conatiner">
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div className="d-flex bd-highlight justify-content-between align-items-start">
-                <div className="p-3 mt-0 flex-grow-1">
-                    <div className="h4">Variant Attributes</div>
-                    <div className="text-secondary">Manage your variant attributes</div>
-                </div>
 
-                <div className="d-flex align-items-center gap-1 p-4 mt-0">
-                    <Button
-                        className="text-danger"
-                        variant="light"
-                        aria-label="Export as PDF"
-                        onClick={handleExportPDF}
-                    >
-                        <BiSolidFilePdf size={24} />
-                    </Button>
-                    <Button
-                        className="text-success"
-                        variant="light"
-                        aria-label="Export as Excel"
-                        onClick={handleExportExcel}
-                    >
-                        <AiOutlineFileExcel size={24} />
-                    </Button>
-
-                    <Button
-                        variant="light"
-                        aria-label="Refresh"
-                        className="text-secondary"
-                        onClick={fetchVariants}
-                    >
-                        <HiOutlineRefresh size={20} />
-                    </Button>
-                    <Button
-                        variant="light"
-                        aria-label="Collapse"
-                        className="text-secondary"
-                    >
-                        <IoIosArrowUp size={18} />
-                    </Button>
-                    <button className="btn btn-warning text-white" onClick={handleShow}>
-                        <LuCirclePlus /> Add Variant
-                    </button>
-                </div>
-            </div>
-            <Modal show={showModal} onHide={handleCloses} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add Variant</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="variant">
-                            <Form.Label>
-                                Variant <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter variant (e.g., Size, Color)"
-                                name="variant"
-                                value={formData.variant}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="value" className="mt-3">
-                            <Form.Label>
-                                Values <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Control
-                                type="text"
-                                placeholder="Enter values separated by comma (e.g., XS, S, M, L)"
-                                name="value"
-                                value={formData.value}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                        Enter Value separated by comma
-
-                        <Form.Group
-                            controlId="status"
-                            className="mt-4 d-flex align-items-center justify-content-between"
-                        >
-                            <Form.Label className="me-3 mb-0">Status</Form.Label>
-                            <Form.Check
-                                type="switch"
-                                name="status"
-                                checked={formData.status}
-                                onChange={handleChange}
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button className="btn btn-dark" onClick={handleCloses}>
-                        Cancel
-                    </button>
-                    <button className="btn btn-warning text-white" onClick={handleSubmit}>
-                        Add Variant
-                    </button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={showEditModal} onHide={handleEditClose} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Edit Variant</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group controlId="editVariant">
-                            <Form.Label>
-                                Variant <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="variant"
-                                value={editFormData.variant}
-                                onChange={handleEditChange}
-                            />
-                        </Form.Group>
-                        <Form.Group controlId="editValue" className="mt-3">
-                            <Form.Label>
-                                Values <span className="text-danger">*</span>
-                            </Form.Label>
-                            <Form.Control
-                                type="text"
-                                name="value"
-                                value={editFormData.value}
-                                onChange={handleEditChange}
-                            />
-                        </Form.Group>
-
-                        <Form.Group
-                            controlId="editStatus"
-                            className="mt-4 d-flex align-items-center justify-content-between"
-                        >
-                            <Form.Label className="me-3 mb-0">Status</Form.Label>
-                            <Form.Check
-                                type="switch"
-                                name="status"
-                                checked={editFormData.status}
-                                onChange={handleEditChange}
-                            />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <button className="btn btn-dark" onClick={handleEditClose}>
-                        Cancel
-                    </button>
-                    <button className="btn btn-warning" onClick={handleEditSubmit}>
-                        Save Changes
-                    </button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-                <Modal.Body className="text-center py-4">
-                    <div className="d-flex justify-content-center mb-3">
-                        <div className="bg-danger bg-opacity-10 rounded-circle p-3">
-                            <RiDeleteBinLine size={28} className="text-danger" />
+        <div className="page-wrapper">
+            <div className="content">
+                <div className="page-header">
+                    <div className="add-item d-flex">
+                        <div className="page-title">
+                            <h4 className="fw-bold">Variant Attributes</h4>
+                            <h6>Manage your variant attributes</h6>
                         </div>
                     </div>
-                    <h5 className="fw-bold">Delete Variant</h5>
-                    <p>Are you sure you want to delete variant?</p>
-                    <div className="d-flex justify-content-center gap-3 mt-4">
-                        <button className="btn btn-dark" onClick={() => setShowDeleteModal(false)}>
+                    <ul className="table-top-head">
+                        <li>
+                            <a data-bs-toggle="tooltip" data-bs-placement="top" title="Pdf" onClick={handleExportPDF}><img src="assets/img/icons/pdf.svg" alt="img" /></a>
+                        </li>
+                        <li>
+                            <a data-bs-toggle="tooltip" data-bs-placement="top" title="Excel" onClick={handleExportExcel}><img src="assets/img/icons/excel.svg" alt="img" /></a>
+                        </li>
+                        <li>
+                            <a data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh" onClick={fetchVariants}><i className="ti ti-refresh" /></a>
+                        </li>
+                        <li>
+                            <a data-bs-toggle="tooltip" data-bs-placement="top" title="Collapse" id="collapse-header"><i className="ti ti-chevron-up" /></a>
+                        </li>
+                    </ul>
+                    <div className="page-btn">
+                        <a href="#" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-variant" onClick={handleShow}><i className="ti ti-circle-plus me-1" />Add Variant</a>
+                    </div>
+                </div>
+                {/* /product list */}
+                <div className="card">
+                    <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+                        <div className="search-set">
+                            <div className="search-input">
+                                <span className="btn-searchset"><i className="ti ti-search fs-14 feather-search" /></span>
+                            </div>
+                        </div>
+                        <div className="table-dropdown my-xl-auto right-content">
+                            <div className="dropdown">
+                                <a value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)} className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">
+                                    Status
+                                </a>
+                                <ul className="dropdown-menu  dropdown-menu-end p-3">
+                                    <li>
+                                        <a value="all" className="dropdown-item rounded-1">All</a>
+                                    </li>
+                                    <li>
+                                        <a value="active" className="dropdown-item rounded-1">Active</a>
+                                    </li>
+                                    <li>
+                                        <a value="inactive" className="dropdown-item rounded-1">Inactive</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="card-body p-0">
+                        <div className="table-responsive">
+                            <table className="table datatable">
+                                <thead className="thead-light">
+                                    <tr>
+                                        <th className="no-sort">
+                                            <label className="checkboxs">
+                                                <input type="checkbox" id="select-all" />
+                                                <span className="checkmarks" />
+                                            </label>
+                                        </th>
+                                        <th>Variant</th>
+                                        <th>Values</th>
+                                        <th>Created Date</th>
+                                        <th>Status</th>
+                                        <th className="no-sort" />
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredVariants
+                                        .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
+                                        .map((item, idx) => (
+                                            <tr key={idx}>
+                                                <td>
+                                                    <label className="checkboxs">
+                                                        <input type="checkbox" />
+                                                        <span className="checkmarks" />
+                                                    </label>
+                                                </td>
+                                                <td className="text-gray-9">{item.variant}</td>
+                                                <td>{item.value}</td>
+                                                <td>{dayjs(item.createdAt).format("DD MMM YYYY")}</td>
+                                                <td><span className="badge table-badge bg-success fw-medium fs-10">Active</span></td>
+                                                <td className="action-table-data">
+                                                    <div className="edit-delete-action">
+                                                        <a className="me-2 p-2" href="#" data-bs-toggle="modal" data-bs-target="#edit-variant" onClick={() => handleEditOpen(item)}>
+                                                            <TbEdit className="feather-edit" />
+                                                        </a>
+                                                        <a data-bs-toggle="modal" data-bs-target="#delete-modal" className="p-2" onClick={() => openDeleteModal(item.id)}>
+                                                            <TbTrash className="feather-trash-2" />
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <Pagination />
+                    </div>
+                </div>
+                <Modal show={showModal} onHide={handleCloses} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add Variant</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group controlId="variant">
+                                <Form.Label>
+                                    Variant <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter variant (e.g., Size, Color)"
+                                    name="variant"
+                                    value={formData.variant}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="value" className="mt-3">
+                                <Form.Label>
+                                    Values <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Enter values separated by comma (e.g., XS, S, M, L)"
+                                    name="value"
+                                    value={formData.value}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                            Enter Value separated by comma
+
+                            <Form.Group
+                                controlId="status"
+                                className="mt-4 d-flex align-items-center justify-content-between"
+                            >
+                                <Form.Label className="me-3 mb-0">Status</Form.Label>
+                                <Form.Check
+                                    type="switch"
+                                    name="status"
+                                    checked={formData.status}
+                                    onChange={handleChange}
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-dark" onClick={handleCloses}>
                             Cancel
                         </button>
-                        <button className="btn btn-warning" onClick={() => handleDelete(pendingDeleteId)}>
-                            Yes Delete
+                        <button className="btn btn-warning text-white" onClick={handleSubmit}>
+                            Add Variant
                         </button>
-                    </div>
-                </Modal.Body>
-            </Modal>
-            <div className="container-mn">
-                <div className="d-flex justify-content-between align-items-center p-3">
-                    <div>
-                        <div className="input-group rounded">
-                            <input
-                                type="search"
-                                className="form-control rounded"
-                                placeholder="🔍︎ Search"
-                                aria-label="Search"
-                                aria-describedby="search-addon"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="d-flex gap-3">
-                        <select
-                            className="form-select"
-                            value={statusFilter}
-                            aria-label="Default select example"
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <option value="all">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <table className="table" ref={tableRef}>
-                        <thead className="tableheader">
-                            <tr>
-                                <th scope="col">
-                                    <input type="checkbox" />
-                                </th>
-                                <th scope="col">Variant</th>
-                                <th scope="col">Values</th>
-                                <th scope="col">Created Date</th>
-                                <th scope="col">Status</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredVariants
-                                .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
-                                .map((item, idx) => (
-                                    <tr key={idx}>
-                                        <th scope="col">
-                                            <input type="checkbox" />
-                                        </th>
-                                        <td>{item.variant}</td>
-                                        <td>{item.value}</td>
-                                        <td>{dayjs(item.createdAt).format("DD MMM YYYY")}</td>
-                                        <td>
-                                            <span className={`badge ${item.status ? "badge-success" : "badge-danger"}`}>
-                                                {item.status ? "Active" : "Inactive"}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div className="iconsms">
-                                                {/* <button>
-                                                    <IoEyeOutline />
-                                                </button> */}
-                                                <button onClick={() => handleEditOpen(item)}>
-                                                    <FiEdit />
-                                                </button>
-                                                <button onClick={() => openDeleteModal(item.id)}>
-                                                    <RiDeleteBinLine />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                        </tbody>
-                    </table>
-                </div>
-                <div className="d-flex justify-content-between align-items-center p-3">
-                    <div className="d-flex gap-3 align-items-center">
-                        <div>Row Per Page</div>
-                        <select
-                            className="form-select"
-                            name="rows"
-                            id="rows"
-                            style={{ width: "80px" }}
-                            value={rowsPerPage}
-                            onChange={(e) => {
-                                setRowsPerPage(Number(e.target.value));
-                                setCurrentPage(1);
-                            }}
-                        >
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                        </select>
-                        <div>Entries</div>
-                    </div>
-                    <div className="d-flex align-items-center gap-3">
-                        <button
-                            className="btn"
-                            style={{ border: "none", background: "transparent" }}
-                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                            disabled={currentPage === 1}
-                            aria-label="Previous Page"
-                        >
-                            <GoChevronLeft size={20} />
+                    </Modal.Footer>
+                </Modal>
+
+                <Modal show={showEditModal} onHide={handleEditClose} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Edit Variant</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form>
+                            <Form.Group controlId="editVariant">
+                                <Form.Label>
+                                    Variant <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="variant"
+                                    value={editFormData.variant}
+                                    onChange={handleEditChange}
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="editValue" className="mt-3">
+                                <Form.Label>
+                                    Values <span className="text-danger">*</span>
+                                </Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="value"
+                                    value={editFormData.value}
+                                    onChange={handleEditChange}
+                                />
+                            </Form.Group>
+
+                            <Form.Group
+                                controlId="editStatus"
+                                className="mt-4 d-flex align-items-center justify-content-between"
+                            >
+                                <Form.Label className="me-3 mb-0">Status</Form.Label>
+                                <Form.Check
+                                    type="switch"
+                                    name="status"
+                                    checked={editFormData.status}
+                                    onChange={handleEditChange}
+                                />
+                            </Form.Group>
+                        </Form>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-dark" onClick={handleEditClose}>
+                            Cancel
                         </button>
-                        <div className="text-center downt">
-                            <span>{currentPage}</span>
-                        </div>
-                        <button
-                            className="btn"
-                            style={{ border: "none", background: "transparent" }}
-                            onClick={() =>
-                                setCurrentPage((prev) =>
-                                    Math.min(prev + 1, Math.ceil(filteredVariants.length / rowsPerPage))
-                                )
-                            }
-                            disabled={currentPage === Math.ceil(filteredVariants.length / rowsPerPage)}
-                            aria-label="Next Page"
-                        >
-                            <GoChevronRight size={20} />
+                        <button className="btn btn-warning" onClick={handleEditSubmit}>
+                            Save Changes
                         </button>
-                    </div>
-                </div>
+                    </Modal.Footer>
+                </Modal>
+
             </div>
-            {/* <div className="settings">
-                <IoSettingsSharp />
-            </div> */}
+
         </div>
+
+
     );
 };
 

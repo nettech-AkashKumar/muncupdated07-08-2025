@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaFileExcel, FaFilePdf, FaPencilAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { FaShoppingBag } from "react-icons/fa";
 import "../../../../styles/product/product-list.css";
 import BASE_URL from "../../../../pages/config/config";
@@ -9,8 +10,9 @@ import { CiCirclePlus } from "react-icons/ci";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
-
+  console.log("Products:", products);
   const [activeTabs, setActiveTabs] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -108,7 +110,7 @@ function ProductList() {
                             </p>
                           </div>
                         </div>
-                        <div className="edit-icon">
+                        <div className="edit-icon" style={{ cursor: "pointer" }} onClick={() => navigate(`/product/edit/${product._id}`)}>
                           <FaPencilAlt />
                         </div>
                       </div>
@@ -166,11 +168,15 @@ function ProductList() {
                           </div>
                         </div>
 
-                        {/* Supplier */}
+                        {/* Supplier & Warehouse */}
                         <div className="category">
                           <div className="category-item">
                             <p className="label">Supplier</p>
-                            <p className="value">{product.supplier}</p>
+                            <p className="value">{product.supplierName || '-'}</p>
+                          </div>
+                          <div className="category-item">
+                            <p className="label">Warehouse</p>
+                            <p className="value">{product.warehouseName || '-'}</p>
                           </div>
                           <div className="category-item">
                             <p className="label">Lead Time</p>
@@ -220,7 +226,7 @@ function ProductList() {
                           </div>
                           <div className="category-item">
                             <p className="label">HSN / SAC</p>
-                            <p className="value">16 days</p>
+                            <p className="value">{product.hsnCode || '-'}</p>
                           </div>
                         </div>
 

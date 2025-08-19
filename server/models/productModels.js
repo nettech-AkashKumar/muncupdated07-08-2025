@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const productSchema = new mongoose.Schema(
   {
     productName: { type: String, required: true },
-    slug: { type: String, unique: true },
     sku: { type: String, unique: true },
     brand: {
       type: mongoose.Schema.Types.ObjectId,
@@ -16,12 +15,15 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     subcategory: { type: mongoose.Schema.Types.ObjectId, ref: "Subcategory" },
+    hsn: {type: mongoose.Schema.Types.ObjectId,ref: "HSN", required: false,
+    },
 
-    supplier: { type: String },
+
+    supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
     itemBarcode: { type: String },
     store: { type: String },
-    warehouse: { type: String },
-
+    warehouse: {type: mongoose.Schema.Types.ObjectId, ref: "Warehouse", required: false,
+    },
     // Pricing Section
     purchasePrice: { type: Number },
     sellingPrice: { type: Number },
@@ -35,8 +37,7 @@ const productSchema = new mongoose.Schema(
     discountValue: { type: Number },
     quantityAlert: { type: Number },
 
-    // Image & SEO
-    // images: [{ type: String }], // URLs or base64 or Cloudinary links
+   
     images: [
       {
         url: { type: String, required: true },

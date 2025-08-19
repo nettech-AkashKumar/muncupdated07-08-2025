@@ -11,7 +11,8 @@ const {
     importHSN,
     exportHSN,
     bulkImportHSN,
-    bulkImport
+    bulkImport,
+    getAllHSN
 } = require('../controllers/hsnControllers');
 
 const storage = multer.memoryStorage();
@@ -25,5 +26,7 @@ router.delete('/:id', deleteHSN);
 router.post('/import-json', importHSN);
 router.post('/import', bulkImport);
 router.get('/export', exportHSN);
+router.get("/all", getAllHSN);
+
 
 module.exports = router;

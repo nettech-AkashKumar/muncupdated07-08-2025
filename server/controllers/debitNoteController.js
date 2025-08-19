@@ -23,10 +23,20 @@ exports.createProductReturn = async (req, res) => {
     }
 
     // 2. Clean up fields
+    // const cleanBody = { ...req.body };
+    // ['billFrom', 'billTo', 'purchase'].forEach(field => {
+    //   if (cleanBody[field] === '') delete cleanBody[field];
+    // });
+    // 2. Clean up fields and ensure ObjectId for billFrom/billTo
     const cleanBody = { ...req.body };
-    ['billFrom', 'billTo', 'purchase'].forEach(field => {
-      if (cleanBody[field] === '') delete cleanBody[field];
-    });
+['billFrom', 'billTo', 'purchase'].forEach(field => {
+  if (!cleanBody[field] || cleanBody[field] === '') {
+    delete cleanBody[field];
+  } else if (typeof cleanBody[field] === 'object' && cleanBody[field]._id) {
+    cleanBody[field] = cleanBody[field]._id;
+  }
+});
+
 
     // 3. Prepare product & item arrays
     const finalProducts = [];
@@ -89,8 +99,17 @@ exports.createProductReturn = async (req, res) => {
         cleanBody.referenceNumber = relatedPurchase.referenceNumber;
       }
 
+
+      // If billFrom is not set, set it from purchase, and also attach supplierName
       if (!cleanBody.billFrom) {
         cleanBody.billFrom = relatedPurchase.billFrom;
+        // Attach supplierName to the address if possible
+        if (cleanBody.billFrom && relatedPurchase.supplier && relatedPurchase.supplier.name) {
+          // If billFrom is an object, add supplierName
+          if (typeof cleanBody.billFrom === 'object' && !Array.isArray(cleanBody.billFrom)) {
+            cleanBody.billFrom.supplierName = relatedPurchase.supplier.name;
+          }
+        }
       }
 
       if (!cleanBody.billTo) {
@@ -260,10 +279,11 @@ exports.getAllDebit = async (req, res) => {
 
     const total = await DebitNote.countDocuments(filter);
 
+
     const debitNotes = await DebitNote.find(filter)
       .populate({
         path: 'purchase',
-        select: 'referenceNumber supplier status purchaseDate',
+        select: 'referenceNumber supplier status purchaseDate images productName',
         populate: {
           path: 'supplier',
           select: 'name'
@@ -271,19 +291,48 @@ exports.getAllDebit = async (req, res) => {
       })
       .populate({
         path: 'products.product',
-        select: 'name sku stock quantity image'
+        select: 'productName sku stock quantity images'
       })
-      .populate('billFrom', 'name email') // Add specific fields if needed
-      .populate('billTo', 'name email')
+      .populate({
+        path: 'billFrom',
+        select: 'name email address firstName lastName',
+      })
+      .populate({
+        path: 'billTo',
+        select: 'name email address firstName lastName',
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(Number(limit));
+
+    // Ensure billFrom and billTo are always objects with string fields for frontend
+    const safeDebitNotes = debitNotes.map(note => {
+      const safe = note.toObject();
+      if (safe.billFrom && typeof safe.billFrom === 'object') {
+        // Only keep string fields
+        safe.billFrom = {
+          name: safe.billFrom.name || '',
+          firstName: safe.billFrom.firstName || '',
+          lastName: safe.billFrom.lastName || '',
+          email: safe.billFrom.email || ''
+        };
+      }
+      if (safe.billTo && typeof safe.billTo === 'object') {
+        safe.billTo = {
+          name: safe.billTo.name || '',
+          firstName: safe.billTo.firstName || '',
+          lastName: safe.billTo.lastName || '',
+          email: safe.billTo.email || ''
+        };
+      }
+      return safe;
+    });
 
     res.status(200).json({
       total,
       totalPages: Math.ceil(total / limit),
       currentPage: Number(page),
-      debitNotes,
+      debitNotes: safeDebitNotes,
     });
   } catch (error) {
     console.error("Error fetching debit notes:", error);
