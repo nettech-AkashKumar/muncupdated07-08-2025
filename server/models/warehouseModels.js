@@ -34,7 +34,7 @@ const warehouseSchema = new mongoose.Schema({
     },
 
     capacityEstimate: { type: Number }, // Optional but useful
-    racks: [rackSchema], // ✅ Racks embedded here
+    racks: [rackSchema], //  Racks embedded here
 }, { timestamps: true });
 
 module.exports = mongoose.model("Warehouse", warehouseSchema);
