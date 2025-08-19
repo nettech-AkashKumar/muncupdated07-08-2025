@@ -25,7 +25,7 @@ function formatAddress(billing) {
   if (billing.city?.cityName) parts.push(billing.city.cityName);
   if (billing.state?.stateName) parts.push(billing.state.stateName);
   if (billing.country?.name) parts.push(billing.country.name);
-  if (billing.pincode) parts.push(billing.pincode);
+  if (billing.postalCode) parts.push(billing.postalCode);
   return parts.join(', ');
 }
 
@@ -38,7 +38,7 @@ function formatShipping(shipping) {
   if (shipping.city?.cityName) parts.push(shipping.city.cityName);
   if (shipping.state?.stateName) parts.push(shipping.state.stateName);
   if (shipping.country?.name) parts.push(shipping.country.name);
-  if (shipping.pincode) parts.push(shipping.pincode);
+  if (shipping.postalCode) parts.push(shipping.postalCode);
   return parts.join(', ');
 }
 
@@ -66,17 +66,17 @@ function AllCustomers({ onClose }) {
   // };
   const [loading, setLoading] = useState(false);
 
-const fetchCustomers = async () => {
-  setLoading(true);
-  try {
-    const res = await axios.get(`${BASE_URL}/api/customers`);
-    setCustomers(res.data);
-  } catch (err) {
-    setCustomers([]);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchCustomers = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/customers`);
+      setCustomers(res.data);
+    } catch (err) {
+      setCustomers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const handleCustomerClick = (customer) => {
@@ -110,7 +110,7 @@ const fetchCustomers = async () => {
   ];
 
 
-    // Submit handler
+  // Submit handler
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
   //   setLoading(true);
@@ -273,16 +273,25 @@ const fetchCustomers = async () => {
                 <td>{customer.phone}</td>
                 <td>{customer.orders}</td>
                 <td>{customer.spent}</td>
-                <td className="d-flex gap-2">
-                  <button className="btn btn-sm btn-outline-primary">
-                    <FaEdit />
-                  </button>
-                  <button className="btn btn-sm btn-outline-danger">
-                    <FaTrashAlt />
-                  </button>
-                  <button className="btn btn-sm btn-outline-secondary">
-                    <FiMoreVertical />
-                  </button>
+                <td>
+                  <div className="edit-delete-action d-flex gap-2">
+                    <a
+                      className="me-2 p-2"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleEditCustomer(customer)}
+                      title="Edit"
+                    >
+                      <FaEdit />
+                    </a>
+                    <a
+                      className="p-2"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleDeleteCustomer(customer._id)}
+                      title="Delete"
+                    >
+                      <FaTrashAlt />
+                    </a>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -20,6 +20,8 @@ router.get("/", ctrl.getAllWarehouses);
 router.get("/:id", ctrl.getWarehouseById);
 router.put("/:id", ctrl.updateWarehouse);
 router.delete("/:id", ctrl.deleteWarehouse);
+router.get("/active", ctrl.getActiveWarehouses);
+
 
 module.exports = router;
 

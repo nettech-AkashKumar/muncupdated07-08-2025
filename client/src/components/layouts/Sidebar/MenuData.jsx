@@ -239,11 +239,21 @@ export const getMenuData = () => {
         },
       ],
     },
-        
+
     {
       section: t("Stock"),
       key: "stock",
       items: [
+        {
+          label: t("Purchase Stocks"),
+          path: "/stock",
+          icon: <TbShoppingBag className="icons" />,
+        },
+        {
+          label: t("Purchase Return Stocks"),
+          path: "/return-stock",
+          icon: <TbShoppingBag className="icons" />,
+        },
         {
           label: t("Manage Stock"),
           path: "/manage-stocks",
@@ -275,7 +285,7 @@ export const getMenuData = () => {
           subItems: [
             {
               label: t("onlineOrders"),
-              path: "/online-orders",
+              path: "/sales",
             },
             {
               label: t("posOrders"),
@@ -458,62 +468,62 @@ export const getMenuData = () => {
     },
 
     // hrm
-    {
-      section: "HRM",
-      key: "hrm",
-      items: [
-        {
-          label: "Employees",
-          path: "/employees",
-          icon: <BsPeople className="icons" />,
-        },
-        {
-          label: "Roles & Permissions",
-          path: "/roles-permissions",
-          icon: <BsPersonGear className="icons" />,
-        },
-        {
-          label: "Attendance",
-          path: "/attendance",
-          icon: <BsCalendarCheck className="icons" />,
-        },
-        {
-          label: "Leave Requests",
-          path: "/leave-requests",
-          icon: <BsFillPersonLinesFill className="icons" />,
-        },
-        {
-          label: "Payroll",
-          path: "/payroll",
-          icon: <FaFileInvoiceDollar className="icons" />,
-        },
-        {
-          label: "Full & Final",
-          path: "/full-and-final",
-          icon: <BsFillPersonXFill className="icons" />,
-        },
-        {
-          label: "Departments",
-          path: "/departments",
-          icon: <RiAccountPinCircleLine className="icons" />,
-        },
-        {
-          label: "Teams",
-          path: "/teams",
-          icon: <RiTeamLine className="icons" />,
-        },
-        {
-          label: "Shift Management",
-          path: "/shifts",
-          icon: <RiTimeLine className="icons" />,
-        },
-        {
-          label: "Managers",
-          path: "/managers",
-          icon: <RiGroupLine className="icons" />,
-        },
-      ],
-    },
+    // {
+    //   section: "HRM",
+    //   key: "hrm",
+    //   items: [
+    //     {
+    //       label: "Employees",
+    //       path: "/employees",
+    //       icon: <BsPeople className="icons" />,
+    //     },
+    //     {
+    //       label: "Roles & Permissions",
+    //       path: "/roles-permissions",
+    //       icon: <BsPersonGear className="icons" />,
+    //     },
+    //     {
+    //       label: "Attendance",
+    //       path: "/attendance",
+    //       icon: <BsCalendarCheck className="icons" />,
+    //     },
+    //     {
+    //       label: "Leave Requests",
+    //       path: "/leave-requests",
+    //       icon: <BsFillPersonLinesFill className="icons" />,
+    //     },
+    //     {
+    //       label: "Payroll",
+    //       path: "/payroll",
+    //       icon: <FaFileInvoiceDollar className="icons" />,
+    //     },
+    //     {
+    //       label: "Full & Final",
+    //       path: "/full-and-final",
+    //       icon: <BsFillPersonXFill className="icons" />,
+    //     },
+    //     {
+    //       label: "Departments",
+    //       path: "/departments",
+    //       icon: <RiAccountPinCircleLine className="icons" />,
+    //     },
+    //     {
+    //       label: "Teams",
+    //       path: "/teams",
+    //       icon: <RiTeamLine className="icons" />,
+    //     },
+    //     {
+    //       label: "Shift Management",
+    //       path: "/shifts",
+    //       icon: <RiTimeLine className="icons" />,
+    //     },
+    //     {
+    //       label: "Managers",
+    //       path: "/managers",
+    //       icon: <RiGroupLine className="icons" />,
+    //     },
+    //   ],
+    // },
     // report
     {
       section: "Reports",
@@ -526,7 +536,7 @@ export const getMenuData = () => {
         },
         {
           label: "Purchase Report",
-          path: "/reports/purchase",
+          path: "/purchase-report",
           icon: <FaRegFileAlt className="icons" />,
         },
         {

@@ -1,9 +1,38 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { getTotalStockValue } from '../../../utils/getTotalStockValue';
+import BASE_URL from '../../../pages/config/config'
 // import '../../../styles/dashboard/admindashboard.css'
-// import '../../../styles/style.css'
+import '../../../styles/style.css'
 
 
 const AdminDashboard = () => {
+    const [totalSupplier, setTotalSupplier] = useState(0);
+    const [totalCustomer, setTotalCustomer] = useState(0);
+    const [totalPurchaseAmount, setTotalPurchaseAmount] = useState(0);
+    const [totalStockValue, setTotalStockValue] = useState(0);
+    const [totalReturnAmount, setTotalReturnAmount] = useState(0);
+
+    useEffect(() => {
+        // Fetch suppliers
+        fetch(`${BASE_URL}/api/suppliers`)
+            .then(res => res.json())
+            .then(data => setTotalSupplier(Array.isArray(data) ? data.length : 0));
+        // Fetch customers
+        fetch(`${BASE_URL}/api/customers`)
+            .then(res => res.json())
+            .then(data => setTotalCustomer(Array.isArray(data) ? data.length : 0));
+        // Fetch purchases and returns
+        fetch(`${BASE_URL}/api/purchases/report`)
+            .then(res => res.json())
+            .then(data => {
+                setTotalPurchaseAmount(data?.totals?.purchase || 0);
+                setTotalReturnAmount(data?.totals?.return || 0);
+            });
+        // Fetch total stock value
+        getTotalStockValue().then(val => setTotalStockValue(val));
+    }, []);
+
+
     return (
         <div className="page-wrapper">
             <div className="content">
@@ -73,7 +102,7 @@ const AdminDashboard = () => {
                                 <div className="ms-2">
                                     <p className="text-white mb-1">Total Purchase</p>
                                     <div className="d-inline-flex align-items-center flex-wrap gap-2">
-                                        <h4 className="text-white">$24,145,789</h4>
+                                        <h4 className="text-white">₹ {totalStockValue.toLocaleString()}</h4>
                                         <span className="badge badge-soft-success"><i
                                             className="ti ti-arrow-up me-1" />+22%</span>
                                     </div>
@@ -251,7 +280,7 @@ const AdminDashboard = () => {
                                                 <i className="ti ti-user-check" />
                                             </div>
                                             <p className="mb-1">Suppliers</p>
-                                            <h5>6987</h5>
+                                            <h5>{totalSupplier}</h5>
                                         </div>
                                     </div>
                                     <div className="col-md-4">
@@ -260,7 +289,7 @@ const AdminDashboard = () => {
                                                 <i className="ti ti-users" />
                                             </div>
                                             <p className="mb-1">Customer</p>
-                                            <h5>4896</h5>
+                                            <h5>{totalCustomer}</h5>
                                         </div>
                                     </div>
                                     <div className="col-md-4">

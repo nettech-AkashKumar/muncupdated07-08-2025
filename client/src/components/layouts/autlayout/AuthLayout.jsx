@@ -16,7 +16,8 @@ const AuthLayout = () => {
       <Sidebar />
 
       {/* Right section: Header + Main */}
-      <div className="right-section">
+      {/* <div className="right-section"> */}
+      <div className="main-wrapper">
         {/* Navbar (fixed height) */}
         <Navbar />
 

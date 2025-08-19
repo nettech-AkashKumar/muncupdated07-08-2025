@@ -1156,7 +1156,7 @@ const Users = () => {
                                   fontSize: "14px",
                                   fontWeight: 400,
                                   color: "#676767",
-                                  out
+                                  outline:"none"
                                 }),
                               }}
                             />
@@ -1381,7 +1381,7 @@ const Users = () => {
                       }}
                     >
                       <button
-                        // className="settingbtn"
+                        data-bs-dismiss="modal"
                         style={{
                           border: "1px solid #E6E6E6",
                           borderRadius: "4px",
@@ -1390,6 +1390,7 @@ const Users = () => {
                           color: "#676767",
                           borderRadius: "5px",
                         }}
+                        
                       >
                         Cancel
                       </button>
@@ -1423,15 +1424,29 @@ const Users = () => {
 
         {/* Edit User */}
         <div className="modal" id="edit-user">
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content" style={{ width: "500px" }}>
+          <div className="modal-dialog modal-dialog-centered"
+          style={{ maxWidth: "970px", height: "540px" }}
+          >
+            <div className="modal-content"  style={{
+                height: "100%",
+                padding: "10px",
+              }}
+>
               <div className="page-wrapper-new p-0">
                 <div className="content">
-                  <div className="modal-header">
+                  <div className="">
                     <div className="page-title">
-                      <h4>Edit User</h4>
+                      <h4 
+                      style={{
+                          color: "#262626",
+                          fontSize: "14px",
+                          fontWeight: 400,
+                          lineHeight: "14px",
+                        }}
+                      >Edit User</h4>
                     </div>
-                    <button
+                    <hr style={{ height: "1px", color: "#bbbbbb" }} />
+                    {/* <button
                       type="button"
                       className="close"
                       data-bs-dismiss="modal"
@@ -1439,9 +1454,11 @@ const Users = () => {
                       id="edit-user-close-btn"
                     >
                       <span aria-hidden="true">×</span>
-                    </button>
+                    </button> */}
                   </div>
-                  <form onSubmit={handleUpdate}>
+                  <form onSubmit={handleUpdate}
+                  style={{ padding: "0px 20px" }}
+                  >
                     <div className="modal-body">
                       <div className="row">
                         <div className="col-lg-12">
