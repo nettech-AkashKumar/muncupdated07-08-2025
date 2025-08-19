@@ -1156,7 +1156,7 @@ const Users = () => {
                                   fontSize: "14px",
                                   fontWeight: 400,
                                   color: "#676767",
-                                  out
+                                  outline:none
                                 }),
                               }}
                             />
