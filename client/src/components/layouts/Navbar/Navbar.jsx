@@ -14,46 +14,110 @@ import BASE_URL from '../../../pages/config/config';
 import Profile from "../../../assets/img/profile.jpeg";
 import { LanguageContext } from '../../../Context/Language/LanguageContext';
 import { useTranslation } from "react-i18next";
-
+import Activities from './activities';
+import { useSocket } from '../../../Context/SocketContext';
+import { toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import { io } from 'socket.io-client';
+import { useAuth } from '../../auth/AuthContext.jsx';
 
 function Navbar() {
+    // state for company logo
+  const [companyImages, setCompanyImages] = useState(null)
+  const [isDarkMode, setIsDarkMode] = useState(false)
+  const userData = JSON.parse(localStorage.getItem("user"));
   // const { language, switchLanguage } = useContext(LanguageContext);
   const mobileBtnRef = useRef(null);
   const fullscreenBtnRef = useRef(null);
   const toggleBtnRef = useRef(null);
   const { mobileOpen, handleMobileToggle } = useSidebar();
+   const { users } = useAuth();
+    const id = users?._id;
 
   // user profile
   const [user, setUser] = useState(null);
+  const [notificationCount, setNotificationCount] = useState(0);
   const userObj = JSON.parse(localStorage.getItem("user"));
-  const userId = userObj?.id; // or userObj?._id based on your schema
+  const userId = userObj?.id || userObj?._id; // Handle both id and _id
   const token = localStorage.getItem("token");
+  const { connectSocket, getSocket } = useSocket();
+  
   // console.log("User ID:", userId);
   // console.log("Token:", token);
   // console.log("User Object:", userObj);
   // console.log("User Data:", user);
 
+  // Fetch notification count
+  const fetchNotificationCount = async () => {
+    try {
+      if (!userId || !token) return;
+      
+      console.log('🔔 Fetching notification count for user:', userId);
+      
+      const response = await fetch(`${BASE_URL}/api/notifications/unread/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('🔔 Notification count received:', data);
+        setNotificationCount(data.count || 0);
+      } else {
+        console.error('🔔 Failed to fetch notification count:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching notification count:', error);
+    }
+  };
+
   useEffect(() => {
     if (!userId || !token) return;
-
+    
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/user/userdata/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        // First try to use the user data from localStorage
+        if (userObj) {
+          setUser(userObj);
+        }
+        
+        // Then fetch fresh data from the API
+        const response = await axios.get(`${BASE_URL}/api/user/${userId}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setUser(res.data);
-      } catch (err) {
-
-        // console.log("Full URL:", `${BASE_URL}/api/user/userdata/${userId}`);
-
-        console.error("Profile fetch failed:", err);
+        
+        if (response.data) {
+          setUser(response.data);
+          // Update localStorage with fresh data
+          localStorage.setItem("user", JSON.stringify(response.data));
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        // If API call fails, use localStorage data if available
+        if (userObj && !user) {
+          setUser(userObj);
+        }
       }
     };
 
     fetchUser();
-  }, [userId, token]);
+    fetchNotificationCount(); // Fetch notification count
+    
+    // Initialize socket connection for real-time notifications
+    const socket = connectSocket(BASE_URL);
+    
+    if (socket) {
+      // Listen for new notifications
+      socket.on('new-notification', (notificationData) => {
+        console.log('🔔 New notification received in navbar:', notificationData);
+        setNotificationCount(prev => prev + 1);
+      });
+    }
+    
+    return () => {
+      // Don't disconnect on component unmount, let it stay connected
+      // Only disconnect if the user logs out or the app is closed
+    };
+  }, [userId, token, connectSocket]);
 
   // if (!user) return <p>Loading user profile...</p>;
 
@@ -143,13 +207,53 @@ function Navbar() {
     setCurrentLang(lang);
   };
 
+  // Handle notifications read
+  const handleNotificationsRead = () => {
+    setNotificationCount(0);
+  };
+
+   // fetch company details
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/api/companyprofile/get`)
+        if (res.status === 200) {
+          setCompanyImages(res.data.data)
+          console.log("res.data", res.data.data)
+        }
+      } catch (error) {
+        toast.error("Unable to find company details", {
+          position: 'top-center'
+        })
+      }
+    }
+    fetchCompanyDetails();
+  }, []);
+
+    useEffect(() => {
+    if (companyImages?.companyFavicon) {
+      let favicon = document.querySelector("link[rel*='icon']");
+      if (!favicon) {
+        favicon = document.createElement("link")
+        favicon.rel = "icon";
+        document.head.appendChild(favicon)
+      }
+      favicon.type = "image/png";
+      favicon.href = companyImages.companyFavicon
+    }
+  }, [companyImages])
+
+
+
   return (
     <div className="header">
       <div className="main-header">
+        {companyImages ? (
+          <>
         {/* Logo */}
         <div className="header-left active">
           <Link to="/home" className="logo logo-normal">
-            <img src={Logo} alt="Logo" />
+           <img style={{ height: "35px", width: "35px" }} src={isDarkMode ? companyImages.companyDarkLogo : companyImages.companyLogo} alt="company logo" />
           </Link>
           <Link to="/home" className="logo logo-white">
             <img src="/assets/img/logo-white.svg" alt="Logo" />
@@ -306,116 +410,70 @@ function Navbar() {
               <span className="badge rounded-pill">1</span>
             </Link>
           </li>
+          {/* Notifications */}
           <li className="nav-item dropdown nav-item-box">
             <a href="#" className="dropdown-toggle nav-link" data-bs-toggle="dropdown" onClick={(e) => e.preventDefault()}>
-              <TbBell />
+              <TbBell style={{position:'absolute',left:'7px'}} />
+              {notificationCount > 0 && (
+                <span className="badge rounded-pill" style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  backgroundColor: 'red',
+                  color: 'white',
+                  fontSize: '10px',
+                  minWidth: '18px',
+                  height: '18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  border: '2px solid white',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}>
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
             </a>
-            <div className="dropdown-menu notifications">
-              <div className="topnav-dropdown-header">
-                <h5 className="notification-title">{t("notifications")}</h5>
-                <a href="#" className="clear-noti" onClick={(e) => e.preventDefault()}>{t("markAllAsRead")}</a>
-              </div>
-              <div className="noti-content">
-                <ul className="notification-list">
-                  <li className="notification-message">
-                    <Link to="/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="Img" src="assets/img/profiles/avatar-13.jpg" />
-                        </span>
-                        <div className="flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">James Kirwin</span> confirmed his order. Order No: #78901. Estimated delivery: 2 days
-                          </p>
-                          <p className="noti-time">4 mins ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/activities">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="Img" src="assets/img/profiles/avatar-03.jpg" />
-                        </span>
-                        <div className="flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Leo Kelly</span> cancelled his order scheduled for 17 Jan 2025
-                          </p>
-                          <p className="noti-time">10 mins ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/activities" className="recent-msg">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="Img" src="assets/img/profiles/avatar-17.jpg" />
-                        </span>
-                        <div className="flex-grow-1">
-                          <p className="noti-details">
-                            Payment of $50 received for Order #67890 from <span className="noti-title">Antonio Engle</span>
-                          </p>
-                          <p className="noti-time">05 mins ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="notification-message">
-                    <Link to="/activities" className="recent-msg">
-                      <div className="media d-flex">
-                        <span className="avatar flex-shrink-0">
-                          <img alt="Img" src="assets/img/profiles/avatar-02.jpg" />
-                        </span>
-                        <div className="flex-grow-1">
-                          <p className="noti-details">
-                            <span className="noti-title">Andrea</span> confirmed his order. Order No: #73401. Estimated delivery: 3 days
-                          </p>
-                          <p className="noti-time">4 mins ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-              <div className="topnav-dropdown-footer d-flex align-items-center gap-3">
-                <button className="btn btn-secondary btn-md w-100" type="button">{t("cancel")}</button>
-                <Link to="/activities" className="btn btn-primary btn-md w-100">{t("viewAll")}</Link>
-              </div>
+            <div className="dropdown-menu notifications" style={{border:'1px solid #E6E6E6', borderRadius: '8px',}}>
+              <Activities onNotificationsRead={handleNotificationsRead} />
             </div>
           </li>
           {/* Settings */}
           <li className="nav-item nav-item-box">
-            <Link to="/general-settings"><TbSettings className="ti" /></Link>
+            <Link to={`profile/${id}`}><TbSettings className="ti" /></Link>
           </li>
 
           {/* Profile */}
-          {user ? (
+          {userData ? (
             <li className="nav-item dropdown has-arrow main-drop profile-nav">
               <a className="nav-link userset" data-bs-toggle="dropdown" href="#">
                 <span className="user-info p-0">
                   <span className="user-letter">
-                    {/* <img src={Profile} alt="User" /> */}
-
-                    {user.profileImage &&
-                      user.profileImage.length > 0 ? (
+                    {userData?.profileImage?.url ? (
                       <img
-                        src={user.profileImage[0].url}
+                        src={userData.profileImage.url}
                         alt="Profile"
-                        // style={{
-                        //   width: "50px",
-                        //   height: "50px",
-                        //   borderRadius: "10%",
-                        // }}
+                        style={{
+                          width: "40px",
+                          height: "30px",
+                          borderRadius: "50%",
+                          objectFit: "cover"
+                        }}
                       />
                     ) : (
                       <div
-                        className="bg-secondary text-white  d-flex justify-content-center align-items-center"
-                        style={{ width: "40px", height: "40px" }}
+                        className="bg-secondary text-white d-flex justify-content-center align-items-center"
+                        style={{ 
+                          width: "40px", 
+                          height: "30px",
+                          borderRadius: "50%",
+                          fontSize: "14px",
+                          fontWeight: "bold"
+                        }}
                       >
-                        {user.firstName?.charAt(0)}
-                        {user.lastName?.charAt(0)}
+                        {userData.firstName?.charAt(0)?.toUpperCase() || ''}
+                        {userData.lastName?.charAt(0)?.toUpperCase() || ''}
                       </div>
                     )}
                   </span>
@@ -424,6 +482,7 @@ function Navbar() {
               <div className="dropdown-menu menu-drop-user">
                 <div className="profileset d-flex align-items-center">
                   <span className="user-img me-2">
+
                      {user.profileImage &&
                     user.profileImage.length > 0 ? (
                     <img
@@ -432,32 +491,121 @@ function Navbar() {
                     
                     />
                   ) : (
-                    <div
-                      className="bg-secondary text-white  d-flex justify-content-center align-items-center"
-                      style={{ width: "40px", height: "40px" }}
-                    >
-                      {user.firstName?.charAt(0)}
-                      {user.lastName?.charAt(0)}
-                    </div>
-                  )}</span>
+=======
+                    {userData?.profileImage?.url  ? (
+                      <img
+                        src={userData.profileImage.url}
+                        alt="Profile"
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          borderRadius: "50%",
+                          objectFit: "cover"
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="bg-secondary text-white d-flex justify-content-center align-items-center"
+                        style={{ 
+                          width: "40px", 
+                          height: "40px",
+                          borderRadius: "50%",
+                          fontSize: "14px",
+                          fontWeight: "bold"
+                        }}
+                      >
+                        {user.firstName?.charAt(0)?.toUpperCase() || ''}
+                        {user.lastName?.charAt(0)?.toUpperCase() || ''}
+                      </div>
+                    )}
+                  </span>
                   <div>
-                    <h6 className="fw-medium"> {user.firstName} {user.lastName}</h6>
-                    <p>{user.role?.roleName}</p>
+                    <h6 className="fw-medium">
+                      {user.firstName} {user.lastName}
+                    </h6>
+                    <p>{user.role?.roleName || 'User'}</p>
                   </div>
                 </div>
-                <Link className="dropdown-item" to="/profile"><TbUserCircle className="me-2" /> {t("myProfile")}</Link>
-                <Link className="dropdown-item" to="/sales-report"><TbFileText className=" me-2" /> {t("reports")}</Link>
-                <Link className="dropdown-item" to="/general-settings"><TbSettings className=" me-2" /> {t("settings")}</Link>
-                <hr className="my-2" />
-                <Link className="dropdown-item logout pb-0" onClick={handleLogout}><TbLogout className=" me-2" /> {t("logout")}</Link>
+                <Link className="dropdown-item" to="/profile">
+                  <TbUserCircle className="me-2" /> {t("myProfile")}
+                </Link>
+                <Link className="dropdown-item" to="/sales-report">
+                  <TbFileText className=" me-2" /> {t("reports")}
+                </Link>
+                {/* <Link className="dropdown-item" to="/general-settings">
+                  <TbSettings className=" me-2" /> {t("settings")}
+                </Link> */}
+                {/* <hr className="my-2" /> */}
+                <Link className="dropdown-item logout pb-0" onClick={handleLogout}>
+                  <TbLogout className=" me-2" /> {t("logout")}
+                </Link>
               </div>
             </li>
           ) : (
-            <p>Loading user profile...</p>
+            <li className="nav-item dropdown has-arrow main-drop profile-nav">
+              <a className="nav-link userset" data-bs-toggle="dropdown" href="#">
+                <span className="user-info p-0">
+                  <span className="user-letter">
+
+                    <div
+                      className="bg-secondary text-white d-flex justify-content-center align-items-center"
+                      style={{ 
+                        width: "40px", 
+                        height: "40px",
+                        borderRadius: "50%",
+                        fontSize: "14px",
+                        fontWeight: "bold"
+                      }}
+                    >
+                      {userObj?.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                  </span>
+                </span>
+              </a>
+              <div className="dropdown-menu menu-drop-user">
+                <div className="profileset d-flex align-items-center">
+                  <span className="user-img me-2">
+                    <div
+                      className="bg-secondary text-white d-flex justify-content-center align-items-center"
+                      style={{ 
+                        width: "40px", 
+                        height: "40px",
+                        borderRadius: "50%",
+                        fontSize: "14px",
+                        fontWeight: "bold"
+                      }}
+                    >
+                      {userObj?.firstName?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                  </span>
+                  <div>
+                    <h6 className="fw-medium">
+                      {userObj?.firstName || 'User'} {userObj?.lastName || ''}
+                    </h6>
+                    <p>{userObj?.role?.roleName || 'User'}</p>
+                  </div>
+                </div>
+                <Link className="dropdown-item" to="/profile">
+                  <TbUserCircle className="me-2" /> {t("myProfile")}
+                </Link>
+                <Link className="dropdown-item" to="/sales-report">
+                  <TbFileText className=" me-2" /> {t("reports")}
+                </Link>
+                <Link className="dropdown-item" to="/general-settings">
+                  <TbSettings className=" me-2" /> {t("settings")}
+                </Link>
+                <hr className="my-2" />
+                <Link className="dropdown-item logout pb-0" onClick={handleLogout}>
+                  <TbLogout className=" me-2" /> {t("logout")}
+                </Link>
+              </div>
+            </li>
           )}
-
         </ul>
-
+        </>
+        ) : (
+          <p>No Company Logo Image</p>
+        )}
         {/* Mobile Menu (3 dots) */}
         <div className="dropdown mobile-user-menu">
           <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">

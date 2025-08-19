@@ -4,7 +4,7 @@ import axios from "axios";
 import EmojiPicker from "emoji-picker-react";
 import { RiAttachment2 } from "react-icons/ri";
 import { HiOutlinePhotograph } from "react-icons/hi";
-import { MdOutlineModeEdit } from "react-icons/md";
+import { MdOutlineMinimize, MdOutlineModeEdit } from "react-icons/md";
 import { AiOutlineLink } from "react-icons/ai";
 import { CiFaceSmile } from "react-icons/ci";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -12,6 +12,8 @@ import { MdOutlineEditCalendar } from "react-icons/md";
 import { FaMinus } from "react-icons/fa";
 import { GoScreenFull } from "react-icons/go";
 import { toast } from "react-toastify";
+import BASE_URL from "../../../../pages/config/config";
+import Ma from "../../../../assets/images/sewc.png"
 
 const EmailModal = ({
   show,
@@ -97,7 +99,7 @@ const EmailModal = ({
         formData.append("images", img);
       });
 
-      await axios.post("http://localhost:5000/api/email/send", formData, {
+      await axios.post(`${BASE_URL}/api/email/mail/send`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -194,36 +196,45 @@ const EmailModal = ({
   return (
     <div className="modal-overlay">
       <div className={`email-modal ${isExpanded ? "expanded-modal" : ""}`}>
-        <div className="modal-header1">
-          <span>Compose New Email</span>
+        <div className="modal-header">
+          <span className="nwemsfg">New Message</span>
           <div className="header-actions">
-            <button className="btns minus" onClick={onClose}>
-              <FaMinus />
+            <button style={{ color: 'black', border: 'none', backgroundColor: 'transparent' }} onClick={onClose}>
+              <MdOutlineMinimize style={{ fontWeight: 300 }} />
             </button>
-            <button className="btns minus" onClick={toggleExpanded}>
-              <GoScreenFull />
+            <button style={{ color: 'black', border: 'none', backgroundColor: 'transparent' }} onClick={toggleExpanded}>
+              <GoScreenFull style={{ fontWeight: 300 }} />
             </button>
-            <button className="btns minus" onClick={handleDraftDelete}>
+            <button style={{ color: 'black', border: 'none', backgroundColor: 'transparent' }} onClick={handleDraftDelete}>
               ✕
             </button>
           </div>
         </div>
 
-        <div className="modal-body1">
+        <div className="modal-body" style={{ margin: '10px' }}>
           <div className="to-field">
-            <label>To</label>
+            <label style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0' }}>To:</label>
             <input
               type="email"
               defaultValue="Angela Thomas"
               value={to}
               onChange={(e) => setTo(e.target.value)}
+              style={{
+                border: 'none',
+                borderBottom: '1px solid #D9D9D9',
+                outline: 'none',
+                background: 'transparent',
+                fontSize: '16px',
+                padding: '4px 0',
+                width: '100%',
+              }}
             />
-            <span className="cc-bcc" onClick={() => setShowCc(!showCc)}>
+            <span style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0' }} className="cc-bcc" onClick={() => setShowCc(!showCc)}>
               Cc
             </span>
             <span
-              style={{ marginLeft: "10px" }}
-              className="cc-bcc "
+              style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0', cursor: 'pointer' }}
+              className=""
               onClick={() => setShowBcc(!showBcc)}
             >
               Bcc
@@ -232,36 +243,65 @@ const EmailModal = ({
           {/* for cc */}
           {showCc && (
             <div className="to-field">
-              <label htmlFor="">Cc</label>
+              <label style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0' }} htmlFor="">Cc:</label>
               <input
                 type="email"
-                placeholder="Add Cc"
+                // placeholder="Add Cc"
                 value={cc}
                 onChange={(e) => setCc(e.target.value)}
+                style={{
+                  border: 'none',
+                  borderBottom: '1px solid #D9D9D9',
+                  outline: 'none',
+                  background: 'transparent',
+                  fontSize: '16px',
+                  padding: '4px 0',
+                  width: '100%',
+                }}
               />
             </div>
           )}
           {/* for Bcc */}
           {showBcc && (
             <div className="to-field">
-              <label htmlFor="">Bcc</label>
+              <label style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0' }} htmlFor="">Bcc:</label>
               <input
                 type="email"
-                placeholder="Add Bcc"
+                // placeholder="Add Bcc"
                 value={bcc}
                 onChange={(e) => setBcc(e.target.value)}
+                style={{
+                  border: 'none',
+                  borderBottom: '1px solid #D9D9D9',
+                  outline: 'none',
+                  background: 'transparent',
+                  fontSize: '16px',
+                  padding: '4px 0',
+                  width: '100%',
+                }}
               />
             </div>
           )}
           <div>
-            <label htmlFor="">Subject </label>
-            <input
-              type="text"
-              className="subject"
-              placeholder="Subject"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-            />
+            <div className="to-field">
+              <label style={{ color: '#676767', fontWeight: 400, fontSize: '16px', lineHeight: '10px', letterSpacing: '0' }} htmlFor="">Subject: </label>
+              <input
+                type="text"
+                className="subject"
+                // placeholder="Subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                style={{
+                  border: 'none',
+                  borderBottom: '1px solid #D9D9D9',
+                  outline: 'none',
+                  background: 'transparent',
+                  fontSize: '16px',
+                  padding: '4px 0',
+                  width: '100%',
+                }}
+              />
+            </div>
             <textarea
               className="email-body"
               placeholder="Compose Email"
@@ -295,42 +335,52 @@ const EmailModal = ({
           </div>
         </div>
         <div className="modal-footer">
-          <div className="footer-icons">
-            <button onClick={handleAttachmentClick}>
-              <RiAttachment2 />
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              className="send-btn"
+              onClick={handleSend}
+              disabled={loading}
+            >
+              <img src={Ma} alt="mma" style={{ color: 'white', marginRight: '10px' }} />
+              {loading ? "Sending" : "Send "}
             </button>
-            <button onClick={() => imageInputRef.current.click()}>
-              <HiOutlinePhotograph />
-            </button>
-            <button onClick={() => setShowLinkInput((prev) => !prev)}>
-              <AiOutlineLink />
-            </button>
-            <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-              <CiFaceSmile />
-            </button>
+            <div className="footer-icons" style={{ display: 'flex', gap: '10px', color: '#676767' }}>
+              <button onClick={handleAttachmentClick}>
+                <RiAttachment2 />
+              </button>
+              <button onClick={() => imageInputRef.current.click()}>
+                <HiOutlinePhotograph />
+              </button>
+              <button onClick={() => setShowLinkInput((prev) => !prev)}>
+                <AiOutlineLink />
+              </button>
+              <button onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+                <CiFaceSmile />
+              </button>
 
-            {/* for handle input */}
-            <input
-              type="file"
-              multiple
-              style={{ display: "none" }}
-              ref={fileInputRef}
-              onChange={handleFileChange}
-            />
+              {/* for handle input */}
+              <input
+                type="file"
+                multiple
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={handleFileChange}
+              />
 
-            <input
-              type="file"
-              accept="image/*"
-              ref={imageInputRef}
-              style={{ display: "none" }}
-              onChange={handleImageChange}
-            />
+              <input
+                type="file"
+                accept="image/*"
+                ref={imageInputRef}
+                style={{ display: "none" }}
+                onChange={handleImageChange}
+              />
 
-            {showEmojiPicker && (
-              <div className="emoji-picker">
-                <EmojiPicker onEmojiClick={handleEmojiClick} />
-              </div>
-            )}
+              {showEmojiPicker && (
+                <div className="emoji-picker">
+                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </div>
+              )}
+            </div>
           </div>
           <div>
             {/* <button
@@ -341,13 +391,6 @@ const EmailModal = ({
             </button> */}
             <button onClick={handleDelete} className="btns">
               <RiDeleteBinLine />
-            </button>
-            <button
-              className="send-btn"
-              onClick={handleSend}
-              disabled={loading}
-            >
-              {loading ? "Sending" : "Send ➜"}
             </button>
           </div>
         </div>

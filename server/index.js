@@ -31,9 +31,24 @@ const VarientRoutes = require('./routes/variantRoutes');
 const WarrantyRoutes = require('./routes/warrantyRoutes');
 const debitNoteRoutes = require('./routes/debitNoteRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+
 const salesRoutes = require('./routes/salesRoutes');
 
+const notificationRoutes = require('./routes/notificationRoutes');
+const userProfileRoutes = require("./routes/profileRoutes");
+
+const emailverifyroute = require("./routes/settings/EmailVerificationroute.js");
+const authrouter = require("./routes/settings/authroutes.js");
+const mobileverifyrouter = require("./routes/settings/mobileverifyroute.js");
+const devicemanagementrouter = require("./routes/settings/devicemanagementroute.js");
+const companysettingrouter = require("./routes/settings/companysettingroute.js");
+const localizationrouter = require("./routes/settings/Localizationroute.js");
+const balanceSheetRoutes = require("./routes/balanceSheetRoutes.js");
+
+
+
 const http = require('http');
+const emailrouter = require('./routes/emailroutes.js');
 const { Server } = require('socket.io');
 
 // Load env variables
@@ -89,6 +104,7 @@ app.use("/api/customers", customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use("/api/conversations", conversations);
 app.use("/api/messages", messages);
+app.use("/api/notifications", notificationRoutes);
 
 app.use("/api/purchases", purchaseRoutes);
 app.use("/api/stock-history", stockHistoryRoutes);
@@ -98,8 +114,43 @@ app.use("/api/warehouse", warehouseRoutes);
 app.use("/api/variant-attributes", VarientRoutes);
 app.use("/api/warranty", WarrantyRoutes);
 app.use('/api/debit-notes', debitNoteRoutes);
-app.use('/api/sales', salesRoutes);
 
+app.use('/api/sales', salesRoutes);
+=======
+app.use("/api/profile", userProfileRoutes);
+
+// api for mail 
+app.use("/api/email/mail", emailrouter)
+
+// email verify via otp api security
+app.use("/api/email", emailverifyroute);
+
+// google auth api
+app.use("/api/auth", authrouter);
+
+// mobile verify via sms
+app.use("/api/mobile", mobileverifyrouter);
+
+// device management api
+app.use("/api/devices", devicemanagementrouter);
+
+
+app.use('/uploads', express.static('uploads'));
+
+// company setting
+// register companyprofile api
+app.use("/api/companyprofile", companysettingrouter);
+
+// Localization api
+app.use("/api/localizationsetting", localizationrouter);
+
+// cloudnary configuration
+app.use("/api/cloudinary-signature", require("./routes/file"));
+
+
+
+//balancesheet api
+app.use("/api/balancesheet", balanceSheetRoutes);
 
 
 app.use(express.json());
@@ -122,24 +173,45 @@ const io = new Server(server, {
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
-  console.log("🟢 Socket connected:", socket.id);
+  // console.log("🟢 Socket connected:", socket.id);
 
   socket.on("add-user", (userId) => {
+    // console.log("👤 User added to online list:", userId, "Type:", typeof userId);
     onlineUsers.set(userId, socket.id);
+    // console.log("👤 Current online users:", Array.from(onlineUsers.keys()));
+    // Emit the updated online users list to all connected clients
+    io.emit("online-users", Array.from(onlineUsers.keys()));
   });
 
   socket.on("send-msg", (data) => {
     const sendUserSocket = onlineUsers.get(data.to);
     if (sendUserSocket) {
       socket.to(sendUserSocket).emit("msg-receive", data);
+      // Emit notification to the recipient
+      socket.to(sendUserSocket).emit("new-notification", {
+        type: 'message',
+        sender: data.from,
+        message: data.message,
+        timestamp: new Date()
+      });
     }
   });
 
   socket.on("disconnect", () => {
-    console.log("🔴 Socket disconnected:", socket.id);
+    // console.log("🔴 Socket disconnected:", socket.id);
+    let disconnectedUserId = null;
     [...onlineUsers.entries()].forEach(([uid, sid]) => {
-      if (sid === socket.id) onlineUsers.delete(uid);
+      if (sid === socket.id) {
+        onlineUsers.delete(uid);
+        disconnectedUserId = uid;
+      }
     });
+    // Emit the updated online users list to all connected clients
+    if (disconnectedUserId) {
+      // console.log("👤 User removed from online list:", disconnectedUserId);
+      // console.log("👤 Remaining online users:", Array.from(onlineUsers.keys()));
+      io.emit("online-users", Array.from(onlineUsers.keys()));
+    }
   });
 });
 

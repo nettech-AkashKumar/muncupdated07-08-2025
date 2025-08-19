@@ -86,9 +86,19 @@ import {
   TbReceiptRefund,
   TbFileDescription,
 } from "react-icons/tb";
+import { useAuth } from "../../auth/AuthContext";
+import { FaStackOverflow } from "react-icons/fa6";
+import { GiExpense } from "react-icons/gi";
+import { IoLogoWebComponent } from "react-icons/io5";
+import { MdOutlinePayments } from "react-icons/md";
+import { MdOutlineSpeakerNotes } from "react-icons/md";
+import { SiFuturelearn } from "react-icons/si";
 
 export const getMenuData = () => {
   const { t } = useTranslation();
+    const { user } = useAuth();
+  const id = user?._id;
+
   return [
     // main dashboard
     {
@@ -191,9 +201,20 @@ export const getMenuData = () => {
           icon: <TbHomeBolt className="icons" />,
         },
         {
-          label: t("warehouses"),
+          
           path: "/warehouse",
           icon: <TbBuildingWarehouse className="icons" />,
+          title: t("Warehouse"),
+          subItems:[
+            {
+              label: t("All warehouse"),
+              path:"/warehouse",
+            },
+            {
+              label : t("Stock Movement Log"),
+              path:"/stock-movement-log"
+            },
+          ]
         },
       ],
     },
@@ -338,7 +359,7 @@ export const getMenuData = () => {
       items: [
         { label: t("users"), icon: <TbUserShield className="icons" />, path: "/Users" },
         { label: t("rolesPermissions"), icon: <TbJumpRope className="icons" />, path: "/roles-permissions" },
-        { label: t("deleteAccountRequest"), icon: <TbTrashX className="icons" />, path: "/delete-account" },
+        // { label: t("deleteAccountRequest"), icon: <TbTrashX className="icons" />, path: "/delete-account" },
       ],
     },
     {
@@ -350,12 +371,12 @@ export const getMenuData = () => {
           icon: <TbSettings className="icons" />,
           key: "generalSettings",
           subItems: [
-            { label: "Purchase", path: "/Purchase-settings" },
-            { label: "Warehouse", path: "/warehouse-settings" },
-            { label: "Profile", path: "/general-settings" },
+            // { label: "Purchase", path: "/Purchase-settings" },
+            // { label: "Warehouse", path: "/warehouse-settings" },
+            { label: "Profile",  path: `/profile/${id}` },
             { label: "Security", path: "/security-settings" },
-            { label: "Notifications", path: "/notification" },
-            { label: "Connected Apps", path: "/connected-apps" },
+            // { label: "Notifications", path: "/notification" },
+            // { label: "Connected Apps", path: "/connected-apps" },
           ],
         },
         {
@@ -363,81 +384,81 @@ export const getMenuData = () => {
           icon: <TbWorld className="icons" />,
           key: "websiteSettings",
           subItems: [
-            { label: "System Settings", path: "/system-settings" },
+            // { label: "System Settings", path: "/system-settings" },
             { label: "Company Settings", path: "/company-settings" },
-            { label: "Localization", path: "/localization-settings" },
-            { label: "Prefixes", path: "/prefixes" },
-            { label: "Preference", path: "/preference" },
-            { label: "Appearance", path: "/appearance" },
-            { label: "Social Authentication", path: "/social-authentication" },
             { label: "Language", path: "/language-settings" },
+            // { label: "Prefixes", path: "/prefixes" },
+            // { label: "Preference", path: "/preference" },
+            // { label: "Appearance", path: "/appearance" },
+            // { label: "Social Authentication", path: "/social-authentication" },
+            // { label: "Language", path: "/language-settings" },
           ],
         },
-        {
-          title: "App Settings",
-          icon: <TbDeviceMobile className="icons" />,
-          key: "appSettings",
-          subItems: [
-            {
-              nestedKey: "Invoice",
-              label: "Invoice",
-              nested: [
-                { label: "Invoice Settings", path: "/invoice-settings" },
-                { label: "Invoice Template", path: "/invoice-template" },
-              ],
-            },
+        // {
+        //   title: "App Settings",
+        //   icon: <TbDeviceMobile className="icons" />,
+        //   key: "appSettings",
+        //   subItems: [
+        //     {
+        //       nestedKey: "Invoice",
+        //       label: "Invoice",
+        //       nested: [
+        //         { label: "Invoice Settings", path: "/invoice-settings" },
+        //         { label: "Invoice Template", path: "/invoice-template" },
+        //       ],
+        //     },
 
 
-            { label: "Printer", path: "/printer-settings" },
-            { label: "POS", path: "/pos-settings" },
-            { label: "Custom Fields", path: "/custom-fields" },
-          ],
-        },
-        {
-          title: "System Settings",
-          icon: <TbDeviceDesktop className="icons" />,
-          key: "systemSettings",
-          subItems: [
-            {
-              label: "Email",
-              nestedKey: "Email",
-              nested: [
-                { label: "Email Settings", path: "/email-settings" },
-                { label: "Email Template", path: "/email-template" },
-              ],
-            },
-            {
-              label: "SMS",
-              nestedKey: "SMS",
-              nested: [
-                { label: "SMS Settings", path: "/sms-settings" },
-                { label: "SMS Template", path: "/sms-template" },
-              ],
-            },
-            { label: "OTP", path: "/otp-settings" },
-            { label: "GDPR Cookies", path: "/gdpr-settings" },
-          ],
-        },
-        {
-          title: "Financial Settings",
-          icon: <TbSettingsDollar className="icons" />,
-          key: "financialSettings",
-          subItems: [
-            { label: "Payment Gateway", path: "/payment-gateway-settings" },
-            { label: "Bank Accounts", path: "/bank-settings-grid" },
-            { label: "Tax Rates", path: "/tax-rates" },
-            { label: "Currencies", path: "/currency-settings" },
-          ],
-        },
-        {
-          title: "Other Settings",
-          icon: <TbSettings2 className="icons" />,
-          key: "otherSettings",
-          subItems: [
-            { label: "Storage", path: "/storage-settings" },
-            { label: "Ban IP Address", path: "/ban-ip-address" },
-          ],
-        },
+        //     { label: "Printer", path: "/printer-settings" },
+        //     { label: "POS", path: "/pos-settings" },
+        //     { label: "Custom Fields", path: "/custom-fields" },
+        //   ],
+        // },
+        // {
+        //   title: "System Settings",
+        //   icon: <TbDeviceDesktop className="icons" />,
+        //   key: "systemSettings",
+        //   subItems: [
+        //     {
+        //       label: "Email",
+        //       nestedKey: "Email",
+        //       nested: [
+        //         { label: "Email Settings", path: "/email-settings" },
+        //         { label: "Email Template", path: "/email-template" },
+        //       ],
+        //     },
+        //     {
+        //       label: "SMS",
+        //       nestedKey: "SMS",
+        //       nested: [
+        //         { label: "SMS Settings", path: "/sms-settings" },
+        //         { label: "SMS Template", path: "/sms-template" },
+        //       ],
+        //     },
+        //     { label: "OTP", path: "/otp-settings" },
+        //     { label: "GDPR Cookies", path: "/gdpr-settings" },
+        //   ],
+        // },
+        // {
+        //   title: "Financial Settings",
+        //   icon: <TbSettingsDollar className="icons" />,
+        //   key: "financialSettings",
+        //   subItems: [
+        //     { label: "Payment Gateway", path: "/payment-gateway-settings" },
+        //     { label: "Bank Accounts", path: "/bank-settings-grid" },
+        //     { label: "Tax Rates", path: "/tax-rates" },
+        //     { label: "Currencies", path: "/currency-settings" },
+        //   ],
+        // },
+        // {
+        //   title: "Other Settings",
+        //   icon: <TbSettings2 className="icons" />,
+        //   key: "otherSettings",
+        //   subItems: [
+        //     { label: "Storage", path: "/storage-settings" },
+        //     { label: "Ban IP Address", path: "/ban-ip-address" },
+        //   ],
+        // },
         {
           label: "Logout",
           icon: <TbLogout className="icons" />,
@@ -568,6 +589,36 @@ export const getMenuData = () => {
           label: "Balance Sheet",
           path: "/balance-sheet",
           icon: <TbReportMoney className="icons" />,
+        },
+        {
+          label: "Profit & Loss",
+          path: "/profit&loss",
+          icon: <SiFuturelearn className="icons"/>,
+        },
+         {
+          label: "Overdue Report",
+          path: "/overdue-report",
+          icon: <FaStackOverflow  className="icons"/>,
+        },
+         {
+          label: "Expense Report",
+          path: "/expense-report",
+          icon: <GiExpense className="icons"/>,
+        },
+         {
+          label: "B2B & B2C",
+          path: "/bc",
+          icon: <IoLogoWebComponent className="icons"/>,
+        },
+         {
+          label: "Payment History",
+          path: "/payment-history",
+          icon: <MdOutlinePayments className="icons"/>,
+        },
+         {
+          label: "Credit & Debit Note",
+          path: "/credit&debit-note",
+          icon: <MdOutlineSpeakerNotes className="icons"/>,
         },
         {
           label: "Trial Balance",

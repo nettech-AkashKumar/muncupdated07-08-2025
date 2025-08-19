@@ -8,10 +8,15 @@ const {
   updateProduct,
   deleteProduct,
   searchProductsByName,
+
   importProducts,
   getProductStock,
 
   getPurchaseReturnStock,
+
+  importProducts, // ✅ Add import controller
+  scanProducts
+
 } = require("../controllers/productController");
 
 
@@ -27,6 +32,8 @@ router.post("/create", upload.array("images", 10), createProduct);
 
 // ✅ New route: import products from CSV/Excel
 router.post("/import", upload.single("file"), importProducts);
+// route scan product to add
+router.post("/scan", scanProducts)
 
 // ✅ Existing routes
 router.get("/search", searchProductsByName); // ✅ must come before /products/:id

@@ -51,6 +51,7 @@ function AllSuppliers() {
     try {
       const res = await fetch(`${BASE_URL}/api/suppliers`);
       const data = await res.json();
+      
       setSuppliers(data);
     } catch (err) {
       // handle error
@@ -113,6 +114,7 @@ function AllSuppliers() {
             </button>
           </div>
         </div>
+
         <div className="card">
           <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
             <div className="search-set">
@@ -169,6 +171,43 @@ function AllSuppliers() {
                       <td>
                         <div className="d-flex align-items-center">
                           {/* <a href="#" className="avatar avatar-md">
+=======
+      </div>
+      <div className="card-body p-0">
+        <div className="table-responsive">
+          <table className="table datatable">
+            <thead className="thead-light">
+              <tr>
+                <th className="no-sort">
+                  <label className="checkboxs">
+                    <input type="checkbox" id="select-all" />
+                    <span className="checkmarks" />
+                  </label>
+                </th>
+                <th>Code</th>
+                <th>Supplier</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Country</th>
+                <th>Status</th>
+                <th className="no-sort" />
+              </tr>
+            </thead>
+            <tbody>
+              {console.log('supplier lenth', suppliers.length)}
+              {paginatedData.map((supplier) => (
+                <tr key={supplier._id}>
+                  <td>
+                    <label className="checkboxs">
+                      <input type="checkbox" />
+                      <span className="checkmarks" />
+                    </label>
+                  </td>
+                  <td>{supplier.code || supplier._id?.slice(-5)}</td>
+                  <td>
+                    <div className="d-flex align-items-center">
+                      <a href="#" className="avatar avatar-md">
+
                         <img src={supplier.image ? `/uploads/${supplier.image}` : "assets/img/supplier/supplier-01.png"} className="img-fluid rounded-2" alt="img" />
                       </a> */}
                           <a href="#" className="avatar avatar-md">

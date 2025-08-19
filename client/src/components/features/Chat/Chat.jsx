@@ -18,9 +18,14 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { MdBlockFlipped } from "react-icons/md";
 import EmojiPicker from 'emoji-picker-react';
 import { LuRefreshCcw, LuChevronUp, LuMic, LuSend } from "react-icons/lu";
+import { TbFolderUp } from "react-icons/tb";
+
+import { useSocket } from '../../../Context/SocketContext';
+import ChatIcon from '../../../assets/img/icons/chat.png';
 
 const SOCKET_URL = import.meta.env.BACKEND_URL || 'http://localhost:5000'; // Use your backend port
 // const socket = io("http://localhost:5000"); // same as backend port
+
 const Chat = () => {
   const [users, setUsers] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -31,6 +36,10 @@ const Chat = () => {
   const [readStatus, setReadStatus] = useState({});
   const [unreadCounts, setUnreadCounts] = useState({}); // Track unread counts per user
   const [searchQuery, setSearchQuery] = useState(''); // Search query for filtering friends
+  const [searchSuggestions, setSearchSuggestions] = useState([]); // Search suggestions dropdown
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false); // Show/hide search dropdown
+  const [searchTimeout, setSearchTimeout] = useState(null); // For debouncing search
+
   const socket = useRef(null);
   const user = JSON.parse(localStorage.getItem('user'));
   const navigate = useNavigate();
@@ -50,12 +59,104 @@ const Chat = () => {
   const [contextMenu, setContextMenu] = useState(null); // { idx, x, y }
   const [replyTo, setReplyTo] = useState(null); // message object
   const [popup, setPopup] = useState({ show: false, message: '' });
-  console.log("amar kumar raaaa",users);
-  console.log("Amar kumar ",onlineUsers);
+  
+  // Get the current user ID - handle both id and _id fields
+  const currentUserId = user?.id || user?._id;
+  
+  // Helper function to normalize user IDs for comparison
+  const normalizeUserId = (userId) => {
+    return userId ? String(userId) : null;
+  };
+  
+  const { connectSocket, getSocket } = useSocket();
+
+  // console.log("User object:", user);
+  // console.log("User ID:", currentUserId);
+  // console.log("User ID type:", typeof currentUserId);
+  // console.log("User ID length:", currentUserId?.length);
+  // console.log("Users:", users);
+  // console.log("Online users:", onlineUsers);
+  // console.log("Online users count:", onlineUsers.length);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
+  };
+
+
+
+  // Function to handle search input changes
+  const handleSearchChange = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    
+    // Clear previous timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+    
+    if (query.trim().length > 0) {
+      // Set a new timeout for debouncing
+      const timeoutId = setTimeout(async () => {
+        try {
+          // Search users by email using the backend API
+          const token = localStorage.getItem('token');
+          
+          const res = await fetch(`${backendurl}/api/user/search?email=${encodeURIComponent(query)}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          
+          if (!res.ok) throw new Error('Failed to search users');
+          
+          const data = await res.json();
+          
+          // Filter out current user and users already in conversation list
+          const conversationUserIds = users.map(u => u._id);
+          const filteredSuggestions = data.users.filter(userItem => 
+            userItem._id !== currentUserId && !conversationUserIds.includes(userItem._id)
+          ).slice(0, 5); // Limit to 5 suggestions
+          
+          setSearchSuggestions(filteredSuggestions);
+          setShowSearchDropdown(true);
+        } catch (err) {
+          console.error("Error searching users:", err);
+          setSearchSuggestions([]);
+          setShowSearchDropdown(false);
+        }
+      }, 300); // 300ms delay
+      
+      setSearchTimeout(timeoutId);
+    } else {
+      setSearchSuggestions([]);
+      setShowSearchDropdown(false);
+    }
+  };
+
+  // Function to select a user from search suggestions (do not add to left panel until first message)
+  const selectUserFromSearch = async (selectedUser) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Only open chat view without adding to left list until a message exists
+      // Initialize local message array but don't push into users list yet
+      setMessages(prev => ({ ...prev, [selectedUser._id]: prev[selectedUser._id] || [] }));
+
+      // Select the user for chat (right panel)
+      setSelectedUser(selectedUser);
+      
+      // Clear search
+      setSearchQuery('');
+      setSearchSuggestions([]);
+      setShowSearchDropdown(false);
+      
+      // Initialize unread count for this user locally
+      setUnreadCounts(prev => ({ ...prev, [selectedUser._id]: prev[selectedUser._id] || 0 }));
+      
+    } catch (err) {
+      console.error("Error adding user to conversation list:", err);
+      setError('Failed to add user to conversation list');
+    }
   };
 
   const onEmojiClick = (emojiObject) => {
@@ -71,53 +172,94 @@ const Chat = () => {
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
     // Check file size and type for each file
-    const maxSize = 1 * 1024 * 1024; // 1MB
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'application/pdf'];
+    const maxSize = 10 * 1024 * 1024; // 10MB - more reasonable for chat files
+    const allowedTypes = [
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
+      'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/quicktime',
+      'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/plain', 'application/zip', 'application/x-rar-compressed'
+    ];
+    
     const validFiles = files.filter(file => {
       if (file.size > maxSize) {
-        setPopup({ show: true, message: `${file.name}: File size must be less than 1MB` });
+        setPopup({ 
+          show: true, 
+          message: `${file.name}: File size must be less than ${Math.round(maxSize / (1024 * 1024))}MB` 
+        });
         return false;
       }
       if (!allowedTypes.includes(file.type)) {
-        setPopup({ show: true, message: `${file.name}: Invalid file type.` });
+        setPopup({ 
+          show: true, 
+          message: `${file.name}: File type not supported. Allowed types: Images, Videos, PDFs, Documents, Archives, and Text files.` 
+        });
         return false;
       }
       return true;
     });
-    setSelectedFiles(validFiles);
-    setShowEmojiPicker(false);
+    
+    if (validFiles.length > 0) {
+      setSelectedFiles(validFiles);
+      setShowEmojiPicker(false);
+      console.log(`Selected ${validFiles.length} valid files:`, validFiles.map(f => ({ name: f.name, size: f.size, type: f.type })));
+    }
   };
 
   const handleFileUpload = async () => {
     if (!selectedFiles.length || !selectedUser) return;
     setIsUploading(true);
     setUploadProgress(0);
+    
     for (const file of selectedFiles) {
       try {
-        // Try signed Cloudinary upload
+        // Try signed Cloudinary upload first
         const token = localStorage.getItem('token');
         const sigRes = await fetch(`${backendurl}/api/cloudinary-signature`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+        
+        if (!sigRes.ok) {
+          throw new Error('Failed to get Cloudinary signature');
+        }
+        
         const { timestamp, signature, apiKey, cloudName, folder } = await sigRes.json();
+        
+        // Validate Cloudinary configuration
+        if (!timestamp || !signature || !apiKey || !cloudName) {
+          throw new Error('Invalid Cloudinary configuration');
+        }
+        
         const formData = new FormData();
         formData.append('file', file);
         formData.append('api_key', apiKey);
         formData.append('timestamp', timestamp);
         formData.append('signature', signature);
         formData.append('folder', folder);
-        for (let pair of formData.entries()) {
-          console.log('Cloudinary upload param:', pair[0], '=', pair[1]);
-        }
+        
+        console.log('Uploading to Cloudinary:', {
+          cloudName,
+          folder,
+          fileName: file.name,
+          fileSize: file.size
+        });
+        
         const uploadRes = await fetch(
           `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
           { method: 'POST', body: formData }
         );
+        
+        if (!uploadRes.ok) {
+          const errorData = await uploadRes.json();
+          throw new Error(errorData.error?.message || 'Cloudinary upload failed');
+        }
+        
         const data = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(data.error?.message || 'Failed to upload file');
+        console.log('Cloudinary upload successful:', data);
+        
         // Success: use Cloudinary URL
         const fileMessage = {
-          from: user.id,
+          from: currentUserId,
           to: selectedUser._id,
           message: `📎 ${file.name}`,
           fileUrl: data.secure_url,
@@ -127,24 +269,46 @@ const Chat = () => {
           read: false,
           replyTo: null
         };
+        
         // Save file message to backend for persistence
-        await fetch(`${backendurl}/api/messages`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(fileMessage),
+        // try {
+        //   const saveResponse = await fetch(`${backendurl}/api/messages`, {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //       Authorization: `Bearer ${token}`,
+        //     },
+        //     body: JSON.stringify(fileMessage),
+        //   });
+          
+        //   if (!saveResponse.ok) {
+        //     const errorData = await saveResponse.json();
+        //     console.warn('Failed to save message to backend:', errorData);
+        //     // Continue with local state update even if backend save fails
+        //   } else {
+        //     console.log('Message saved to backend successfully');
+        //   }
+        // } catch (saveError) {
+        //   console.warn('Error saving message to backend:', saveError);
+        //   // Continue with local state update even if backend save fails
+        // }
+        
+        // setMessages(prev => {
+        //   const newMessages = {
+        //     ...prev,
+        //     [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
+        //   };
+        //   return newMessages;
+        // });
+        
+        // Only add user to left panel if they're not already there
+        setUsers(prev => {
+          const exists = prev.some(u => u._id === selectedUser._id);
+          return exists ? prev : [selectedUser, ...prev];
         });
-        setMessages(prev => {
-          const newMessages = {
-            ...prev,
-            [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
-          };
-          return newMessages;
-        });
+        
         socket.current.emit('send-msg', {
-          from: user.id,
+          from: currentUserId,
           to: selectedUser._id,
           message: fileMessage.message,
           fileUrl: fileMessage.fileUrl,
@@ -152,28 +316,42 @@ const Chat = () => {
           fileName: fileMessage.fileName,
           replyTo: fileMessage.replyTo
         });
+        
         setTimeout(() => {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
-      } catch (error) {
+        
+      } catch (cloudinaryError) {
+        console.error('Cloudinary upload failed:', cloudinaryError);
+        
         // Fallback: upload to backend for local storage
         try {
+          console.log('Attempting fallback upload to backend...');
           const token = localStorage.getItem('token');
           const formData = new FormData();
           formData.append('file', file);
-          formData.append('from', user.id);
+          formData.append('from', currentUserId);
           formData.append('to', selectedUser._id);
-          const uploadUrl = `${backendurl}/api/upload-file`;
+
+          const uploadUrl = `${backendurl}/api/cloudinary-signature/upload-file`;
           const response = await fetch(uploadUrl, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` },
             body: formData
           });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Backend upload failed');
+          }
+
           const data = await response.json();
-          if (!response.ok) throw new Error(data.message || 'Failed to upload file');
+          console.log('Backend upload successful:', data);
+
           // Success: use local file URL
           const fileMessage = {
-            from: user.id,
+            from: currentUserId,
+            to: selectedUser._id,
             message: `📎 ${file.name}`,
             fileUrl: data.fileUrl,
             fileType: file.type,
@@ -182,15 +360,14 @@ const Chat = () => {
             read: false,
             replyTo: null
           };
-          setMessages(prev => {
-            const newMessages = {
-              ...prev,
-              [selectedUser._id]: [...(prev[selectedUser._id] || []), fileMessage]
-            };
-            return newMessages;
+
+          setUsers(prev => {
+            const exists = prev.some(u => u._id === selectedUser._id);
+            return exists ? prev : [selectedUser, ...prev];
           });
+
           socket.current.emit('send-msg', {
-            from: user.id,
+            from: currentUserId,
             to: selectedUser._id,
             message: fileMessage.message,
             fileUrl: fileMessage.fileUrl,
@@ -198,14 +375,21 @@ const Chat = () => {
             fileName: fileMessage.fileName,
             replyTo: fileMessage.replyTo
           });
+          
           setTimeout(() => {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
+          
         } catch (fallbackError) {
-          setPopup({ show: true, message: 'Failed to upload file to both Cloudinary and local storage.' });
+          console.error('Both Cloudinary and backend upload failed:', fallbackError);
+          setPopup({ 
+            show: true, 
+            message: `Failed to upload ${file.name}. Please try again or contact support.` 
+          });
         }
       }
     }
+    
     setSelectedFiles([]);
     setIsUploading(false);
   };
@@ -230,7 +414,9 @@ const Chat = () => {
 
   const calculateUnreadCount = (userId) => {
     const userMessages = messages[userId] || [];
-    return userMessages.filter(msg => msg.from === userId && !msg.read).length;
+    const unreadCount = userMessages.filter(msg => msg.from === userId && !msg.read).length;
+    // console.log(`Unread count for user ${userId}:`, unreadCount, 'Messages:', userMessages.length);
+    return unreadCount;
   };
 
   const scrollToFirstUnreadMessage = () => {
@@ -260,7 +446,7 @@ const Chat = () => {
     if (userMessages.length === 0) return 'No conversation';
     
     const lastMessage = userMessages[userMessages.length - 1];
-    const isFromCurrentUser = lastMessage.from === user.id;
+    const isFromCurrentUser = lastMessage.from === currentUserId;
     const prefix = isFromCurrentUser ? 'You: ' : '';
     const messageText = lastMessage.message && lastMessage.message.length > 20 
       ? lastMessage.message.substring(0, 20) + '...' 
@@ -281,8 +467,7 @@ const Chat = () => {
   const getLastMessageTimestamp = (userId) => {
     const safeMessages = messages || {};
     const userMessages = safeMessages[userId] || [];
-    if (userMessages.length === 0) return new Date(0); // Very old date for sorting
-    
+    if (userMessages.length === 0) return new Date(0);
     const lastMessage = userMessages[userMessages.length - 1];
     return lastMessage && lastMessage.timestamp ? new Date(lastMessage.timestamp) : new Date(0);
   };
@@ -294,18 +479,21 @@ const Chat = () => {
     
     const lastMessage = userMessages[userMessages.length - 1];
     // Only show status for messages sent by current user
-    if (lastMessage && lastMessage.from === user.id) {
+    if (lastMessage && lastMessage.from === currentUserId) {
       return lastMessage.read ? '✓✓' : '✓';
     }
     return null;
   };
 
+  // Left panel list: show only users with whom you have chat history, filtered by search
   const getFilteredUsers = () => {
-    const safeUsers = users || [];
-    if (!searchQuery.trim()) return safeUsers;
-    
-    return safeUsers.filter(userItem => 
-      userItem.firstname && userItem.lastname.toLowerCase().includes(searchQuery.toLowerCase())
+    const query = searchQuery.trim().toLowerCase();
+    const baseUsers = (users || []).filter(u => u && u._id);
+    if (!query) return baseUsers;
+    return baseUsers.filter((userItem) =>
+      (userItem.firstName && userItem.firstName.toLowerCase().includes(query)) ||
+      (userItem.lastName && userItem.lastName.toLowerCase().includes(query)) ||
+      (userItem.email && userItem.email.toLowerCase().includes(query))
     );
   };
 
@@ -322,41 +510,95 @@ const Chat = () => {
       if (clickDropdown && !event.target.closest('.settings-dropdown-container')) {
         setClickDropdown(false);
       }
+      if (showSearchDropdown && !event.target.closest('.chat-list-search-box')) {
+        setShowSearchDropdown(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      // Cleanup search timeout
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
     };
-  }, [showEmojiPicker, clickDropdowntwo, clickDropdown]);
+  }, [showEmojiPicker, clickDropdowntwo, clickDropdown, showSearchDropdown, searchTimeout]);
 
  useEffect(() => {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
 
-      // ✅ FIXED URL
-      const res = await fetch(`${backendurl}/api/user/getuser`, {
+      // ✅ Get conversations for the logged-in user first
+      let conversationsRes = await fetch(`${backendurl}/api/messages/${currentUserId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to fetch users');
-      setUsers(data); // ✅ now this will be an array of users
+      // console.log("Primary API status:", conversationsRes.status);
+      let conversationsData;
+      try {
+        conversationsData = await conversationsRes.json();
+      } catch (e) {
+        conversationsData = [];
+      }
+      if (!Array.isArray(conversationsData)) {
+        // console.log('Primary conversations response not array, raw:', conversationsData);
+      }
+      if ((!conversationsRes.ok || !Array.isArray(conversationsData) || conversationsData.length === 0)) {
+        // Fallback to alternate mount
+        try {
+          const altRes = await fetch(`${backendurl}/api/conversations/${currentUserId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          // console.log("Fallback API status:", altRes.status);
+          const altData = await altRes.json();
+          if (altRes.ok && Array.isArray(altData)) {
+            conversationsRes = altRes;
+            conversationsData = altData;
+          }
+        } catch (e) {
+          // console.log('Fallback fetch failed:', e.message);
+        }
+      }
 
-      // ✅ Get conversations for the logged-in user
-      
-      const conversationsRes = await fetch(`${backendurl}/api/conversations/${user.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      // console.log("Conversations data (final):", conversationsData);
+      // console.log("Current user ID:", currentUserId);
 
-      const conversationsData = await conversationsRes.json();
-
-      if (conversationsRes.ok) {
+      if (Array.isArray(conversationsData) && conversationsData.length > 0) {
+        // Extract user IDs from conversations and build messages
+        const conversationUserIds = [];
         const allMessages = {};
-        conversationsData.forEach(conversation => {
-          const otherParticipant = conversation.participants.find(p => p._id !== user.id);
+        const usersWithConversations = [];
+        
+        conversationsData.forEach((conversation, index) => {
+          // console.log(`Processing conversation ${index}:`, conversation);
+          // console.log("Conversation participants:", conversation.participants);
+          // Normalize participants as objects with _id
+          const normalizedParticipants = (conversation.participants || []).map((p) =>
+            typeof p === 'string' ? { _id: p } : p
+          );
+          // Find the other participant (not the current user)
+          const otherParticipant = normalizedParticipants.find(p => String(p._id) !== String(currentUserId));
+          // console.log("Other participant found:", otherParticipant);
+          
           if (otherParticipant) {
-            allMessages[otherParticipant._id] = conversation.messages.map((msg) => ({
+            conversationUserIds.push(otherParticipant._id);
+            // Add user to the list
+            usersWithConversations.push({
+              _id: otherParticipant._id,
+              firstName: otherParticipant.firstName || otherParticipant.name || otherParticipant.username || otherParticipant.email || 'User',
+              lastName: otherParticipant.lastName || '',
+              email: otherParticipant.email || '',
+              profileImage: otherParticipant.profileImage ? 
+                (Array.isArray(otherParticipant.profileImage) && otherParticipant.profileImage.length > 0 ? 
+                  otherParticipant.profileImage[0].url : 
+                  (typeof otherParticipant.profileImage === 'string' ? otherParticipant.profileImage : 
+                   (otherParticipant.profileImage.url || otherParticipant.profileImage))) : 
+                (otherParticipant.profilePicture || null)
+            });
+            // Build messages for this conversation (may be empty)
+            const convMessages = Array.isArray(conversation.messages) ? conversation.messages : [];
+            allMessages[otherParticipant._id] = convMessages.map((msg) => ({
               from: msg.from,
               message: msg.message,
               read: msg.read,
@@ -368,85 +610,152 @@ const Chat = () => {
             }));
           }
         });
+        
+        // console.log("Users with conversations:", usersWithConversations);
+        // console.log("All messages:", allMessages);
+        // console.log("Conversation user IDs:", conversationUserIds);
+        
         setMessages(allMessages);
+        // Deduplicate users by _id in case of duplicates
+        const uniqueUsers = usersWithConversations.filter((u, idx, arr) =>
+          idx === arr.findIndex(x => String(x._id) === String(u._id))
+        );
+        setUsers(uniqueUsers);
+        
+        // Calculate initial unread counts
+        const initialUnreadCounts = {};
+        usersWithConversations.forEach(userItem => {
+          const unreadCount = calculateUnreadCount(userItem._id);
+          initialUnreadCounts[userItem._id] = unreadCount;
+          // console.log(`Initial unread count for ${userItem._id}:`, unreadCount);
+        });
+        setUnreadCounts(initialUnreadCounts);
+        
+
+      } else {
+        // console.log("No conversations found or response not ok");
+        // If no conversations, don't show any users in left panel
+        setUsers([]);
+        setMessages({});
       }
     } catch (err) {
+      console.error("Error fetching users and conversations:", err);
       setError(err.message);
     }
   };
 
-  if (user?.id) fetchUsers();
-}, [user?.id]);
+  if (currentUserId) fetchUsers();
+}, [currentUserId]);
+
+
 
 
   useEffect(() => {
-    socket.current = io(backendurl);
-    socket.current.emit('add-user', users.id);
-    socket.current.on('online-users', (online) => {
-      setOnlineUsers(online);
-    });
-    socket.current.on('msg-receive', (data) => {
-      setMessages((prev) => {
-        const userId = data.from === users.id ? data.to : data.from;
-        const userMessages = prev[userId] || [];
-        return {
-          ...prev,
-          [userId]: [...userMessages, {
-            from: data.from,
-            message: data.message,
-            fileUrl: data.fileUrl,
-            fileType: data.fileType,
-            fileName: data.fileName,
-            read: false,
-            timestamp: new Date(),
-            replyTo: data.replyTo
-          }]
-        };
+    if (!currentUserId) return;
+    
+    // Use the centralized socket connection
+    const socketInstance = connectSocket(backendurl);
+    
+    if (socketInstance) {
+      socket.current = socketInstance;
+      
+      // Emit add-user when connected
+      if (socketInstance.connected) {
+        // console.log("🟢 Socket connected successfully");
+        // console.log("🟢 Emitting add-user with ID:", currentUserId);
+        socketInstance.emit('add-user', currentUserId);
+      } else {
+        socketInstance.on('connect', () => {
+          // console.log("🟢 Socket connected successfully");
+          // console.log("🟢 Emitting add-user with ID:", currentUserId);
+          socketInstance.emit('add-user', currentUserId);
+        });
+      }
+      
+      socketInstance.on('online-users', (online) => {
+        // console.log("🟢 Online users received:", online);
+        // console.log("🟢 Online users types:", online.map(id => typeof id));
+        // console.log("🟢 Current user ID:", currentUserId, "Type:", typeof currentUserId);
+        setOnlineUsers(online);
       });
       
-      // Increment unread count for received messages
-      if (data.from !== users.id) {
-        setUnreadCounts((prev) => ({
-          ...prev,
-          [data.from]: (prev[data.from] || 0) + 1
-        }));
-      }
-    });
-    socket.current.on('msg-read', (data) => {
-      setReadStatus((prev) => ({ ...prev, [data.from]: true }));
-
-      // Update message read status for messages sent by this user to the user who just read them
-      setMessages((prev) => {
-        const updatedMessages = { ...prev };
-        if (updatedMessages[data.from]) {
-          updatedMessages[data.from] = updatedMessages[data.from].map(msg =>
-            msg.from === users.id ? { ...msg, read: true } : msg
-          );
+      socketInstance.on('msg-receive', (data) => {
+        setMessages((prev) => {
+          const userId = data.from === currentUserId ? data.to : data.from;
+          const userMessages = prev[userId] || [];
+          return {
+            ...prev,
+            [userId]: [...userMessages, {
+              from: data.from,
+              message: data.message,
+              fileUrl: data.fileUrl,
+              fileType: data.fileType,
+              fileName: data.fileName,
+              read: false,
+              timestamp: new Date(),
+              replyTo: data.replyTo
+            }]
+          };
+        });
+        // Only add the other user to left panel if they're not already there (ensures only users with actual conversations appear)
+        const otherId = data.from === currentUserId ? data.to : data.from;
+        if (otherId !== currentUserId) {
+          // Try to find the user in existing users list; otherwise fetch minimal details from search pool
+          setUsers(prev => {
+            if (prev.some(u => u._id === otherId)) return prev;
+            // Fallback: synthesize minimal object to show; will get enriched on next fetch
+            return [{ _id: otherId, firstName: 'User', lastName: '', email: '', profileImage: null }, ...prev];
+          });
         }
-        return updatedMessages;
+        
+        // Increment unread count for received messages
+        if (data.from !== currentUserId) {
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [data.from]: (prev[data.from] || 0) + 1
+          }));
+        }
       });
-    });
-    // Listen for real-time message deletion
-    socket.current.on('delete-msg', (data) => {
-      setMessages(prev => {
-        const userMessages = prev[data.from] || [];
-        return {
+      
+      socketInstance.on('msg-read', (data) => {
+        setReadStatus((prev) => ({ ...prev, [data.from]: true }));
+
+        // Update message read status for messages sent by this user to the user who just read them
+        setMessages((prev) => {
+          const updatedMessages = { ...prev };
+          if (updatedMessages[data.from]) {
+            updatedMessages[data.from] = updatedMessages[data.from].map(msg =>
+              msg.from === currentUserId ? { ...msg, read: true } : msg
+            );
+          }
+          return updatedMessages;
+        });
+      });
+      
+      // Listen for real-time message deletion
+      socketInstance.on('delete-msg', (data) => {
+        setMessages(prev => {
+          const userMessages = prev[data.from] || [];
+          return {
+            ...prev,
+            [data.from]: userMessages.filter(msg => String(msg.timestamp) !== String(data.messageTimestamp))
+          };
+        });
+      });
+      
+      // Listen for real-time chat clear
+      socketInstance.on('clear-chat', (data) => {
+        setMessages(prev => ({
           ...prev,
-          [data.from]: userMessages.filter(msg => String(msg.timestamp) !== String(data.messageTimestamp))
-        };
+          [data.from]: []
+        }));
       });
-    });
-    // Listen for real-time chat clear
-    socket.current.on('clear-chat', (data) => {
-      setMessages(prev => ({
-        ...prev,
-        [data.from]: []
-      }));
-    });
+    }
+    
     return () => {
-      socket.current.disconnect();
+      // Don't disconnect here, let the socket context manage the connection
     };
-  }, [users.id]);
+  }, [currentUserId, connectSocket]);
 
   // Fetch chat history when a user is selected
   useEffect(() => {
@@ -455,7 +764,7 @@ const Chat = () => {
       try {
         const token = localStorage.getItem('token');
         const res = await fetch(
-          `${backendurl}/api/messages?from=${user.id}&to=${selectedUser._id}`,
+          `${backendurl}/api/messages?from=${currentUserId}&to=${selectedUser._id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -463,10 +772,10 @@ const Chat = () => {
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Failed to fetch messages');
         
-        console.log('Fetched messages for selected user:', data);
-        console.log('Message count:', data.length);
-        console.log('User messages:', data.filter(msg => msg.from === user.id).length);
-        console.log('Sample message structure:', data[0]);
+        // console.log('Fetched messages for selected user:', data);
+        // console.log('Message count:', data.length);
+        // console.log('User messages:', data.filter(msg => msg.from === currentUserId).length);
+        // console.log('Sample message structure:', data[0]);
         
         setMessages((prev) => ({
           ...prev,
@@ -488,9 +797,9 @@ const Chat = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ from: selectedUser._id, to: user.id }),
+          body: JSON.stringify({ from: selectedUser._id, to: currentUserId }),
         });
-        socket.current.emit('message-read', { from: selectedUser._id, to: user.id });
+        socket.current.emit('message-read', { from: selectedUser._id, to: currentUserId });
         setReadStatus((prev) => ({ ...prev, [selectedUser._id]: true }));
         
         // Update messages to mark them as read
@@ -514,7 +823,7 @@ const Chat = () => {
           Object.keys(messages).forEach(userId => {
             const count = calculateUnreadCount(userId);
             newUnreadCounts[userId] = count;
-            console.log(`User ${userId}: ${count} unread messages`);
+            // console.log(`User ${userId}: ${count} unread messages`);
           });
           setUnreadCounts(newUnreadCounts);
         }, 200);
@@ -523,7 +832,7 @@ const Chat = () => {
       }
     };
     fetchMessages();
-  }, [selectedUser, users.id]);
+  }, [selectedUser, currentUserId]);
 
   // Calculate unread counts whenever messages change
   useEffect(() => {
@@ -531,6 +840,7 @@ const Chat = () => {
     Object.keys(messages).forEach(userId => {
       newUnreadCounts[userId] = calculateUnreadCount(userId);
     });
+    // console.log("Updating unread counts:", newUnreadCounts);
     setUnreadCounts(newUnreadCounts);
   }, [messages, selectedUser]);
 
@@ -566,21 +876,21 @@ const Chat = () => {
         const userMessages = messages[selectedUser._id] || [];
         const selectedMessageData = Array.from(selectedMessages)
           .map(index => userMessages[index])
-          .filter(msg => msg.from === user.id) // Only allow deletion of user's own messages
+          .filter(msg => msg.from === currentUserId) // Only allow deletion of user's own messages
           .map(msg => ({
             timestamp: msg.timestamp,
             message: msg.message,
             from: msg.from
           }));
         
-        console.log('Selected messages to delete:', selectedMessageData);
+        // console.log('Selected messages to delete:', selectedMessageData);
         
         const requestBody = { 
           messages: selectedMessageData,
-          from: user.id, 
+          from: currentUserId, 
           to: selectedUser._id 
         };
-        console.log('Request body:', requestBody);
+        // console.log('Request body:', requestBody);
         
         const response = await fetch(`${backendurl}/api/messages/delete-selected`, {
           method: 'DELETE',
@@ -592,7 +902,7 @@ const Chat = () => {
         });
         
         const responseData = await response.json();
-        console.log('Backend response:', responseData);
+        // console.log('Backend response:', responseData);
         
         if (!response.ok) {
           throw new Error(responseData.message || 'Failed to delete messages');
@@ -600,14 +910,14 @@ const Chat = () => {
         
                 // Refresh messages from server to ensure consistency
         const refreshRes = await fetch(
-          `${backendurl}/api/messages?from=${user.id}&to=${selectedUser._id}`,
+          `${backendurl}/api/messages?from=${currentUserId}&to=${selectedUser._id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
         const refreshData = await refreshRes.json();
-        console.log('Refreshed messages from server:', refreshData);
-        console.log('Refreshed message count:', refreshData.length);
+        // console.log('Refreshed messages from server:', refreshData);
+        // console.log('Refreshed message count:', refreshData.length);
         
         if (refreshRes.ok) {
           setMessages(prev => ({
@@ -625,7 +935,7 @@ const Chat = () => {
           }));
         } else {
           // Fallback: manually remove selected messages from local state
-          console.log('Server refresh failed, using local state fallback');
+          // console.log('Server refresh failed, using local state fallback');
           setMessages(prev => ({
             ...prev,
             [selectedUser._id]: (prev[selectedUser._id] || []).filter((msg, index) => 
@@ -645,7 +955,7 @@ const Chat = () => {
   };
 
   const handleMessageClick = (msg, idx, event) => {
-    if (msg.from === user.id) {
+    if (msg.from === currentUserId) {
       event.preventDefault();
       setContextMenu({ idx, x: event.clientX, y: event.clientY });
     }
@@ -655,15 +965,21 @@ const Chat = () => {
     if (!selectedUser) return;
     const userMessages = messages[selectedUser._id] || [];
     const msg = userMessages[idx];
-    if (!msg || msg.from !== user.id) return;
+    if (!msg || msg.from !== currentUserId) return;
     if (!window.confirm('Delete this message?')) return;
     try {
       const token = localStorage.getItem('token');
       const requestBody = {
-        messages: [{ timestamp: msg.timestamp, message: msg.message, from: msg.from }],
-        from: user.id,
+        messages: [{ 
+          timestamp: new Date(msg.timestamp).toISOString(), 
+          message: msg.message, 
+          from: msg.from 
+        }],
+        from: currentUserId,
         to: selectedUser._id
       };
+      // console.log('Deleting message with request body:', requestBody);
+      
       const response = await fetch(`${backendurl}/api/messages/delete-selected`, {
         method: 'DELETE',
         headers: {
@@ -672,23 +988,32 @@ const Chat = () => {
         },
         body: JSON.stringify(requestBody),
       });
+      
+      // console.log('Delete response status:', response.status);
+      const responseData = await response.json();
+      // console.log('Delete response data:', responseData);
+      
       if (!response.ok) {
-        const responseData = await response.json();
         throw new Error(responseData.message || 'Failed to delete message');
       }
+      
       // Remove from local state
       setMessages(prev => ({
         ...prev,
         [selectedUser._id]: (prev[selectedUser._id] || []).filter((_, i) => i !== idx)
       }));
+      
       // Emit socket event for real-time deletion
       socket.current.emit('delete-msg', {
-        from: user.id,
+        from: currentUserId,
         to: selectedUser._id,
         messageTimestamp: msg.timestamp
       });
+      
+      // console.log('Message deleted successfully');
     } catch (error) {
-      alert('Failed to delete message.');
+      console.error('Error deleting message:', error);
+      alert('Failed to delete message: ' + error.message);
     } finally {
       setContextMenu(null);
     }
@@ -719,7 +1044,7 @@ const Chat = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          from: user.id,
+          from: currentUserId,
           to: selectedUser._id,
           message,
           replyTo: replyToObj
@@ -734,7 +1059,7 @@ const Chat = () => {
       return {
         ...prev,
         [selectedUser._id]: [...userMessages, {
-          from: user.id,
+          from: currentUserId,
           message,
           read: false,
           timestamp: new Date(),
@@ -742,10 +1067,15 @@ const Chat = () => {
         }]
       };
     });
+    // Only add user to left panel if they're not already there (this ensures only users with actual conversations appear)
+    setUsers(prev => {
+      const exists = prev.some(u => u._id === selectedUser._id);
+      return exists ? prev : [selectedUser, ...prev];
+    });
     setReadStatus((prev) => ({ ...prev, [selectedUser._id]: false }));
     socket.current.emit('send-msg', {
       to: selectedUser._id,
-      from: user.id,
+      from: currentUserId,
       message,
       replyTo: replyToObj
     });
@@ -753,12 +1083,137 @@ const Chat = () => {
     setReplyTo(null);
   };
 
+  // Test Cloudinary configuration
+  const testCloudinaryConfig = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Testing Cloudinary with token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/test-cloudinary`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      console.log('Cloudinary test response status:', response.status);
+      console.log('Cloudinary test response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Cloudinary test failed with status:', response.status);
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Response is not JSON:', contentType);
+        console.error('Response text:', responseText);
+        throw new Error(`Expected JSON but got ${contentType}`);
+      }
+      
+      const data = await response.json();
+      console.log('Cloudinary test result:', data);
+      
+      if (data.message) {
+        setPopup({ 
+          show: true, 
+          message: `Cloudinary Test: ${data.message}` 
+        });
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Failed to test Cloudinary config:', error);
+      setPopup({ 
+        show: true, 
+        message: `Cloudinary test failed: ${error.message}` 
+      });
+      return null;
+    }
+  };
+
+  // Check environment configuration
+  const checkEnvironment = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Checking environment with token:', token ? 'Token exists' : 'No token');
+      
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/env-check`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      console.log('Environment check response status:', response.status);
+      console.log('Environment check response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Environment check failed with status:', response.status);
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Response is not JSON:', contentType);
+        console.error('Response text:', responseText);
+        throw new Error(`Expected JSON but got ${contentType}`);
+      }
+      
+      const data = await response.json();
+      console.log('Environment check result:', data);
+      
+      if (!data || !data.cloudinary) {
+        console.error('Invalid response structure:', data);
+        throw new Error('Invalid response structure from server');
+      }
+      
+      // Show results in popup
+      const message = `Environment Check:\n\nCloudinary:\n- Cloud Name: ${data.cloudinary.cloud_name}\n- API Key: ${data.cloudinary.api_key}\n- API Secret: ${data.cloudinary.api_secret}\n\nUploads:\n- Directory: ${data.uploads.directory}\n- Exists: ${data.uploads.exists}\n- Writable: ${data.uploads.writable}`;
+      
+      setPopup({ 
+        show: true, 
+        message: message 
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Failed to check environment:', error);
+      setPopup({ 
+        show: true, 
+        message: `Failed to check environment: ${error.message}` 
+      });
+      return null;
+    }
+  };
+
+  // Simple ping test to verify routing
+  const testPing = async () => {
+    try {
+      const response = await fetch(`${backendurl}/api/cloudinary-signature/ping`);
+      const data = await response.json();
+      console.log('Ping test result:', data);
+      setPopup({ 
+        show: true, 
+        message: `Ping test successful: ${data.message}` 
+      });
+      return data;
+    } catch (error) {
+      console.error('Failed to ping:', error);
+      setPopup({ 
+        show: true, 
+        message: `Ping test failed: ${error.message}` 
+      });
+      return null;
+    }
+  };
+
   return (
     <>
-    <div style={{ display: 'flex', flexDirection: 'column', height: '94vh', backgroundColor:'rgb(231, 230, 230)', padding:'15px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '88vh', padding:'15px' }}>
 
       {/* header */}
-      <div style={{display:'flex', justifyContent:'space-between', marginBottom:'20px'}}>
+      {/* <div style={{display:'flex', justifyContent:'space-between', marginBottom:'20px'}}>
 
       <div>
       <span style={{fontWeight:'bold', fontSize:'25px'}}>Chat</span>
@@ -771,38 +1226,139 @@ const Chat = () => {
         <button style={{backgroundColor:'white', color:'gray', padding:'5px 10px', display:'flex', alignItems:'center', border:'none'}}><LuChevronUp /></button>
       </div>
 
-      </div>
+      </div> */}
       
       {/* Main content */}
-      <div style={{ display: 'flex', flex: 1, height:'70vh', gap:'15px'  }}>
+      <div style={{ display: 'flex', flex: 1, height:'100vh', gap:'15px'  }}>
       
         {/* Left panel: User list */}
         <div style={{ width: '25%', 
-          borderRight: '1px solid #ccc', 
+          border: '1px solid #E6E6E6', 
           padding: '15px',
-          height: 'calc(100vh - 150px)',
+          height: 'calc(100vh - 140px)',
           display: 'flex', 
           flexDirection: 'column',
-          backgroundColor:'white', 
+          backgroundColor:'#FFFFFF', 
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
           borderRadius:'10px' }}>
 
           <div style={{ flexShrink: 0 }}>
 
-            <span style={{fontWeight:'bold', fontSize:'20px'}}>Chats</span>
+            <span style={{fontWeight:'500', fontSize:'20px'}}>Chats</span>
             
             {/* Search Box */}
-            <div style={{ marginBottom: '15px', padding:'0px 10px'}} className="chat-list-search-box" >
+            <div style={{ marginBottom: '15px', padding:'0px 10px', position: 'relative' }} className="chat-list-search-box" >
+              
+              <div style={{
+                display: 'flex',alignItems: 'center',gap: '6px',}}>
+
+                <CiSearch style={{fontSize:'20px'}} />
+              
               <input
                 type="text"
-                placeholder="Search For Contacts or Messages"
+                placeholder="Search"
                 className="chat-list-search-input"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 style={{
                   width: '100%',
                 }}
               />
-              <CiSearch />
+
+              </div>
+              
+              {/* Search Suggestions Dropdown */}
+              {showSearchDropdown && searchSuggestions.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '10px',
+                  right: '10px',
+                  backgroundColor: 'white',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                  zIndex: 1000,
+                  maxHeight: '200px',
+                  overflowY: 'auto'
+                }}>
+                  {searchSuggestions.map((userItem) => (
+                    <div
+                      key={userItem._id}
+                      style={{
+                        padding: '12px 15px',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #f0f0f0',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        hover: {
+                        backgroundColor: '#f5f5f5'
+                        }
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+                      onClick={() => selectUserFromSearch(userItem)}
+                    >
+                      {/* User Avatar */}
+                      {userItem.profileImage ? (
+                        <img 
+                          src={userItem.profileImage} 
+                          alt={userItem.firstName}
+                          style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            objectFit: 'cover',
+                            border: '2px solid #ddd'
+                          }}
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : (
+                        <div 
+                          style={{ 
+                            width: '32px', 
+                            height: '32px', 
+                            borderRadius: '50%', 
+                            backgroundColor: '#007AFF',
+                            color: 'white',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: 'bold',
+                            border: '2px solid #ddd'
+                          }}
+                        >
+                          {(userItem.firstName || userItem.email || 'U').slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      
+                      {/* User Info */}
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
+                          {userItem.firstName} {userItem.lastName}
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          {userItem.email}
+                        </div>
+                      </div>
+                      
+                      {/* Start Conversation Button */}
+                      <div style={{ 
+                        fontSize: '12px', 
+                        color: '#007AFF',
+                        fontWeight: 'bold'
+                      }}>
+                        Start Chat
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             
             {error && <div style={{ color: 'red' }}>{error}</div>}
@@ -810,171 +1366,201 @@ const Chat = () => {
           </div>
           
           <ul style={{ listStyle: 'none', padding: 0, overflowY: 'auto', flex: 1, marginTop:'1px' }} className="chat-list-usersection">
-          {getFilteredUsers()
-            .sort((a, b) => {
-              const aTimestamp = getLastMessageTimestamp(a._id);
-              const bTimestamp = getLastMessageTimestamp(b._id);
-              return bTimestamp - aTimestamp; // Sort by most recent first
-            })
-            .map((userItem) => (
-            <li
-              key={userItem._id}
-              className="chat-list-user"
-              style={{
-                padding: '12px 15px',
-                cursor: 'pointer',
-                background: selectedUser && selectedUser._id === userItem._id ? '#eee' : 'transparent',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                margin:'12px',
-                borderRadius: '5px'
-              }}
-              onClick={() => {
-                setSelectedUser(userItem);
-                // Immediately clear unread count for this user
-                setUnreadCounts((prev) => ({
-                  ...prev,
-                  [userItem._id]: 0
-                }));
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {userItem.profilePicture ? (
-                  <>
-                  <div>
-                  <div style={{ 
-                    borderRadius: '50%', 
-                    color: 'white',
-                    justifyContent: 'center',
-                  }}>
-                  <img 
-                    src={userItem.profileImage} 
-                    alt={userItem.firstName}
+          {getFilteredUsers().length > 0 ? (
+            getFilteredUsers()
+              .sort((a, b) => {
+                const aTimestamp = getLastMessageTimestamp(a._id);
+                const bTimestamp = getLastMessageTimestamp(b._id);
+                return bTimestamp - aTimestamp; // Sort by most recent first
+              })
+              .map((userItem) => (
+              <li
+                key={userItem._id}
+                className="chat-list-user"
+                style={{
+                  padding: '12px 15px',
+                  cursor: 'pointer',
+                  background: selectedUser && selectedUser._id === userItem._id ? '#E3F3FF' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  margin:'12px',
+                  borderRadius: '5px',
+                  borderBottom: '1px solid #f0f0f0',
+                }}
+                onClick={() => {
+                  setSelectedUser(userItem);
+                  // Immediately clear unread count for this user
+                  setUnreadCounts((prev) => ({
+                    ...prev,
+                    [userItem._id]: 0
+                  }));
+                  // console.log("Selected user:", userItem._id, "Clearing unread count");
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  {userItem.profileImage ? (
+                    <>
+                    <div>
+                    <div style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      borderRadius: '50%', 
+                      backgroundColor: '#007AFF',
+                      color: 'white',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      border: '2px solid #ddd',
+                      display: 'flex',
+                      position: 'relative',
+                      textAlign: 'center',
+                    }}>
+                    <img 
+                      src={userItem.profileImage} 
+                      alt={userItem.firstName}
+                      style={{ 
+                        width: '40px', 
+                        height: '40px', 
+                        borderRadius: '50%', 
+                        objectFit: 'cover',
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.nextSibling.style.display = 'flex';
+                      }}
+                    />
+                    
+                    {onlineUsers.includes(normalizeUserId(userItem._id)) ? (
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
+                        <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
+                      </div>
+                      ) : (
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
+                        <span style={{ color: 'gray', fontSize: 1 }}>●</span>
+                      </div>
+                      )}
+                    
+                    </div>
+
+                      {console.log(`User ${userItem._id} online status:`, onlineUsers.includes(normalizeUserId(userItem._id)), 'Online users:', onlineUsers)}
+                      {console.log(`User ID type:`, typeof userItem._id, 'Online users types:', onlineUsers.map(id => typeof id))}
+
+                    </div>
+                    </>
+                  ) : (
+                    <>
+                    <div>
+                  <div 
                     style={{ 
                       width: '40px', 
                       height: '40px', 
                       borderRadius: '50%', 
-                      objectFit: 'cover',
-                      border: '2px solid #ddd'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
-                    }}
-                  />
-                  
-                  </div>
-
-                  {onlineUsers.includes(userItem._id) ? (
-                    <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
-                      <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
-                    </div>
-                    ) : (
-                    <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
-                      <span style={{ color: 'gray', fontSize: 1 }}>●</span>
-                    </div>
-                    )}
-
-                  </div>
-                  </>
-                ) : (
-                  <>
-                  <div>
-                <div 
-                  style={{ 
-                    width: '40px', 
-                    height: '40px', 
-                    borderRadius: '50%', 
-                    backgroundColor: '#007AFF',
-                    color: 'white',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '16px',
-                    fontWeight: 'bold',
-                    border: '2px solid #ddd',
-                    display: userItem.profileImage ? 'none' : 'flex'
-                  }}
-                >
-                  {userItem.firstName.slice(0, 2).toUpperCase()}
-
-                </div>
-
-                  {onlineUsers.includes(userItem._id) ? (
-                    <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
-                      <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
-                    </div>
-                  ) : (
-                    <div style={{ marginTop: '-20px', marginLeft: '30px' }}>
-                      <span style={{ color: 'gray', fontSize: 1 }}>●</span>
-                    </div>
-                  )}
-
-                </div>
-                  </>
-                )}
-
-                
-
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold' }}>
-                    {userItem.firstName}
-                    </span>
-                  </div>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    color: '#666', 
-                    marginTop: '2px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '150px'
-                  }}>
-                    {getLastMessage(userItem._id)}
-                  </span>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                <span style={{ 
-                  fontSize: '10px', 
-                  color: '#999',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {getLastMessageTime(userItem._id)}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  {getLastMessageStatus(userItem._id) && (
-                    <span style={{ 
-                      fontSize: '10px', 
-                      color: getLastMessageStatus(userItem._id) === '✓✓' ? 'rgb(43, 216, 66)' : '#999'
-                    }}>
-                      {getLastMessageStatus(userItem._id)}
-                    </span>
-                  )}
-                  {unreadCounts[userItem._id] > 0 && (
-                    <span style={{
-                      backgroundColor: 'orange',
+                      backgroundColor: '#007AFF',
                       color: 'white',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '12px',
+                      fontSize: '16px',
                       fontWeight: 'bold',
-                      minWidth: '20px'
-                    }}>
-                      {unreadCounts[userItem._id]}
-              </span>
-              )}
-                </div>
-              </div>
+                      border: '2px solid #ddd',
+                      display: 'flex',
+                      position: 'relative',
+                      textAlign: 'center',
+                    }}
+                  >
+                    {(userItem.firstName || userItem.email || 'U').slice(0, 2).toUpperCase()}
 
-            </li>
-          ))}
+                    {onlineUsers.includes(normalizeUserId(userItem._id)) ? (
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
+                        <span style={{ color: 'rgb(43, 216, 66)', fontSize: 21, }}>●</span>
+                      </div>
+                    ) : (
+                      <div style={{ position: 'absolute', top: '-10px', right: '-5px' }}>
+                        <span style={{ color: 'gray', fontSize: 1 }}>●</span>
+                      </div>
+                    )}
+                  </div>
+
+                    
+                    {console.log(`User ${userItem._id} online status:`, onlineUsers.includes(normalizeUserId(userItem._id)), 'Online users:', onlineUsers)}
+                    {console.log(`User ID type:`, typeof userItem._id, 'Online users types:', onlineUsers.map(id => typeof id))}
+
+                  </div>
+                    </>
+                  )}
+
+                  {/* name and message */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <span style={{ fontWeight: 'bold' }}>
+                        {(userItem.firstName || userItem.email || 'User')} {userItem.lastName || ''}
+                      </span>
+                    </div>
+                    <span style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      marginTop: '2px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      maxWidth: '150px'
+                    }}>
+                      {getLastMessage(userItem._id)}
+                    </span>
+                  </div>
+
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+                  <span style={{ 
+                    fontSize: '10px', 
+                    color: '#999',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {getLastMessageTime(userItem._id)}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {getLastMessageStatus(userItem._id) && (
+                      <span style={{ 
+                        fontSize: '10px', 
+                        color: getLastMessageStatus(userItem._id) === '✓✓' ? 'rgb(43, 216, 66)' : '#999'
+                      }}>
+                        {getLastMessageStatus(userItem._id)}
+                      </span>
+                    )}
+                    {unreadCounts[userItem._id] > 0 && (
+                      <span style={{
+                        backgroundColor: 'orange',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        minWidth: '20px'
+                      }}>
+                        {unreadCounts[userItem._id]}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+              </li>
+            ))
+          ) : (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '20px', 
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              {searchQuery ? 'No users found matching your search' : 'No chat history yet. Start a conversation to see users here.'}
+            </div>
+          )}
         </ul>
         </div>
 
@@ -983,10 +1569,12 @@ const Chat = () => {
           width: '75%',
           display: 'flex', 
           flexDirection: 'column', 
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100vh - 140px)',
           overflow: 'hidden',
-          backgroundColor:'white',
+          backgroundColor:'#FFFFFF',
+          border: '1px solid #E6E6E6',
           borderRadius:'10px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         }}>
 
         {selectedUser ? (
@@ -996,7 +1584,7 @@ const Chat = () => {
 
               <div style={{display:'flex', gap:'10px', alignItems:'center'}}>
 
-              {selectedUser.profilePicture ? (
+              {selectedUser.profileImage ? (
               <>
                 <div style={{ 
                     borderRadius: '50%', 
@@ -1034,25 +1622,28 @@ const Chat = () => {
                     fontSize: '16px',
                     fontWeight: 'bold',
                     border: '2px solid #ddd',
-                    display: selectedUser.profileImage ? 'none' : 'flex'
+                    display: 'flex'
                   }}
                 >
                   
-                  {selectedUser.firstName.slice(0, 2).toUpperCase()}
+                  {(selectedUser.firstName || selectedUser.email || 'U').slice(0, 2).toUpperCase()}
 
                 </div>
 
                 </>
               )}
 
-                    {onlineUsers.includes(selectedUser._id) && (
-                    <span style={{ color: 'rgb(43, 216, 66)', marginLeft: 30, marginTop:'25px', fontSize: 20, position:'absolute' }}>●</span>
-                    )}
+                    
 
               <div>
-                <span><b>{selectedUser.firstName}</b></span>
-                <br/>
-                <span style={{color:'rgb(182, 180, 180)'}}>{onlineUsers.includes(selectedUser._id) ? 'online' : 'offline'}</span>
+                <span><b>{selectedUser.firstName} {selectedUser.lastName}</b></span>
+
+                <div style={{display:'flex', gap:'5px', alignItems:'center'}}>
+                  {onlineUsers.includes(normalizeUserId(selectedUser._id)) && (
+                    <span style={{ color: 'rgb(43, 216, 66)', fontSize: 15 }}>●</span>
+                    )}
+                <span style={{color:'rgb(182, 180, 180)'}}>{onlineUsers.includes(normalizeUserId(selectedUser._id)) ? 'online' : 'offline'}</span>
+                </div>
               </div>
             </div>
 
@@ -1096,10 +1687,10 @@ const Chat = () => {
                 </div>
               ) : (
                 <>
-                <div style={{ color: "grey", position: "relative", marginTop:'15px', marginRight:'10px' }}>
+                <div style={{ color: "grey", position: "relative", marginTop:'8px', marginRight:'10px' }}>
                 <div style={{display:'flex', gap:'20px', fontSize:'20px'}}>
-                  <CiSearch />
-                  <span onClick={() => setClickDropdown(!clickDropdown)}>
+                  <span><CiSearch /></span>
+                  <span onClick={() => setClickDropdown(!clickDropdown)} style={{transform:'rotate(90deg)', cursor:'pointer'}}>
                     <HiOutlineDotsVertical className="threedot-setting" />
                   </span>
                 </div>
@@ -1112,8 +1703,8 @@ const Chat = () => {
                  className="settings-dropdown-container"
                  style={{
                    position: "absolute",
-                   top: "140px",
-                   right: "50px",
+                   top: "120px",
+                   right: "100px",
                    zIndex: "100",
                  }}
                >
@@ -1123,7 +1714,7 @@ const Chat = () => {
                   style={{
                   backgroundColor: "white",
                   width: "200px",
-                  height: "165px",
+                  height: "auto",
                   border: "1px solid #dfd8d8",
                   padding:"10px 15px",
                   display:"flex",
@@ -1154,7 +1745,7 @@ const Chat = () => {
                              Authorization: `Bearer ${token}`,
                            },
                            body: JSON.stringify({ 
-                             from: user.id, 
+                             from: currentUserId, 
                              to: selectedUser._id 
                            }),
                          });
@@ -1167,7 +1758,7 @@ const Chat = () => {
                          
                          // Emit socket event for real-time chat clear
                          socket.current.emit('clear-chat', {
-                           from: user.id,
+                           from: currentUserId,
                            to: selectedUser._id
                          });
                          
@@ -1227,14 +1818,14 @@ const Chat = () => {
                     marginBottom: '18px',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: msg.from === user.id ? 'flex-end' : 'flex-start',
+                    alignItems: msg.from === currentUserId ? 'flex-end' : 'flex-start',
                     position: 'relative',
                     width: '100%'
                   }}
                   onClick={() => handleMessageSelection(idx)}
                 >
                   {/* Checkbox for selection mode */}
-                  {isSelectionMode && msg.from === user.id && (
+                  {isSelectionMode && msg.from === currentUserId && (
                     <input
                       type="checkbox"
                       checked={selectedMessages.has(idx)}
@@ -1255,12 +1846,12 @@ const Chat = () => {
                       fontSize: 12,
                       color: '#555',
                       textAlign: 'left',
-                      alignSelf: msg.from === user.id ? 'flex-end' : 'flex-start',
-                      marginRight: msg.from === user.id ? 0 : undefined,
-                      marginLeft: msg.from !== user.id ? 0 : undefined
+                      alignSelf: msg.from === currentUserId ? 'flex-end' : 'flex-start',
+                      marginRight: msg.from === currentUserId ? 0 : undefined,
+                      marginLeft: msg.from !== currentUserId ? 0 : undefined
                     }}>
                       <span style={{ fontWeight: 500, color: '#007AFF' }}>
-                        {msg.replyTo.username ? msg.replyTo.username : (msg.replyTo.from === user.id ? 'You' : 'Friend')}
+                        {msg.replyTo.username ? msg.replyTo.username : (msg.replyTo.from === currentUserId ? 'You' : 'Friend')}
                       </span>
                       <br/>
                       <span style={{ color: '#333' }}>{msg.replyTo.message}</span>
@@ -1270,19 +1861,23 @@ const Chat = () => {
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: msg.from === user.id ? 'row-reverse' : 'row',
+                      flexDirection: msg.from === currentUserId ? 'row-reverse' : 'row',
                       alignItems: 'flex-end',
                       gap: '8px',
                       width: '100%'
                     }}
                   >
+
                     {/* Profile Picture */}
-                    <div style={{ flexShrink: 0 }}>
-                      {msg.from === user.id ? (
+                    {/* <div style={{ flexShrink: 0 }}>
+                      {msg.from === currentUserId ? (
                         // Current user's profile picture
                         user?.profileImage ? (
                           <img 
-                            src={user.profileImage} 
+                            src={Array.isArray(user.profileImage) && user.profileImage.length > 0 ? 
+                              user.profileImage[0].url : 
+                              (typeof user.profileImage === 'string' ? user.profileImage : 
+                               (user.profileImage.url || user.profileImage))} 
                             alt={user?.firstName}
                             style={{ 
                               width: '32px', 
@@ -1352,18 +1947,22 @@ const Chat = () => {
                             {selectedUser?.firstName?.slice(0, 2).toUpperCase()}
                           </div>
                         )
-                      )}
-                    </div>
+                      } */}
+
                     {/* Message Content */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: msg.from === user.id ? 'flex-end' : 'flex-start', maxWidth: '70%' }}>
-                      <span
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: msg.from === currentUserId ? 'flex-end' : 'flex-start', maxWidth: '70%',
+                          background: msg.from === currentUserId ? '#EBF7FF' : '#F9F9F9',
+                          border: msg.from === currentUserId ? '1px solid #BBE1FF' : '1px solid #E6E6E6',
+                          padding: '6px 12px',
+                          borderTopLeftRadius: msg.from === currentUserId ? '12px' : '0px',
+                          borderTopRightRadius: msg.from === currentUserId ? '0px' : '12px',
+                          borderBottomLeftRadius: '12px 12px',
+                          borderBottomRightRadius: '12px 12px',
+                          wordWrap: 'break-word', }}>
+                      <div
                         style={{
                           display: 'inline-block',
-                          background: msg.from === user.id ? 'rgb(225, 223, 223)' : 'rgb(225, 223, 223)',
-                          padding: '6px 12px',
-                          borderRadius: 12,
                           margin: '2px 0',
-                          wordWrap: 'break-word',
                           cursor: msg.fileUrl ? 'pointer' : 'default'
                         }}
                         onClick={msg.fileUrl ? () => window.open(msg.fileUrl, '_blank') : undefined}
@@ -1415,6 +2014,7 @@ const Chat = () => {
                                   gap: '8px'
                                 }}
                                 onClick={(e) => {
+                                 
                                   e.stopPropagation();
                                   window.open(msg.fileUrl, '_blank');
                                 }}
@@ -1430,17 +2030,20 @@ const Chat = () => {
                             )}
                           </div>
                         )}
-                      </span>
+                        
+                      </div>
+
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                         <span style={{ fontSize: '10px', color: '#666' }}>
                           {msg.timestamp ? formatTime(msg.timestamp) : ''}
                         </span>
-                        {msg.from === user.id && (
+                        {msg.from === currentUserId && (
                           <span style={{ fontSize: 10, color:msg.read ? 'rgb(43, 216, 66)' : '#999' }}>
                             {msg.read ? '✓✓' : '✓'}
                           </span>
                         )}
                       </div>
+                      
                     </div>
                     {/* Show three-dots icon for all messages (not in selection mode) */}
                     {!isSelectionMode && (
@@ -1451,8 +2054,8 @@ const Chat = () => {
                           cursor: 'pointer',
                           position: 'absolute',
                           top: 0,
-                          right: msg.from === user.id ? '-30px' : 'auto',
-                          left: msg.from !== user.id ? '-30px' : 'auto',
+                          right: msg.from === currentUserId ? '-30px' : 'auto',
+                          left: msg.from !== currentUserId ? '-30px' : 'auto',
                           zIndex: 10,
                           padding: 2
                         }}
@@ -1464,7 +2067,7 @@ const Chat = () => {
                           let x = e.clientX;
                           let y = e.clientY;
                           // For your own messages, if menu would overflow right, show to the left
-                          if (msg.from === user.id) {
+                          if (msg.from === currentUserId) {
                             // Find the chat area right edge
                             const chatArea = e.target.closest('[style*="background-color:white"][style*="border-radius:10px"]');
                             const chatAreaRect = chatArea ? chatArea.getBoundingClientRect() : null;
@@ -1504,7 +2107,7 @@ const Chat = () => {
                           width: 70
                         }}
                       >
-                        {msg.from === user.id ? (
+                        {msg.from === currentUserId ? (
                           <div
                             style={{ padding: '8px', cursor: 'pointer', textAlign:'left' }}
                             onClick={() => handleDeleteSingleMessage(idx)}
@@ -1529,6 +2132,7 @@ const Chat = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
+
             {/* text message box */}
             <div style={{padding:'8px 16px', borderTop:'1px solid rgb(231, 230, 230)', backgroundColor:'white'}}>
 
@@ -1556,12 +2160,12 @@ const Chat = () => {
                 marginTop: 'auto',
                 position: 'sticky',
                 bottom: 0,
-                backgroundColor: 'rgb(238, 237, 237)',
+                backgroundColor: 'white',
                 padding: '5px 15px',
                 alignItems:'center',
                 border:'1px solid rgb(212, 212, 212)',
                 borderRadius:'10px',
-                gap:'10px'
+                gap:'12px'
               }}>
 
                 <LuMic />
@@ -1571,7 +2175,7 @@ const Chat = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Type your message..."
-                  style={{ flex: 1, padding: 8, border:'none', outline:'none', backgroundColor:'rgb(238, 237, 237)' }}
+                  style={{ flex: 1, padding: 8, border:'none', outline:'none', backgroundColor:'white' }}
                 />
                 
                 <GrEmoji 
@@ -1583,8 +2187,8 @@ const Chat = () => {
                     className="emoji-picker-container"
                     style={{
                       position: "absolute",
-                      bottom: "60px",
-                      left: "10px",
+                      bottom: "70px",
+                      right: "5px",
                       zIndex: "1000"
                     }}
                   >
@@ -1592,103 +2196,20 @@ const Chat = () => {
                   </div>
                 )}
                 
-                {/* send files */}
-                <label 
-                  htmlFor="file-upload1" 
-                  className="custom-file-upload1"
-                  style={{ cursor: "pointer" }}
-                >
-                  <CiFolderOn style={{ fontSize: "20px", color:'gray' }} />
-                </label>
-                <input 
-                  id="file-upload1" 
-                  type="file" 
-                  multiple
-                  accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.avi,.mov,.wmv,.pdf"
-                  onChange={handleFileSelect}
-                  style={{ display: "none" }}
-                />
-                
-                {/* File preview and upload button */}
-                {selectedFiles.length > 0 && (
-                  <div style={{
-                    position: "absolute",
-                    bottom: "60px",
-                    left: "10px",
-                    backgroundColor: "white",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    padding: "12px",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    zIndex: "1000",
-                    minWidth: "250px"
-                  }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-                      <span style={{ fontSize: "14px", fontWeight: "bold" }}>📎 {selectedFiles.length} files selected</span>
-                      <button 
-                        onClick={() => setSelectedFiles([])}
-                        style={{ 
-                          background: "none", 
-                          border: "none", 
-                          cursor: "pointer",
-                          fontSize: "16px",
-                          color: "#666"
-                        }}
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
-                      Total Size: {selectedFiles.reduce((sum, file) => sum + file.size, 0)}
-                    </div>
-                    {selectedFiles.map((file, index) => (
-                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '12px', color: '#666' }}>{file.name}</span>
-                        <button 
-                          onClick={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== index))}
-                          style={{ 
-                            background: "none", 
-                            border: "none", 
-                            cursor: "pointer",
-                            fontSize: "16px",
-                            color: "#666"
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                    <button 
-                      onClick={handleFileUpload}
-                      disabled={isUploading}
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        backgroundColor: isUploading ? "#ccc" : "#007bff",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        cursor: isUploading ? "not-allowed" : "pointer"
-                      }}
-                    >
-                      {isUploading ? "Uploading..." : "Send Files"}
-                    </button>
-                  </div>
-                )}
 
                 <span
                     onClick={() => setClickDropdownTwo(!clickDropdowntwo)}
                     style={{ color: "grey", position: "relative" }}
                   >
-                    <HiOutlineDotsVertical style={{ fontSize: "20px", color:'gray' }} />
+                    <HiOutlineDotsVertical style={{ fontSize: "25px", color:'gray' }} />
                 </span>
                   {clickDropdowntwo && (
                     <div
                       className="file-dropdown-container"
                       style={{
                         position: "absolute",
-                        top: "-183px",
-                        right: "55px",
+                        top: "-200px",
+                        right: "130px",
                         zIndex: "100",
                       }}
                     >
@@ -1700,7 +2221,7 @@ const Chat = () => {
                         style={{
                         backgroundColor: "white",
                         width: "150px",
-                        height: "165px",
+                        height: "auto",
                         border: "1px solid #dfd8d8",
                         padding:"10px 15px",
                         display:"flex",
@@ -1749,6 +2270,92 @@ const Chat = () => {
                   </div>
                   )}
 
+                {/* send files */}
+                <label 
+                  htmlFor="file-upload1" 
+                  className="custom-file-upload1"
+                  style={{ cursor: "pointer" }}
+                >
+                  <TbFolderUp style={{ fontSize: "25px", color:'gray' }} />
+                </label>
+                <input 
+                  id="file-upload1" 
+                  type="file" 
+                  multiple
+                  accept=".jpg,.jpeg,.png,.gif,.webp,.mp4,.avi,.mov,.wmv,.pdf"
+                  onChange={handleFileSelect}
+                  style={{ display: "none" }}
+                />
+                
+                {/* File preview and upload button */}
+                {selectedFiles.length > 0 && (
+                  <div style={{
+                    position: "absolute",
+                    bottom: "60px",
+                    left: "10px",
+                    backgroundColor: "white",
+                    border: "1px solid #ddd",
+                    borderRadius: "8px",
+                    padding: "12px",
+                    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+                    zIndex: "1000",
+                    minWidth: "250px"
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                      <span style={{ fontSize: "14px", fontWeight: "bold" }}>📎 {selectedFiles.length} files selected</span>
+                      <button 
+                        onClick={() => setSelectedFiles([])}
+                        style={{ 
+                          background: "none", 
+                          border: "none", 
+                          cursor: "pointer",
+                          fontSize: "16px",
+                          color: "#666"
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#666", marginBottom: "8px" }}>
+                      Total Size: {formatFileSize(selectedFiles.reduce((sum, file) => sum + file.size, 0))}
+                    </div>
+                    {selectedFiles.map((file, index) => (
+                      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#666' }}>{file.name}</span>
+                        <button 
+                          onClick={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== index))}
+                          style={{ 
+                            background: "none", 
+                            border: "none", 
+                            cursor: "pointer",
+                            fontSize: "16px",
+                            color: "#666"
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                      <button 
+                        onClick={handleFileUpload}
+                        disabled={isUploading}
+                        style={{
+                          flex: 1,
+                          padding: "8px",
+                          backgroundColor: isUploading ? "#ccc" : "#007bff",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: isUploading ? "not-allowed" : "pointer"
+                        }}
+                      >
+                        {isUploading ? "Uploading..." : "Send Files"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <button type="submit" style={{ border:'none', backgroundColor:'#007AFF', color:'white', display:'flex', justifyContent:'center', borderRadius:'8px', padding:'8px 10px' }}>
                   <LuSend />
                 </button>
@@ -1757,14 +2364,15 @@ const Chat = () => {
 
           </>
         ) : (
-          <div style={{padding:60, textAlign:'center'}}>
-
-             <h2 style={{ margin: 0, color: '#495057' }}>Welcome, {users?.username || 'User'} !</h2>
+          <div style={{padding:60, textAlign:'center',display:'flex',alignItems:'center', justifyContent:'center',alignContent:'center'}}>
+            <div style={{marginTop:'150px', textAlign:'center'}}>
+              <img src={ChatIcon} style={{width:'172px',marginBottom:'50px'}} />
+             <h2 style={{ margin: 0, color: '#495057' }}>Welcome, {user?.firstName || 'User'} !</h2>
              
-             Select a user to start chatting
+             Select a user to start chatting.
             
             <br/><br/>
-
+{/* 
             <button 
             onClick={handleLogout}
             style={{
@@ -1781,7 +2389,8 @@ const Chat = () => {
             onMouseOut={(e) => e.target.style.backgroundColor = '#dc3545'}
             >
               Logout
-            </button>
+            </button> */}
+            </div>
 
           </div>
         )}

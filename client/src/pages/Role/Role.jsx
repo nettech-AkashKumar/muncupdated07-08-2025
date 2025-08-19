@@ -9,7 +9,14 @@ import { RxDotFilled } from "react-icons/rx";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useNavigate } from "react-router-dom";
-
+import "../../styles/role.css";
+import { BiSearch } from "react-icons/bi";
+import { IoIosArrowDown } from "react-icons/io";
+import IConnie from "../../assets/images/IConnie.png";
+import Erdit from "../../assets/images/erdit.png";
+import { LiaEditSolid } from "react-icons/lia";
+import { MdNavigateNext } from "react-icons/md";
+import { GrFormPrevious } from "react-icons/gr";
 
 const Role = () => {
   const navigate = useNavigate();
@@ -29,8 +36,8 @@ const Role = () => {
 
   const [editRolePermissions, setEditRolePermissions] = useState({});
 
-  const modules = ['Category', 'Inventory', 'Sales']; // customize as needed
-  const permissionTypes = ['read', 'write', 'update', 'delete', 'all'];
+  const modules = ["Category", "Inventory", "Sales"]; // customize as needed
+  const permissionTypes = ["read", "write", "update", "delete", "all"];
 
   const loadRoleForEdit = async (roleId) => {
     try {
@@ -128,7 +135,6 @@ const Role = () => {
     setEditRoleStatus(role.status === "Active");
   };
 
-
   const handleDeleteRole = async (id) => {
     if (window.confirm("Are you sure you want to delete this role?")) {
       try {
@@ -143,7 +149,6 @@ const Role = () => {
       }
     }
   };
-
 
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(roles);
@@ -183,7 +188,6 @@ const Role = () => {
     currentPage * itemsPerPage
   );
 
-
   // const [roles, setRoles] = useState([]);
 
   useEffect(() => {
@@ -199,10 +203,10 @@ const Role = () => {
   //   }
   // };
 
-  const handleViewPermissions = (roleName) => {
-    localStorage.setItem("selectedRoleName", roleName);
-    window.location.href = "/permissions"; // direct navigation without route param
-  };
+  // const handleViewPermissions = (roleName) => {
+  //   localStorage.setItem("selectedRoleName", roleName);
+  //   window.location.href = "/permissions"; // direct navigation without route param
+  // };
 
   return (
     <div className="page-wrapper">
@@ -210,26 +214,25 @@ const Role = () => {
         <div className="page-header">
           <div className="add-item d-flex">
             <div className="page-title">
-              <h4>Roles &amp; Permission</h4>
-              <h6>Manage your roles</h6>
+              <h4 className="pgetiterole">Roles &amp; Permission</h4>
             </div>
           </div>
 
           <div className="table-top-head me-2">
             <li>
-              <button type="button" className="icon-btn" title="Pdf">
+              {/* <button type="button" className="icon-btn" title="Pdf">
                 <FaFilePdf />
-              </button>
+              </button> */}
             </li>
             <li>
-              <button
+              {/* <button
                 type="button"
                 className="icon-btn"
                 title="Export Excel"
                 onClick={exportToExcel}
               >
                 <FaFileExcel />
-              </button>
+              </button> */}
             </li>
           </div>
           <div className="page-btn">
@@ -239,34 +242,44 @@ const Role = () => {
               data-bs-toggle="modal"
               data-bs-target="#add-role"
             >
-              <CiCirclePlus className=" me-1" />
-              Add Role
+              + Add Role
             </a>
           </div>
         </div>
-        <div className="card">
+        <hr style={{ height: "1px", color: "#bbbbbb" }} />
+        <div className="card crdrd">
           <div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
             <div className="search-set">
-              <div className="search-input">
-                <span className="btn-searchset">
-                  <input
-                    type="text"
-                    placeholder="Search roles..."
-                    className="form-control"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </span>
+              <div className="search-input" style={{ position: "relative" }}>
+                <BiSearch
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "10px",
+                    transform: "translateY(-50%)",
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="search-inputsrch"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ paddingLeft: "35px" }}
+                />
               </div>
             </div>
 
             <div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="dropdown me-2">
+              <div className="dropdown me-2 alio">
                 <a
-                  className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
+                  href="#"
+                  className="dropdown-toggle btn btn-light btn-md d-inline-flex align-items-center"
                   data-bs-toggle="dropdown"
+                  role="button"
                 >
-                  Status
+                  All
+                  <IoIosArrowDown style={{ marginLeft: "5px" }} />
                 </a>
                 <ul className="dropdown-menu  dropdown-menu-end p-3">
                   <li>
@@ -295,13 +308,14 @@ const Role = () => {
                   </li>
                 </ul>
               </div>
-              <div className="dropdown">
+              <div className="dropdown alio">
                 <a
                   href="javascript:void(0);"
-                  className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
+                  className="dropdown-toggle btn btn-light btn-md d-inline-flex align-items-center"
                   data-bs-toggle="dropdown"
                 >
-                  Sort By : Latest
+                  Latest{" "}
+                  <img src={IConnie} alt="" style={{ marginLeft: "5px" }} />
                 </a>
                 <ul className="dropdown-menu  dropdown-menu-end p-3">
                   <li>
@@ -334,59 +348,167 @@ const Role = () => {
           </div>
           <div className="card-body p-0">
             <div className="table-responsive">
-              <table className="table datatable">
-                <thead className="thead-light">
-                  <tr>
+              <table className="table datatable tblerole">
+                <thead
+                  className="thead-light tblerolethead"
+                  style={{ backgroundColor: "#F1F1F1" }}
+                >
+                  <tr style={{ textAlign: "center" }}>
                     <th className="no-sort">
                       <div className="form-check form-check-md">
                         <input
+                          style={{ border: "1px solid #676767" }}
                           className="form-check-input"
                           type="checkbox"
                           id="select-all"
                         />
                       </div>
                     </th>
-                    <th>Role</th>
-                    <th>Created Date</th>
-                    <th>Status</th>
-                    <th />
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Role
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Created Date
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      style={{
+                        color: "#676767",
+                        fontSize: "16px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                        fontFamily: 'Roboto", sans-serif',
+                      }}
+                    >
+                      Action
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="tbleroletbody">
                   {paginatedRoles.length > 0 ? (
                     paginatedRoles.map((role) => (
-                      <tr key={role._id}>
-                        <td>
+                      <tr key={role._id} style={{ textAlign: "center" }}>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <div className="form-check form-check-md">
                             <input
+                              style={{ border: "1px solid #676767" }}
                               className="form-check-input"
                               type="checkbox"
                             />
                           </div>
                         </td>
-                        <td>{role.roleName}</td>
-                        <td>{new Date(role.createdAt).toLocaleDateString()}</td>
-                        <td>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
+                          {role.roleName}
+                        </td>
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
+                          {new Date(role.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </td>
+
+                        <td
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <span
-                            className={`badge table-badge fw-medium fs-10 ${role.status === "Active"
-                              ? "bg-success"
-                              : "bg-danger"
-                              }`}
+                            className={`badge table-badge fw-medium fs-10 ${
+                              role.status === "Active" ? "" : ""
+                            }`}
+                            style={
+                              role.status === "Active"
+                                ? {
+                                    backgroundColor: "#DFFFE0",
+                                    color: "#0F5132",
+                                    padding: "6px 8px 6px 8px",
+                                  }
+                                : {
+                                    backgroundColor: "#FCE4E6",
+                                    color: "#0F5132",
+                                    padding: "6px 8px 6px 8px",
+                                  }
+                            }
                           >
-                            <RxDotFilled />
                             {role.status}
                           </span>
                         </td>
 
-                        <td className="action-table-data">
+                        <td
+                          className="action-table-data"
+                          style={{
+                            color: "#262626",
+                            fontSize: "16px",
+                            fontWeight: 400,
+                            lineHeight: "14px",
+                            fontFamily: 'Roboto", sans-serif',
+                          }}
+                        >
                           <div className="edit-delete-action">
                             <a
                               className="me-2 p-2"
-                              // onClick={() =>
-                              //   navigate(`/permissions/${role._id}`)
-                              // }
-                              onClick={() => handleViewPermissions(role.roleName)}
-
+                              onClick={() =>
+                                navigate(`/permissions/${role._id}`)
+                              }
+                              // onClick={() => handleViewPermissions(role.roleName)}
                             >
                               <TbEye />
                             </a>
@@ -421,9 +543,17 @@ const Role = () => {
                 </tbody>
               </table>
             </div>
-            <div className="d-flex justify-content-between align-items-center p-3">
-              <div className="d-flex justify-content-end align-items-center">
-                <label className="me-2">Items per page:</label>
+            <div
+              className="d-flex justify-content-end  align-items-center p-3"
+              style={{ gap: "10px" }}
+            >
+              <div
+                className="d-flex justify-content-end align-items-center"
+                style={{
+                  backgroundColor: "white",
+                  boxShadow: "rgba #0000000a(0, 0, 0, 0.04) 0px 3px 8px",
+                }}
+              >
                 <select
                   value={itemsPerPage}
                   onChange={(e) => {
@@ -432,46 +562,53 @@ const Role = () => {
                   }}
                   className="form-select w-auto"
                 >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
+                  <option value={10}>10 Per Page</option>
+                  <option value={25}>25 Per Page</option>
+                  <option value={50}>50 Per Page</option>
+                  <option value={100}>100 Per Page</option>
                 </select>
               </div>
 
               {/* Pagination buttons */}
-              <div>
+              <span
+                style={{
+                  backgroundColor: "white",
+                  boxShadow: "rgb(0 0 0 / 4%) 0px 3px 8px",
+                  padding: "7px",
+                  borderRadius: "5px",
+                  border: "1px solid #e4e0e0ff",
+                  color: "gray",
+                }}
+              >
+                {filteredRoles.length === 0
+                  ? "0 of 0"
+                  : `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(
+                      currentPage * itemsPerPage,
+                      filteredRoles.length
+                    )} of ${filteredRoles.length}`}
                 <button
-                  className="btn btn-light btn-sm me-2"
+                  style={{
+                    border: "none",
+                    color: "grey",
+                    backgroundColor: "white",
+                  }}
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
                 >
-                  Prev
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    className={`btn btn-sm me-1 ${currentPage === i + 1
-                      ? "btn-primary"
-                      : "btn-outline-primary"
-                      }`}
-                    onClick={() => setCurrentPage(i + 1)}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
+                  <GrFormPrevious />
+                </button>{" "}
                 <button
-                  className="btn btn-light btn-sm"
+                  style={{ border: "none", backgroundColor: "white" }}
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  <MdNavigateNext />
                 </button>
-              </div>
+              </span>
             </div>
           </div>
         </div>
@@ -480,19 +617,38 @@ const Role = () => {
 
       <div>
         {/* Add Role */}
-        <div className="modal fade" id="add-role">
+        <div className="modal" id="add-role">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h4>Create Role</h4>
-                <button type="button" className="close" data-bs-dismiss="modal">
-                  <span>×</span>
-                </button>
+                <h4
+                  style={{
+                    color: "#262626",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "14px",
+                  }}
+                >
+                  Create Role
+                </h4>
+                <hr
+                  style={{ margin: "0", height: "1px", color: "#bdbdbdff" }}
+                />
               </div>
               <form onSubmit={handleCreateRole}>
                 <div className="modal-body">
-                  <div className="mb-3">
-                    <label className="form-label">Role Name</label>
+                  <div className="mb-3" style={{ position: "relative" }}>
+                    <label
+                      className="form-label"
+                      style={{
+                        color: "#262626",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                      }}
+                    >
+                      Role Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -503,24 +659,81 @@ const Role = () => {
                   </div>
                   <div className="mb-0">
                     <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-                      <span className="status-label">Status</span>
-                      <input
-                        type="checkbox"
-                        id="roleStatus"
-                        className="check"
-                        checked={roleStatus}
-                        onChange={(e) => setRoleStatus(e.target.checked)}
-                      />
-                      <label htmlFor="roleStatus" className="checktoggle" />
+                      <span className="status-label" style={{fontSize:'16px', fontWeight:400, lineHeight:'14px', color:'#262626'}}>Status</span>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-light dropdown-toggle"
+                          type="button"
+                          id="roleStatus"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          {roleStatus ? "Active" : "Inactive"}
+                        </button>
+                        <ul
+                          className="dropdown-menu"
+                          aria-labelledby="statusDropdown"
+                        >
+                          <li>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setRoleStatus(true)}
+                            >
+                              Active
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setRoleStatus(false)}
+                            >
+                              Inactive
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button className="btn btn-secondary" data-bs-dismiss="modal">
+                <div
+                  className="modal-footer"
+                  style={{
+                    display: "flex",
+                    justifyContent: "end",
+                    gap: "10px",
+                    fontFamily: "Roboto, sans-serif",
+                    fontWeight: 400,
+                    fontSize: "16px",
+                    lineHeight: "14px",
+                  }}
+                >
+                  <button
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    style={{
+                      border: "1px solid #E6E6E6",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      backgroundColor: "#FFFFFF",
+                      color: "#676767",
+                      borderRadius: "5px",
+                    }}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    Create Role
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{
+                      border: "1px solid #676767",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      backgroundColor: "#262626",
+                      color: "#FFFFFF",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    Create
                   </button>
                 </div>
               </form>
@@ -530,19 +743,36 @@ const Role = () => {
         {/* /Add Role */}
 
         {/* Edit Role */}
-        <div className="modal fade" id="edit-role">
+        <div className="modal" id="edit-role">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
-              <div className="modal-header">
-                <h4>Edit Role</h4>
-                <button type="button" className="close" data-bs-dismiss="modal">
-                  <span>×</span>
-                </button>
+              <div className="p-3">
+                <h4
+                  style={{
+                    color: "#262626",
+                    fontSize: "14px",
+                    fontWeight: 400,
+                    lineHeight: "14px",
+                  }}
+                >
+                  Edit Role
+                </h4>
               </div>
+              <hr style={{ margin: "0", height: "1px", color: "#bdbdbdff" }} />
               <form onSubmit={handleUpdateRole}>
                 <div className="modal-body">
-                  <div className="mb-3">
-                    <label className="form-label">Role Name</label>
+                  <div className="mb-3" style={{ position: "relative" }}>
+                    <label
+                      style={{
+                        color: "#262626",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        lineHeight: "14px",
+                      }}
+                      className="form-label"
+                    >
+                      Role Name
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -550,27 +780,93 @@ const Role = () => {
                       onChange={(e) => setEditRoleName(e.target.value)}
                       required
                     />
+                    <LiaEditSolid
+                      style={{
+                        position: "absolute",
+                        top: "70%",
+                        left: "430px",
+                        transform: "translateY(-50%)",
+                        fontSize: "20px",
+                      }}
+                    />
                   </div>
                   <div className="mb-0">
                     <div className="status-toggle modal-status d-flex justify-content-between align-items-center">
                       <span className="status-label">Status</span>
-                      <input
-                        type="checkbox"
-                        id="editRoleStatus"
-                        className="check"
-                        checked={editRoleStatus}
-                        onChange={(e) => setEditRoleStatus(e.target.checked)}
-                      />
-                      <label htmlFor="editRoleStatus" className="checktoggle" />
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-light dropdown-toggle"
+                          type="button"
+                          id="statusDropdown"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          {editRoleStatus ? "Active" : "Inactive"}
+                        </button>
+                        <ul
+                          className="dropdown-menu"
+                          aria-labelledby="statusDropdown"
+                        >
+                          <li>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setEditRoleStatus(true)}
+                            >
+                              Active
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item"
+                              onClick={() => setEditRoleStatus(false)}
+                            >
+                              Inactive
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button className="btn btn-secondary" data-bs-dismiss="modal">
+                <div
+                  className="modal-footer"
+                  style={{
+                    display: "flex",
+                    justifyContent: "end",
+                    gap: "10px",
+                    fontFamily: "Roboto, sans-serif",
+                    fontWeight: 400,
+                    fontSize: "16px",
+                    lineHeight: "14px",
+                  }}
+                >
+                  <button
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                    style={{
+                      border: "1px solid #E6E6E6",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      backgroundColor: "#FFFFFF",
+                      color: "#676767",
+                      borderRadius: "5px",
+                    }}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="btn btn-primary">
-                    Update Role
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{
+                      border: "1px solid #676767",
+                      borderRadius: "4px",
+                      padding: "8px",
+                      backgroundColor: "#262626",
+                      color: "#FFFFFF",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    Save
                   </button>
                 </div>
               </form>

@@ -382,307 +382,310 @@
 // export default Warehouse;
 
 /* -----------------------------------------------------------------
-   src/pages/Warehouse/Warehouse.jsx
+   src/pages/Warehouse/Warehouse.jsx // previous
 ------------------------------------------------------------------ */
-import React, { useEffect, useState, useCallback } from "react";
-import axios from "axios";
-import { FaFileExcel, FaFilePdf } from "react-icons/fa";
-import { TbEdit, TbEye, TbTrash } from "react-icons/tb";
-import BASE_URL from "../../../pages/config/config";
-import AddWarehouseModal from "../../../pages/Modal/warehouse/AddWarehouseModal";
+// import React, { useEffect, useState, useCallback } from "react";
+// import axios from "axios";
+// import { FaFileExcel, FaFilePdf } from "react-icons/fa";
+// import { TbEdit, TbEye, TbTrash } from "react-icons/tb";
+// import BASE_URL from "../../../pages/config/config";
+// import AddWarehouseModal from "../../../pages/Modal/warehouse/AddWarehouseModal";
 
-const Warehouse = () => {
-    /* ---------------- state ---------------- */
-    const [warehouses, setWarehouses] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+// const Warehouse = () => {
+//     /* ---------------- state ---------------- */
+//     const [warehouses, setWarehouses] = useState([]);
+//     const [loading, setLoading] = useState(false);
+//     const [error, setError] = useState(null);
 
-    const [mapOpen, setMapOpen] = useState(false);
-    const [selectedRack, setSelectedRack] = useState([]);
+//     const [mapOpen, setMapOpen] = useState(false);
+//     const [selectedRack, setSelectedRack] = useState([]);
 
-    /* -------------- helpers --------------- */
-    const formatDate = (iso) =>
-        new Date(iso).toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-        });
+//     /* -------------- helpers --------------- */
+//     const formatDate = (iso) =>
+//         new Date(iso).toLocaleDateString("en-IN", {
+//             day: "2-digit",
+//             month: "short",
+//             year: "numeric",
+//         });
 
-    const totalBarcodes = (racks = []) =>
-        racks.reduce((sum, r) => sum + r.levels.length, 0);
+//     const totalBarcodes = (racks = []) =>
+//         racks.reduce((sum, r) => sum + r.levels.length, 0);
 
-    /* --------------- fetch ---------------- */
-    const fetchWarehouses = useCallback(async () => {
-        setLoading(true);
-        try {
-            const res = await axios.get(`${BASE_URL}/api/warehouse`); // <- endpoint
-            setWarehouses(res.data.data); // backend: { success, data }
-        } catch (err) {
-            setError(err);
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+//     /* --------------- fetch ---------------- */
+//     const fetchWarehouses = useCallback(async () => {
+//         setLoading(true);
+//         try {
+//             const res = await axios.get(`${BASE_URL}/api/warehouse`); // <- endpoint
+//             setWarehouses(res.data.data); // backend: { success, data }
+            
+//         } catch (err) {
+//             setError(err);
+//             console.error(err);
+//         } finally {
+//             setLoading(false);
+//         }
+//     }, []);
 
-    useEffect(() => {
-        fetchWarehouses();
-        const listener = () => fetchWarehouses();
-        window.addEventListener("warehouse-added", listener);
-        return () => window.removeEventListener("warehouse-added", listener);
-    }, [fetchWarehouses]);
+//     useEffect(() => {
+//         fetchWarehouses();
+//         const listener = () => fetchWarehouses();
+//         window.addEventListener("warehouse-added", listener);
+//         return () => window.removeEventListener("warehouse-added", listener);
+//     }, [fetchWarehouses]);
 
-    /* ---------- map modal handlers -------- */
-    const openRackMap = (racks) => {
-        setSelectedRack(racks);
-        setMapOpen(true);
-    };
+//     /* ---------- map modal handlers -------- */
+//     const openRackMap = (racks) => {
+//         setSelectedRack(racks);
+//         setMapOpen(true);
+//     };
 
-    /* --------------- render --------------- */
-    return (
-        <div className="page-wrapper">
-            <div className="content">
-                {/* ---------- Header ---------- */}
-                <div className="page-header">
-                    <div className="add-item d-flex">
-                        <div className="page-title">
-                            <h4>Warehouses</h4>
-                            <h6>Manage your warehouses</h6>
-                        </div>
-                    </div>
+//     /* --------------- render --------------- */
+//     return (
+//         <div className="page-wrapper">
+//             <div className="content">
+//                 {/* ---------- Header ---------- */}
+//                 <div className="page-header">
+//                     <div className="add-item d-flex">
+//                         <div className="page-title">
+//                             <h4>Warehouses</h4>
+//                             <h6>Manage your warehouses</h6>
+//                         </div>
+//                     </div>
 
-                    <div className="table-top-head me-2">
-                        <button className="icon-btn" title="Pdf">
-                            <FaFilePdf />
-                        </button>
-                        <button className="icon-btn" title="Export Excel">
-                            <FaFileExcel />
-                        </button>
-                    </div>
+//                     <div className="table-top-head me-2">
+//                         <button className="icon-btn" title="Pdf">
+//                             <FaFilePdf />
+//                         </button>
+//                         <button className="icon-btn" title="Export Excel">
+//                             <FaFileExcel />
+//                         </button>
+//                     </div>
 
-                    <div className="page-btn">
-                        <button
-                            className="btn btn-primary"
-                            data-bs-toggle="modal"
-                            data-bs-target="#add-warehouse"
-                        >
-                            <i className="ti ti-circle-plus me-1" />
-                            Add Warehouse
-                        </button>
-                    </div>
-                </div>
+//                     <div className="page-btn">
+//                         <button
+//                             className="btn btn-primary"
+//                             data-bs-toggle="modal"
+//                             data-bs-target="#add-warehouse"
+//                         >
+//                             <i className="ti ti-circle-plus me-1" />
+//                             Add Warehouse
+//                         </button>
+//                     </div>
+//                 </div>
 
-                {/* ---------- Table ---------- */}
-                <div className="card">
-                    <div className="card-body p-0">
-                        {loading ? (
-                            <p className="p-4 mb-0">Loading warehouses…</p>
-                        ) : error ? (
-                            <p className="p-4 text-danger">Failed to load warehouses.</p>
-                        ) : warehouses.length === 0 ? (
-                            <p className="p-4 mb-0">No warehouses found.</p>
-                        ) : (
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead className="thead-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Warehouse</th>
-                                            <th>Contact Person</th>
-                                            <th>Phone</th>
-                                            <th>Space (sq ft)</th>
-                                            <th>Items</th>
-                                            <th>Racks</th>
-                                            <th>Capacity</th>
-                                            <th>Barcodes</th>
-                                            <th>Created On</th>
-                                            <th>Status</th>
-                                            <th />
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {warehouses.map((w, idx) => (
-                                            <tr key={w._id}>
-                                                <td>{idx + 1}</td>
-                                                <td>{w.warehouseName}</td>
-                                                <td>
-                                                    {w.contactPerson
-                                                        ? `${w.contactPerson.firstName} ${w.contactPerson.lastName}`
-                                                        : "--"}
-                                                </td>
-                                                <td>{w.phone}</td>
-                                                <td>{w.space}</td>
-                                                <td>{w.items}</td>
-                                                <td>{w.racks?.length ?? 0}</td>
-                                                <td>{w.capacityEstimate ?? "--"}</td>
-                                                <td>{totalBarcodes(w.racks)}</td>
-                                                <td>{formatDate(w.createdAt)}</td>
-                                                <td>
-                                                    <span
-                                                        className={`badge ${w.status === "Active"
-                                                            ? "badge-success"
-                                                            : "badge-danger"
-                                                            }`}
-                                                    >
-                                                        {w.status}
-                                                    </span>
-                                                </td>
-                                                <td className="action-table-data">
-                                                    <div className="edit-delete-action d-flex gap-2">
-                                                        <button
-                                                            className="btn btn-sm btn-light"
-                                                            onClick={() => openRackMap(w.racks)}
-                                                            title="View Rack Map"
-                                                        >
-                                                            <TbEye />
-                                                        </button>
-                                                        <button className="btn btn-sm btn-light">
-                                                            <TbEdit />
-                                                        </button>
-                                                        <button className="btn btn-sm btn-light">
-                                                            <TbTrash />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
+//                 {/* ---------- Table ---------- */}
+//                 <div className="card">
+//                     <div className="card-body p-0">
+//                         {loading ? (
+//                             <p className="p-4 mb-0">Loading warehouses…</p>
+//                         ) : error ? (
+//                             <p className="p-4 text-danger">Failed to load warehouses.</p>
+//                         ) : warehouses.length === 0 ? (
+//                             <p className="p-4 mb-0">No warehouses found.</p>
+//                         ) : (
+//                             <div className="table-responsive">
+//                                 <table className="table">
+//                                     <thead className="thead-light">
+//                                         <tr>
+//                                             <th>#</th>
+//                                             <th>Warehouse</th>
+//                                             <th>Contact Person</th>
+//                                             <th>Phone</th>
+//                                             <th>Space (sq ft)</th>
+//                                             <th>Items</th>
+//                                             <th>Racks</th>
+//                                             <th>Capacity</th>
+//                                             <th>Barcodes</th>
+//                                             <th>Created On</th>
+//                                             <th>Status</th>
+//                                             <th />
+//                                         </tr>
+//                                     </thead>
+//                                     <tbody>
+//                                     {console.log('warehouse', warehouses)}
+//                                         {warehouses.map((w, idx) => (
 
-            {/* ---------- Rack‑layout modal ---------- */}
-            {/* {mapOpen && (
-                <div
-                    className="modal fade show d-block"
-                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-                >
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Warehouse Rack Layout</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setMapOpen(false)}
-                                />
-                            </div>
-                            <div className="modal-body">
-                                <div className="row">
-                                    {selectedRack.map((rack) => (
-                                        <div className="col-2 mb-3" key={rack.rackLabel}>
-                                            <div className="border p-1 bg-light text-center rounded">
-                                                <strong>{rack.rackLabel}</strong>
-                                                <div style={{ fontSize: "10px" }}>
-                                                    {rack.levels.length} barcodes
-                                                </div>
-                                                {rack.levels.map((lvl) => (
-                                                    <div
-                                                        key={lvl.level}
-                                                        className="bg-primary text-white mt-1 py-1 rounded"
-                                                        style={{ fontSize: "10px" }}
-                                                    >
-                                                        {lvl.barcode}
-                                                        <small className="d-block">
-                                                            {lvl.barcode.length} chars
-                                                        </small>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="modal-footer">
-                                <button
-                                    className="btn btn-secondary"
-                                    onClick={() => setMapOpen(false)}
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )} */}
+//                                             <tr key={w._id}>
+//                                                 <td>{idx + 1}</td>
+//                                                 <td>{w.warehouseName}</td>
+//                                                 <td>
+//                                                     {w.contactPerson
+//                                                         ? `${w.contactPerson.firstName} ${w.contactPerson.lastName}`
+//                                                         : "--"}
+//                                                 </td>
+//                                                 <td>{w.phone}</td>
+//                                                 <td>{w.space}</td>
+//                                                 <td>{w.items}</td>
+//                                                 <td>{w.racks?.length ?? 0}</td>
+//                                                 <td>{w.capacityEstimate ?? "--"}</td>
+//                                                 <td>{totalBarcodes(w.racks)}</td>
+//                                                 <td>{formatDate(w.createdAt)}</td>
+//                                                 <td>
+//                                                     <span
+//                                                         className={`badge ${w.status === "Active"
+//                                                             ? "badge-success"
+//                                                             : "badge-danger"
+//                                                             }`}
+//                                                     >
+//                                                         {w.status}
+//                                                     </span>
+//                                                 </td>
+//                                                 <td className="action-table-data">
+//                                                     <div className="edit-delete-action d-flex gap-2">
+//                                                         <button
+//                                                             className="btn btn-sm btn-light"
+//                                                             onClick={() => openRackMap(w.racks)}
+//                                                             title="View Rack Map"
+//                                                         >
+//                                                             <TbEye />
+//                                                         </button>
+//                                                         <button className="btn btn-sm btn-light">
+//                                                             <TbEdit />
+//                                                         </button>
+//                                                         <button className="btn btn-sm btn-light">
+//                                                             <TbTrash />
+//                                                         </button>
+//                                                     </div>
+//                                                 </td>
+//                                             </tr>
+//                                         ))}
+//                                     </tbody>
+//                                 </table>
+//                             </div>
+//                         )}
+//                     </div>
+//                 </div>
+//             </div>
 
-            {/* ---------- Rack‑layout modal ---------- */}
-            {mapOpen && (
-                <div
-                    className="modal fade show d-block"
-                    style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-                >
-                    <div className="modal-dialog modal-lg modal-dialog-centered">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Warehouse Rack Layout</h5>
-                                <button
-                                    type="button"
-                                    className="btn-close"
-                                    onClick={() => setMapOpen(false)}
-                                />
-                            </div>
+//             {/* ---------- Rack‑layout modal ---------- */}
+//             {/* {mapOpen && (
+//                 <div
+//                     className="modal fade show d-block"
+//                     style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+//                 >
+//                     <div className="modal-dialog modal-lg modal-dialog-centered">
+//                         <div className="modal-content">
+//                             <div className="modal-header">
+//                                 <h5 className="modal-title">Warehouse Rack Layout</h5>
+//                                 <button
+//                                     type="button"
+//                                     className="btn-close"
+//                                     onClick={() => setMapOpen(false)}
+//                                 />
+//                             </div>
+//                             <div className="modal-body">
+//                                 <div className="row">
+//                                     {selectedRack.map((rack) => (
+//                                         <div className="col-2 mb-3" key={rack.rackLabel}>
+//                                             <div className="border p-1 bg-light text-center rounded">
+//                                                 <strong>{rack.rackLabel}</strong>
+//                                                 <div style={{ fontSize: "10px" }}>
+//                                                     {rack.levels.length} barcodes
+//                                                 </div>
+//                                                 {rack.levels.map((lvl) => (
+//                                                     <div
+//                                                         key={lvl.level}
+//                                                         className="bg-primary text-white mt-1 py-1 rounded"
+//                                                         style={{ fontSize: "10px" }}
+//                                                     >
+//                                                         {lvl.barcode}
+//                                                         <small className="d-block">
+//                                                             {lvl.barcode.length} chars
+//                                                         </small>
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                         </div>
+//                                     ))}
+//                                 </div>
+//                             </div>
+//                             <div className="modal-footer">
+//                                 <button
+//                                     className="btn btn-secondary"
+//                                     onClick={() => setMapOpen(false)}
+//                                 >
+//                                     Close
+//                                 </button>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )} */}
 
-                            <div className="modal-body">
-                                <div className="row">
-                                    {selectedRack.map((rack) => (
-                                        <div className="col-2 mb-3" key={rack.rackLabel}>
-                                            <div className="border p-1 bg-light text-center rounded">
-                                                {/* ① rackLabel */}
-                                                <strong>{rack.rackLabel}</strong>
+//             {/* ---------- Rack‑layout modal ---------- */}
+//             {mapOpen && (
+//                 <div
+//                     className="modal fade show d-block"
+//                     style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+//                 >
+//                     <div className="modal-dialog modal-lg modal-dialog-centered">
+//                         <div className="modal-content">
+//                             <div className="modal-header">
+//                                 <h5 className="modal-title">Warehouse Rack Layout</h5>
+//                                 <button
+//                                     type="button"
+//                                     className="btn-close"
+//                                     onClick={() => setMapOpen(false)}
+//                                 />
+//                             </div>
 
-                                                {/* ② shelfLevels + ③ capacity */}
-                                                <div style={{ fontSize: "10px" }}>
-                                                    {rack.shelfLevels} levels • cap {rack.capacity}
-                                                </div>
+//                             <div className="modal-body">
+//                                 <div className="row">
+//                                     {selectedRack.map((rack) => (
+//                                         <div className="col-2 mb-3" key={rack.rackLabel}>
+//                                             <div className="border p-1 bg-light text-center rounded">
+//                                                 {/* ① rackLabel */}
+//                                                 <strong>{rack.rackLabel}</strong>
 
-                                                {/* ④ barcode count */}
-                                                {/* <div style={{ fontSize: "10px" }}>
-                                                    {rack.levels.length} barcodes
-                                                </div> */}
+//                                                 {/* ② shelfLevels + ③ capacity */}
+//                                                 <div style={{ fontSize: "10px" }}>
+//                                                     {rack.shelfLevels} levels • cap {rack.capacity}
+//                                                 </div>
 
-                                                {/* individual barcodes */}
-                                                {rack.levels.map((lvl) => (
-                                                    <div
-                                                        key={lvl.level}
-                                                        className="bg-primary text-white mt-1 py-1 rounded"
-                                                        style={{ fontSize: "10px" }}
-                                                    >
-                                                        {lvl.barcode}
-                                                        <small className="d-block">
-                                                            {lvl.barcode.length} chars
-                                                        </small>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
+//                                                 {/* ④ barcode count */}
+//                                                 {/* <div style={{ fontSize: "10px" }}>
+//                                                     {rack.levels.length} barcodes
+//                                                 </div> */}
 
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={() => setMapOpen(false)}>
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+//                                                 {/* individual barcodes */}
+//                                                 {rack.levels.map((lvl) => (
+//                                                     <div
+//                                                         key={lvl.level}
+//                                                         className="bg-primary text-white mt-1 py-1 rounded"
+//                                                         style={{ fontSize: "10px" }}
+//                                                     >
+//                                                         {lvl.barcode}
+//                                                         <small className="d-block">
+//                                                             {lvl.barcode.length} chars
+//                                                         </small>
+//                                                     </div>
+//                                                 ))}
+//                                             </div>
+//                                         </div>
+//                                     ))}
+//                                 </div>
+//                             </div>
+
+//                             <div className="modal-footer">
+//                                 <button className="btn btn-secondary" onClick={() => setMapOpen(false)}>
+//                                     Close
+//                                 </button>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             )}
 
 
-            {/* ---------- Add‑Warehouse modal ---------- */}
-            <AddWarehouseModal
-                afterSave={() => window.dispatchEvent(new Event("warehouse-added"))}
-            />
-        </div>
-    );
-};
+//             {/* ---------- Add‑Warehouse modal ---------- */}
+//             <AddWarehouseModal
+//                 afterSave={() => window.dispatchEvent(new Event("warehouse-added"))}
+//             />
+//         </div>
+//     );
+// };
 
-export default Warehouse;
+// export default Warehouse;
 
 // final gvet code
 // src/pages/Warehouse/Warehouse.jsx
@@ -1066,3 +1069,1042 @@ export default Warehouse;
 // }
 
 // export default Warehouse
+
+
+
+// new code for werehouse 
+
+
+
+ import React, { useCallback, useEffect, useState } from "react";
+import { MdArrowForwardIos } from "react-icons/md";
+import { PiWarehouseFill } from "react-icons/pi";
+import { FaHeart } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import BASE_URL from "../../../pages/config/config";
+import AddWarehouseModal from "../../../pages/Modal/warehouse/AddWarehouseModal";
+import axios from "axios";
+
+
+
+function Warehouse() {
+  const [warehouses, setWarehouses] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+
+  const fetchWarehouses = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await axios.get(`${BASE_URL}/api/warehouse`); // <- endpoint
+            
+            
+            setWarehouses(res.data.data); // backend: { success, data }
+            
+        } catch (err) {
+            setError(err);
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+      useEffect(() => {
+        fetchWarehouses();
+//         const listener = () => fetchWarehouses();
+//         window.addEventListener("warehouse-added", listener);
+//         return () => window.removeEventListener("warehouse-added", listener);
+    }, [fetchWarehouses]);
+
+
+
+
+
+   
+
+  return (
+    <div>
+      {/* Warehouse header */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            color: "#676767",
+            display: "flex",
+            gap: "16px",
+            fontWeight: "500",
+          }}
+        >
+          <span>Warehouse</span>
+          <span>
+            <MdArrowForwardIos style={{ color: "#b0afafff" }} />
+          </span>
+          <span>All Warehouse </span>
+        </div>
+
+        {/* Add Warehouse */}
+
+       
+         <Link to="/AddWarehouse">
+            <button style={{border:'1px solid #1450AE', backgroundColor: "#1368EC", color:'white', padding:'8px', borderRadius: '4px'}}>
+            Add Warehouse</button>
+         </Link>
+        
+      </div>
+
+      {/* Recently Accessed */}
+      <div style={{ fontWeight: "500", fontSize: "16px", color: "#262626", marginTop:'20px' }}>
+        <span>Recently Accessed</span>
+      
+      {/* Cards */}
+
+      <div
+        style={{
+          fontWeight: "500",
+          fontSize: "16px",
+          color: "#262626",
+          marginTop: "10px",
+          paddingBottom: "4px",
+        }}
+      >
+        {/* Cards */}
+
+        <div style={{ marginTop: "2px" }}>
+          <div className="row">
+            {console.log('wre', warehouses)}
+          {warehouses.map((item)=>(
+            <div className="col-3">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom:'30px',
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-006 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      {/* Warehouse Delhi */}
+                      {/* {item.contactPerson.firstName} {item.contactPerson.lastName} */}
+                      {item.warehouseName}
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      {/* Delhi - Ram Prashad */}
+                      {item.city.cityName}&nbsp;-&nbsp;{item.contactPerson.firstName} {item.contactPerson.lastName}
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,000</span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          </div>
+        </div>
+      </div>
+
+      </div>
+
+      {/* favourite */}
+
+      <div
+        style={{
+          fontWeight: "500",
+          fontSize: "16px",
+          color: "#262626",
+          marginTop: "10px",
+          paddingBottom: "4px",
+        }}
+      >
+        <span>Favouite</span>
+
+        {/* Cards */}
+
+        <div style={{ marginTop: "2px" }}>
+          <div className="row">
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-006 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      Warehouse Delhi
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Delhi - Ram Prashad
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Other Columns (2nd) */}
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-001 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WareHouse Ranchi
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Ranchi - Abhay Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col"></div>
+            <div className="col"></div>
+          </div>
+        </div>
+      </div>
+
+      {/* Owened Warehouse */}
+
+      <div
+        style={{
+          fontWeight: "500",
+          fontSize: "16px",
+          color: "#262626",
+          marginTop: "10px",
+          paddingBottom: "4px",
+        }}
+      >
+        <span>Owened</span>
+
+        {/* Cards */}
+
+        <div style={{ marginTop: "2px" }}>
+          <div className="row">
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-006 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WH-001
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Noida - Suraj Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Other Columns (2nd) */}
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-001 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WH - Noida
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Noida - Suraj Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Owned Warehouse */}
+
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-001 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WH-001
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Pune - Ajay Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    // marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-001 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WareHouse Meerut
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Ranchi - Abhay Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Third-Party warehouse */}
+
+      <div
+        style={{
+          fontWeight: "500",
+          fontSize: "16px",
+          color: "#262626",
+          marginTop: "10px",
+          paddingBottom: "4px",
+        }}
+      >
+        <span>Third-Party warehouse</span>
+
+        {/* Cards */}
+
+        <div style={{ marginTop: "2px" }}>
+          <div className="row">
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-006 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      Warehouse Delhi
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Delhi - Ram Prashad
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Other Columns (2nd) */}
+            <div className="col">
+              <div
+                style={{
+                  backgroundColor: "#f9f9f9",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  height: "150px", // Set a fixed or min height
+                  position: "relative", // for absolute positioning inside
+                }}
+              >
+                {/* WH-006 and Heart - Left Side */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    width: "100%",
+                    marginBottom: "10px",
+                  }}
+                >
+                  {/* Left: WH-001 */}
+                  <div
+                    style={{
+                      backgroundColor: "#f1f1f1",
+                      border: "1px solid #e6e6e6",
+                      borderRadius: "8px",
+                      padding: "10px ",
+                      alignItems: "center",
+                    }}
+                  >
+                    <span>
+                      <PiWarehouseFill
+                        style={{
+                          color: "#1368EC",
+                          fontSize: "20px",
+                          fontWeight: "bold",
+                        }}
+                      />{" "}
+                      WareHouse Ranchi
+                    </span>
+                  </div>
+
+                  {/* Right: Heart icon */}
+                  <div
+                    style={{
+                      padding: "10px",
+                      backgroundColor: "#f1f1f1",
+                      borderRadius: "8px",
+                      width: "fit-content",
+                    }}
+                  >
+                    <FaHeart
+                      style={{
+                        color: "#1368EC",
+                        fontWeight: "500",
+                        fontSize: "26px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Bottom Section (Address + Arrow) */}
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "10px",
+                    right: "10px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  {/* Address */}
+                  <div>
+                    <p style={{ margin: "0", fontWeight: "500" }}>
+                      Ranchi - Abhay Kumar
+                    </p>
+                    <span style={{ color: "#1368EC" }}>$76,986 </span>
+                    <span style={{ marginLeft: "4px" }}>Stock Valuation</span>
+                  </div>
+
+                  {/* Arrow */}
+                  <div>
+                    <Link to="/WarehouseDetails">
+                      <FaArrowRight />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col"></div>
+            <div className="col"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default Warehouse;

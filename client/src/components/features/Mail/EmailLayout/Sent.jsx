@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import EmailMessages from "../EmailMessages/EmailMessages";
 import axios from "axios";
+import BASE_URL from "../../../../pages/config/config";
 
 const Sent = ({ onToggleStar }) => {
   const [emails, setEmails] = useState([]);
@@ -8,7 +9,7 @@ const Sent = ({ onToggleStar }) => {
   useEffect(() => {
     const fetchInboxEmails = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/email/receive");
+        const res = await axios.get(`${BASE_URL}/api/email/mail/receive`);
 
         const formatted = res.data.data.map((email) => {
           const name = email.name;
@@ -66,7 +67,7 @@ const Sent = ({ onToggleStar }) => {
 
   const handleToggleStar = async (id, currentStarred) => {
     try {
-      await axios.put(`http://localhost:5000/api/email/star/${id}`, {
+      await axios.put(`${BASE_URL}/api/email/mail/star/${id}`, {
         starred: !currentStarred,
       });
 

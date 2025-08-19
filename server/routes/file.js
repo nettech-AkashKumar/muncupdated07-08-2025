@@ -4,15 +4,15 @@ const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
 const router = express.Router();
-const auth = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth/authMiddleware');
 const Message = require('../models/Message');
 const crypto = require('crypto');
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET
 });
 
 // Create uploads directory for local storage fallback
@@ -35,22 +35,24 @@ const diskStorage = multer.diskStorage({
 
 // File filter function
 const fileFilter = (req, file, cb) => {
-  // Check file size (1MB limit)
-  if (file.size > 1 * 1024 * 1024) {
-    return cb(new Error('File size must be less than 1MB'), false);
+  // Check file size (10MB limit to match frontend)
+  if (file.size > 10 * 1024 * 1024) {
+    return cb(new Error('File size must be less than 10MB'), false);
   }
 
-  // Check file type
+  // Check file type - expanded to match frontend
   const allowedTypes = [
     'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-    'video/mp4', 'video/avi', 'video/mov', 'video/wmv',
-    'application/pdf'
+    'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/quicktime',
+    'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'text/plain', 'application/zip', 'application/x-rar-compressed'
   ];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only images, videos, and PDFs are allowed.'), false);
+    cb(new Error('Invalid file type. Only images, videos, PDFs, documents, archives, and text files are allowed.'), false);
   }
 };
 
@@ -58,7 +60,7 @@ const upload = multer({
   storage: memoryStorage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 1 * 1024 * 1024 // 1MB limit
+    fileSize: 10 * 1024 * 1024 // 10MB limit to match frontend
   }
 });
 
@@ -108,7 +110,7 @@ async function saveMessageToDatabase(fromId, toId, messageData) {
 }
 
 // File upload endpoint with Cloudinary fallback to local storage
-router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
+router.post('/upload-file', verifyToken, upload.single('file'), async (req, res) => {
   try {
     console.log('File upload request received');
     
@@ -124,7 +126,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
     });
 
     // Try Cloudinary first
-    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    if (process.env.CLOUD_NAME && process.env.CLOUD_API_KEY && process.env.CLOUD_API_SECRET) {
       try {
         console.log('Attempting Cloudinary upload...');
         
@@ -142,7 +144,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
 
         // Save file message to database
         const fileMessage = {
-          from: req.user.id,
+          from: req.user.id || req.user._id, // Handle both id and _id formats
           message: `📎 ${req.file.originalname}`,
           fileUrl: result.secure_url,
           fileType: req.file.mimetype,
@@ -151,7 +153,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
           read: false
         };
 
-        await saveMessageToDatabase(req.user.id, req.body.to, fileMessage);
+        await saveMessageToDatabase(req.user.id || req.user._id, req.body.to, fileMessage);
 
         return res.json({
           message: 'File uploaded successfully to Cloudinary',
@@ -183,7 +185,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
 
     // Save file message to database
     const fileMessage = {
-      from: req.user.id,
+      from: req.user.id || req.user._id, // Handle both id and _id formats
       message: `📎 ${req.file.originalname}`,
       fileUrl: fileUrl,
       fileType: req.file.mimetype,
@@ -192,7 +194,7 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
       read: false
     };
 
-    await saveMessageToDatabase(req.user.id, req.body.to, fileMessage);
+    await saveMessageToDatabase(req.user.id || req.user._id, req.body.to, fileMessage);
 
     res.json({
       message: 'File uploaded successfully to local storage',
@@ -217,31 +219,31 @@ router.post('/upload-file', auth, upload.single('file'), async (req, res) => {
 
 
 // Test endpoint to check Cloudinary configuration
-router.get('/test-cloudinary', auth, async (req, res) => {
+router.get('/test-cloudinary', verifyToken, async (req, res) => {
   try {
     console.log('Testing Cloudinary configuration...');
     console.log('Environment variables:', {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Missing',
-      api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
-      api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing'
+      cloud_name: process.env.CLOUD_NAME ? 'Set' : 'Missing',
+      api_key: process.env.CLOUD_API_KEY ? 'Set' : 'Missing',
+      api_secret: process.env.CLOUD_API_SECRET ? 'Set' : 'Missing'
     });
 
-    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY || !process.env.CLOUD_API_SECRET) {
       return res.status(500).json({ 
         message: 'Cloudinary credentials missing',
         details: {
-          cloud_name: !!process.env.CLOUDINARY_CLOUD_NAME,
-          api_key: !!process.env.CLOUDINARY_API_KEY,
-          api_secret: !!process.env.CLOUDINARY_API_SECRET
+          cloud_name: !!process.env.CLOUD_NAME,
+          api_key: !!process.env.CLOUD_API_KEY,
+          api_secret: !!process.env.CLOUD_API_SECRET
         }
       });
     }
 
     // Test Cloudinary connection with credentials
     const testConfig = {
-      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-      api_key: process.env.CLOUDINARY_API_KEY,
-      api_secret: process.env.CLOUDINARY_API_SECRET
+      cloud_name: process.env.CLOUD_NAME,
+      api_key: process.env.CLOUD_API_KEY,
+      api_secret: process.env.CLOUD_API_SECRET
     };
     
     console.log('Cloudinary config (first few chars):', {
@@ -268,29 +270,53 @@ router.get('/test-cloudinary', auth, async (req, res) => {
       message: 'Cloudinary configuration error',
       error: error.message,
       details: {
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME ? 'Set' : 'Missing',
-        api_key: process.env.CLOUDINARY_API_KEY ? 'Set' : 'Missing',
-        api_secret: process.env.CLOUDINARY_API_SECRET ? 'Set' : 'Missing'
+        cloud_name: process.env.CLOUD_NAME ? 'Set' : 'Missing',
+        api_key: process.env.CLOUD_API_KEY ? 'Set' : 'Missing',
+        api_secret: process.env.CLOUD_API_SECRET ? 'Set' : 'Missing'
       }
     });
   }
 });
 
-router.get('/cloudinary-signature', auth, (req, res) => {
+// Simple test endpoint without auth for debugging
+router.get('/ping', (req, res) => {
+  res.json({ message: 'File routes are working', timestamp: new Date().toISOString() });
+});
+
+// Environment check endpoint for debugging
+router.get('/env-check', verifyToken, (req, res) => {
+  res.json({
+    cloudinary: {
+      cloud_name: process.env.CLOUD_NAME ? 'Set' : 'Missing',
+      api_key: process.env.CLOUD_API_KEY ? 'Set' : 'Missing',
+      api_secret: process.env.CLOUD_API_SECRET ? 'Set' : 'Missing'
+    },
+    uploads: {
+      directory: uploadsDir,
+      exists: fs.existsSync(uploadsDir),
+      writable: fs.accessSync ? (() => {
+        try { fs.accessSync(uploadsDir, fs.constants.W_OK); return true; } 
+        catch { return false; }
+      })() : 'Unknown'
+    }
+  });
+});
+
+router.get('/cloudinary-signature', verifyToken, (req, res) => {
   const timestamp = Math.floor(Date.now() / 1000);
   const folder = 'chat-files';
   const stringToSign = `folder=${folder}&timestamp=${timestamp}`;
   const signature = crypto
     .createHash('sha1')
-    .update(stringToSign + process.env.CLOUDINARY_API_SECRET)
+    .update(stringToSign + process.env.CLOUD_API_SECRET)
     .digest('hex');
 
   res.json({
     timestamp,
     signature,
     folder,
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
+    cloudName: process.env.CLOUD_NAME,
+    apiKey: process.env.CLOUD_API_KEY,
   });
 });
 

@@ -172,11 +172,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import BASE_URL from "../config/config";
 import "../../styles/permissions.css"; // Ensure this includes switch styling
+import { useParams } from "react-router-dom";
+import { HiMiniChevronUpDown } from "react-icons/hi2";
 
 const modules = ["Brand", "Category", "Product"];
 const permissionFields = ["Allow All", "Read", "Write", "Update", "Delete", "Import", "Export"];
 
 const Permission = () => {
+  const { roleId } = useParams();
   const [selectedRole, setSelectedRole] = useState(null);
   const [roles, setRoles] = useState([]);
   const [rolePermissions, setRolePermissions] = useState({});
@@ -186,18 +189,53 @@ const Permission = () => {
     fetchRoles();
   }, []);
 
+  // auto select the role if id exists
+  useEffect(() => {
+    if (roleId && roles.length > 0) {
+      const found = roles.find((role) => role._id === roleId);
+      if (found) setSelectedRole(found);
+    }
+  }, [roleId, roles]);
+
+  useEffect(() => {
+    if (selectedRole?._id) {
+      fetchRolePermissions(selectedRole._id);
+    } else {
+      setRolePermissions({});
+    }
+  }, [selectedRole]);
+
+  // const fetchRoles = async () => {
+  //   try {
+  //     const res = await axios.get(`${BASE_URL}/api/role/getRole`);
+  //     setRoles(res.data);
+
+  //     const roleName = localStorage.getItem("selectedRoleName");
+  //     if (roleName) {
+  //       const matched = res.data.find((role) => role.roleName === roleName);
+  //       if (matched) {
+  //         setSelectedRole(matched);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     console.error("Error fetching roles", err);
+  //   }
+  // };
+
+
+  //   const fetchRoles = async () => {
+  //   try {
+  //     const res = await axios.get(`${BASE_URL}/api/role/getRole`);
+  //     setRoles(res.data);
+  //   } catch (err) {
+  //     console.error("Error fetching roles", err);
+  //   }
+  // };
+
   const fetchRoles = async () => {
     try {
       const res = await axios.get(`${BASE_URL}/api/role/getRole`);
       setRoles(res.data);
-
-      const roleName = localStorage.getItem("selectedRoleName");
-      if (roleName) {
-        const matched = res.data.find((role) => role.roleName === roleName);
-        if (matched) {
-          setSelectedRole(matched);
-        }
-      }
     } catch (err) {
       console.error("Error fetching roles", err);
     }
@@ -270,36 +308,64 @@ const Permission = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h4>Manage Permissions</h4>
+    <div className="container mt-4 mngrepremsson">
+      <h4 style={{
+        fontFamily: "Roboto, sans-serif",
+        fontSize: '14px',
+        fontWeight: 400,
+        lineHeight: '14px',
+      }}>Role & Permission</h4>
+      <hr style={{ height: '1px', color: '#bbbbbb' }} />
 
-      <div className="mb-4">
-        <label className="form-label">Select Role:</label>
-        <select
-          className="form-select"
-          value={selectedRole?._id || ""}
-          onChange={(e) => {
-            const selected = roles.find(role => role._id === e.target.value);
-            setSelectedRole(selected || null);
-          }}
-        >
-          <option value="">-- Select Role --</option>
-          {roles.map(role => (
-            <option key={role._id} value={role._id}>{role.roleName}</option>
-          ))}
-        </select>
+      <div className="slcct-dropdown-container">
+        <label className="slcct-dropdown-label">Select Role</label>
+        <div className="slcct-dropdown-wrapper">
+          <select
+            className="slcct-custom-select"
+            value={selectedRole?._id || ""}
+            onChange={(e) => {
+              const selected = roles.find(role => role._id === e.target.value);
+              setSelectedRole(selected || null);
+            }}
+          >
+            <option value="">-- Select Role --</option>
+            {roles.map(role => (
+              <option key={role._id} value={role._id}>
+                {role.roleName}
+              </option>
+            ))}
+          </select>
+          <span className="slcct-dropdown-icon"><HiMiniChevronUpDown /></span>
+        </div>
       </div>
+
 
       {loading ? (
         <p>Loading permissions...</p>
       ) : selectedRole ? (
         <>
           <table className="table table-bordered table-hover">
-            <thead>
+            <thead style={{
+              backgroundColor: '#F1F1F1', padding: '24px 24px'
+            }}>
               <tr>
-                <th>Module</th>
+                <th style={{
+                  color: '#676767',
+                  fontFamily: "Roboto, sans-serif",
+                  fontSize: '14px',
+                  fontWeight: 400,
+                  lineHeight: '14px',
+                }}>Module</th>
                 {permissionFields.map(perm => (
-                  <th key={perm} className="text-center">{perm}</th>
+                  <th
+                    style={{
+                      color: '#676767',
+                      fontFamily: "Roboto, sans-serif",
+                      fontSize: '14px',
+                      fontWeight: 400,
+                      lineHeight: '14px',
+                    }}
+                    key={perm} className="text-center">{perm}</th>
                 ))}
               </tr>
             </thead>
@@ -308,7 +374,15 @@ const Permission = () => {
                 const perms = rolePermissions[module] || {};
                 return (
                   <tr key={module}>
-                    <td>{module}</td>
+                    <td
+                      style={{
+                        color: '#262626',
+                        fontFamily: "Roboto, sans-serif",
+                        fontSize: '16px',
+                        fontWeight: 400,
+                        lineHeight: '14px',
+                      }}
+                    >{module}</td>
                     {permissionFields.map(p => {
                       const key = p === "Allow All" ? "all" : p.toLowerCase();
                       return (
@@ -351,10 +425,24 @@ const Permission = () => {
               })}
             </tbody> */}
           </table>
-
-          <button className="btn btn-primary mt-3" onClick={handleSubmit}>
-            Save Permissions
-          </button>
+          <div style={{
+            display: 'flex', justifyContent: 'end', fontFamily: "Roboto, sans-serif",
+            fontWeight: 400,
+            fontSize: '16px',
+            lineHeight: '14px',
+          }}>
+            <button className="btn btn-primary mt-3"
+              style={{
+                border: "1px solid #676767",
+                borderRadius: '4px',
+                padding: "8px",
+                backgroundColor: "#262626",
+                color: "#FFFFFF",
+              }}
+              onClick={handleSubmit}>
+              Save
+            </button>
+          </div>
         </>
       ) : (
         <p>Please select a role to edit permissions.</p>

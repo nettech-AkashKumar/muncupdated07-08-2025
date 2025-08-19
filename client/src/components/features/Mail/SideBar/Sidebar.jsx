@@ -16,6 +16,16 @@ import { useEffect, useState } from "react";
 import EmailModal from "../EmailModal/EmailModal";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
+import BASE_URL from "../../../../pages/config/config";
+import Ma from "../../../../assets/images/ma.png"
+import Mb from "../../../../assets/images/mb.png"
+import Mc from "../../../../assets/images/mc.png"
+import Md from "../../../../assets/images/md.png"
+import Me from "../../../../assets/images/me.png"
+import Mf from "../../../../assets/images/mee.png"
+import Mg from "../../../../assets/images/mg.png"
+import Mh from "../../../../assets/images/mh.png"
+import Mi from "../../../../assets/images/mi.png"
 
 const Sidebar = () => {
   const [emailshow, setEmailShow] = useState(false);
@@ -38,7 +48,7 @@ const Sidebar = () => {
 
   const fetchEmails = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/email/receive");
+      const res = await axios.get(`${BASE_URL}/api/email/mail/receive`);
       setEmails(res.data.data);
     } catch (error) {
       console.error("Failed to fetch emails", error);
@@ -47,7 +57,7 @@ const Sidebar = () => {
   // for deleted
   const fetchDeletedCount = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/email/deleted");
+      const res = await axios.get(`${BASE_URL}/api/email/mail/deleted`);
       setDeletedCount(res.data.data.length);
     } catch (error) {
       console.error("Failed to fetch deleted emails", error);
@@ -68,29 +78,30 @@ const Sidebar = () => {
   return (
     <>
       <div className="sidebarm">
-        <div className="user-box">
+        {/* <div className="user-box">
           <img className="dp" src={Img} alt="profile" />
           <div>
             <div className="name">James Hong</div>
             <div className="emailhong">Jnh343@example.com</div>
           </div>
-        </div>
+        </div> */}
 
-        <div className="compose" onClick={() => setEmailShow(true)}>
+        <div className="compose" style={{ backgroundColor: '#1368ec' }} onClick={() => setEmailShow(true)}>
           <FaRegEdit />
           Compose
         </div>
+        <hr style={{ height: '1px', color: '#bdbdbdff' }} />
         <EmailModal show={emailshow} onClose={() => setEmailShow(false)} onSent={fetchEmails} />
 
         <div className="section border-bootom">
-          <div className="section-title">Emails</div>
+          <div className="section-title">Mail</div>
           <NavLink
             className={({ isActive }) => (isActive ? "item active" : "item")}
             style={{ textDecoration: "none" }}
             to="/mail/inbox"
           >
-            <span>
-              <HiOutlineInbox />
+            <span className="sectionnnemmailc">
+              <img src={Mf} alt="mf" style={{ marginRight: '10px' }} />
               Inbox
             </span>{" "}
             <span className="count">
@@ -106,8 +117,8 @@ const Sidebar = () => {
             style={{ textDecoration: "none" }}
             to="/mail/starred"
           >
-            <span>
-              <FaRegStar />
+            <span className="sectionnnemmailc">
+              <img src={Mh} alt="mh" style={{ marginRight: '10px' }} />
               Starred
             </span>{" "}
             <span>
@@ -119,8 +130,8 @@ const Sidebar = () => {
             style={{ textDecoration: "none" }}
             to="/mail/sent"
           >
-            <span>
-              <IoRocketOutline />
+            <span className="sectionnnemmailc">
+              <img src={Ma} alt="ma" style={{ marginRight: '10px' }} />
               Sent
             </span>{" "}
             <span>
@@ -136,8 +147,8 @@ const Sidebar = () => {
             style={{ textDecoration: "none" }}
             to="/mail/drafts"
           >
-            <span>
-              <FaRegFilePdf />
+            <span className="sectionnnemmailc">
+              <img src={Mb} alt="mb" style={{ marginRight: '10px' }} />
               Drafts
             </span>{" "}
             <span>
@@ -149,8 +160,8 @@ const Sidebar = () => {
             style={{ textDecoration: "none" }}
             to="/mail/deleted"
           >
-            <span>
-              <RiDeleteBinLine />
+            <span className="sectionnnemmailc">
+              <img src={Mc} alt="mc" style={{ marginRight: '10px' }} />
               Deleted{" "}
             </span>
             <span>{deletedCount}</span>
@@ -160,16 +171,14 @@ const Sidebar = () => {
             style={{ textDecoration: "none" }}
             to="/mail/spam"
           >
-            <span>
-              <RiSpam2Line />
+            <span className="sectionnnemmailc">
+              <img src={Md} alt="md" style={{ marginRight: '10px' }} />
               Spam{" "}
             </span>
             <span>
               {emails.filter((email) => email.spam && !email.deleted).length}
             </span>
           </NavLink>
-          {showMore && (
-            <>
               <NavLink
                 className={({ isActive }) =>
                   isActive ? "item active" : "item"
@@ -177,8 +186,8 @@ const Sidebar = () => {
                 style={{ textDecoration: "none" }}
                 to="/mail/important"
               >
-                <span>
-                  <ImCompass />
+                <span className="sectionnnemmailc">
+                  <img src={Mi} alt="mi" style={{ marginRight: '10px' }} />
                   Important{" "}
                 </span>
                 <span>
@@ -195,23 +204,25 @@ const Sidebar = () => {
                 style={{ textDecoration: "none" }}
                 to="/mail/allemails"
               >
-                <span>
-                  <PiUploadLight />
+                <span className="sectionnnemmailc">
+                  <img src={Me} alt="me" style={{ marginRight: '10px' }} />
                   All Emails{" "}
                 </span>
                 <span>{emails.length}</span>
-              </NavLink>
+          </NavLink>
+           {/* {showMore && (
+            <>
             </>
           )}
 
           <div className="item" onClick={() => setshowMore((prev) => !prev)}>
             {showMore ? "Show Less" : "Show More"}{" "}
             {!showMore && <FaAngleDown />} {showMore && <FaAngleUp />}{" "}
-          </div>
+          </div> */}
         </div>
-        {showLabelModal && (
+        {/* {showLabelModal && (
           <div className="modal-overlay2">
-            <div className="modal-content1">
+            <div className="modal-content">
               <h3>Add New Label</h3>
               <input
                 type="text"
@@ -235,15 +246,15 @@ const Sidebar = () => {
               </div>
             </div>
           </div>
-        )}
-        <div className="section border-bootom">
-          <div className="section-title">
+        )} */}
+        {/* <div className="section border-bootom"> */}
+        {/* <div className="section-title">
             Labels{" "}
             <div className="plus" onClick={() => setShowLabelModal(true)}>
               <FaSquarePlus />
             </div>
-          </div>
-          {(showAllLabels ? customLabels : customLabels.slice(0, 5)).map(
+          </div> */}
+        {/* {(showAllLabels ? customLabels : customLabels.slice(0, 5)).map(
             (label, index) => (
               <NavLink
                 key={index}
@@ -259,8 +270,8 @@ const Sidebar = () => {
                 </div>
               </NavLink>
             )
-          )}
-          {/* <NavLink
+          )} */}
+        {/* <NavLink
           className={({ isActive }) => (isActive ? "item active" : "item")}
           style={{ textDecoration: "none", color: "black" }}
           to="/teamevents"
@@ -301,7 +312,7 @@ const Sidebar = () => {
           </div>
         </NavLink> */}
 
-          {customLabels.length > 5 && (
+        {/* {customLabels.length > 5 && (
             <div
               className="item"
               onClick={() => setShowAllLabels((prev) => !prev)}
@@ -310,7 +321,7 @@ const Sidebar = () => {
               {!showAllLabels ? <FaAngleDown /> : <FaAngleUp />}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* <div className='section border-bootom'>
         <div className='section-title'>Folders <div className='plus'><FaSquarePlus /></div></div>

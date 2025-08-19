@@ -15,6 +15,7 @@ import { Link } from "react-router-dom";
 import { BsEyeFill } from "react-icons/bs";
 import { MdFileDownload } from "react-icons/md";
 import { BiSolidFilePdf } from "react-icons/bi";
+import BASE_URL from "../../../../pages/config/config.js";
 
 const EmailDetail = ({ email, onBack, handleToggleStar }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -47,7 +48,7 @@ const EmailDetail = ({ email, onBack, handleToggleStar }) => {
 
   const handleDeleteSelected = async () => {
     try {
-      await axios.post("http://localhost:5000/api/email/delete", {
+      await axios.post(`${BASE_URL}/api/email/mail/delete`, {
         ids: selectedEmails,
       });
       setEmails((prev) =>
@@ -61,7 +62,7 @@ const EmailDetail = ({ email, onBack, handleToggleStar }) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.post("http://localhost:5000/api/email/delete", { ids: [id] });
+      await axios.post(`${BASE_URL}/api/email/mail/delete`, { ids: [id] });
       setEmails((prev) => prev.filter((email) => email._id !== id));
       setMenuOpenId(null);
     } catch (error) {
@@ -486,15 +487,18 @@ const EmailDetail = ({ email, onBack, handleToggleStar }) => {
         <span
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
           style={{
+            display:'flex',
+            alignItems:'center',
+            justifyContent:'center',
             border: "1px solid black",
             borderRadius: "50%",
             padding: "10px 10px",
-            width: "20px",
-            height: "20px",
+            width: "30px",
+            height: "30px",
             fontWeight: 500,
           }}
         >
-          <GrEmoji style={{ marginRight: "10px", color: "#808080" }} />
+          <GrEmoji style={{ color: "#3b3b3bff" }} />
         </span>
         {console.log("Email body being sent:", email.body)}
       </div>

@@ -14,6 +14,7 @@ import PrivateRoute from "../utils/PrivateRoute";
 
 import Product from "../components/features/inventory/product/Product";
 import ChooseToAddProduct from "../components/features/inventory/product/ChooseToAddProduct.jsx";
+import ScanToAddProduct from "../components/features/inventory/product/ScanToAddProduct.jsx";
 import ProductCreate from "../components/features/inventory/product/ProductCreate";
 import ExpriedProduct from "../components/features/inventory/product/ExpriedProduct";
 import Category from "../components/features/category/Category";
@@ -36,6 +37,9 @@ import Coupons from "../components/features/Promo/Coupons.jsx";
 import GiftCard from "../components/features/Promo/GiftCard.jsx"
 import "../i18n.js"; // Import here
 import Chat from "../components/features/Chat/Chat.jsx";
+import Activities from "../components/layouts/Navbar/activities.jsx";
+import ViewAllNotifications from "../components/layouts/Navbar/ViewAllNotifications.jsx";
+import Barcode from "../components/features/inventory/barcode/Barcode.jsx";
 // import Mail from "../components/features/Mail/mail.jsx"
 
 // ------------------ Mail Components ------------------ //
@@ -51,6 +55,7 @@ import Importants from "../components/features/Mail/EmailLayout/Importants.jsx";
 import Spam from "../components/features/Mail/EmailLayout/Spam.jsx";
 import Deleted from "../components/features/Mail/EmailLayout/Deleted.jsx";
 import EmailMessages from "../components/features/Mail/EmailMessages/EmailMessages.jsx";
+
 
 
 import ManageStock from "../components/features/stock/manageStock/ManageStock";
@@ -85,6 +90,43 @@ import ProductStock from "../components/features/inventory/product/ProductStock.
 import ViewProductStock from "../pages/ViewProductStock.jsx";
 import ViewReturnProduct from "../pages/ViewReturnProduct.jsx";
 
+import Settings from "../pages/setting28-07-2025/Settings.jsx";
+import UserProfiles from "../components/componentsetting28-07-2025/profile/Profile.jsx";
+import Security from "../components/componentsetting28-07-2025/security/Security.jsx";
+import Notification from "../components/componentsetting28-07-2025/notification/Notification.jsx";
+import ConnectedApps from "../components/componentsetting28-07-2025/connectedApps/ConnectedApps.jsx";
+import SystemSettings from "../components/componentsetting28-07-2025/systemsettings/SystemSettings.jsx";
+import Companysettings from "../components/componentsetting28-07-2025/companySettings/Companysettings.jsx";
+import Localization from "../components/componentsetting28-07-2025/localization/Localization.jsx";
+import Prefixes from "../components/componentsetting28-07-2025/prefixes/Prefixes.jsx";
+import Preferance from "../components/componentsetting28-07-2025/prefrance/Preferance.jsx";
+import Appearance from "../components/componentsetting28-07-2025/appearance/Appearance.jsx";
+import SocialAuthentications from "../components/componentsetting28-07-2025/socialAuthentication/SocialAuthentication.jsx";
+import Language from "../components/componentsetting28-07-2025/language/Language.jsx";
+import OtpVerification from "../components/auth/OtpVerification.jsx";
+import BalanceSheet from "../pages/finance&accounts/balance_sheet/BalanceSheet.jsx";
+import ProfitLoss from "../pages/finance&accounts/profit_loss/ProfitLoss.jsx";
+import ProfitLossDateChoose from "../pages/finance&accounts/profit_loss/ProfitLossDateChoose.jsx";
+import ProfitLossSelectDate from "../pages/finance&accounts/profit_loss/ProfitLossSelectDate.jsx";
+import OverdueReport from "../pages/finance&accounts/overdue_report/OverdueReport.jsx";
+import ExpenseReport from "../pages/finance&accounts/expense_report/ExpenseReport.jsx";
+import ExpenseForm from "../pages/finance&accounts/expense_report/ExpenseForm.jsx";
+import ExpenseFormEdit from "../pages/finance&accounts/expense_report/ExpenseFromEdit.jsx";
+import BC from "../pages/finance&accounts/b2b&b2c/BC.jsx";
+import PaymentHistory from "../pages/finance&accounts/payment_history/PaymentHistory.jsx";
+import CreditDebitNotes from "../pages/finance&accounts/credit&debit_note/CreditDebitNotes.jsx";
+import Credit from "../pages/finance&accounts/credit&debit_note/Credit.jsx";
+import Debit from "../pages/finance&accounts/credit&debit_note/Debit.jsx";
+import Dashboards from "../pages/dashboard/Dashboards.jsx";
+import AddWarehouse from "../components/features/warehouse/AddWarehouse.jsx";
+import WarehouseDetails from "../components/features/warehouse/WarehouseDetails.jsx";
+import Godown from "../components/features/warehouse/Godown.jsx";
+import SelectPage from "../components/features/warehouse/SelectPage.jsx";
+import StockMovementLog from "../components/features/warehouse/StockMovementLog.jsx";
+
+//pos
+import Pos from "../pages/pos/Pos.jsx";
+
 const AppRoutes = () => {
   return (
 
@@ -92,6 +134,7 @@ const AppRoutes = () => {
       {/* Auth & 404 remain outside layout */}
       <Route path="/" element={<Login />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/otp" element={<OtpVerification />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -108,10 +151,30 @@ const AppRoutes = () => {
       >
         <Route path="/home" element={<Dashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/general-settings" element={<Setting />} />
+        {/* <Route path="/general-settings" element={<Setting />} /> */}
+         <Route path="/" element={<Settings />}>
+          <Route path="profile/:id" element={<UserProfiles />} />
+          <Route path="security-settings" element={<Security />} />
+          <Route path="notification" element={<Notification />} />
+          <Route path="connectedapps" element={<ConnectedApps />} />
+          <Route path="system-settings" element={<SystemSettings />} />
+          <Route path="company-settings" element={<Companysettings />} />
+          <Route path="language-settings" element={<Localization />} />
+          <Route path="prefixes" element={<Prefixes />} />
+          <Route path="preferance" element={<Preferance />} />
+          <Route path="appearance" element={<Appearance />} />
+          <Route path="socialauth" element={<SocialAuthentications />} />
+          <Route path="language" element={<Language />} />
+        </Route>
+
         <Route path="/profile" element={<Profile />} />
         <Route path="/product" element={<Product />} />
+
         <Route path="/choose-adproduct" element={<ChooseToAddProduct />} />
+
+        <Route path="/choose-adproduct" element={<ChooseToAddProduct/>}/>
+        <Route path="/scan-product" element={<ScanToAddProduct />} />
+
         <Route path="/add-product" element={<ProductCreate />} />
         <Route path="/expired-products" element={<ExpriedProduct />} />
         <Route path="/category-list" element={<Category />} />
@@ -121,7 +184,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<Users />} />
         <Route path="/roles-permissions" element={<Role />} />
         {/* <Route path="/permissions/:roleId" element={<RolePermissionEditor />} /> */}
-        <Route path="/permissions" element={<RolePermissionEditor />} />
+        <Route path="/permissions/:roleId" element={<RolePermissionEditor />} />
         <Route path="/warranty" element={<Warranty />} />
         <Route path="/countries" element={<Country />} />
         <Route path="/states" element={<State />} />
@@ -133,13 +196,16 @@ const AppRoutes = () => {
         <Route path="/chat" element={<Chat />} />
         <Route path="/variant-attributes" element={<Variant />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin-2" element={<Dashboards/>} />
         <Route path="/theme" element={<ThemeCustomizer />} />
         <Route path="/language" element={<LanguageSwitcher />} />
         <Route path="/debit-note" element={<DebitNote />} />
         <Route path="/credit-note" element={<CreditNote />} />
-
-
-
+        <Route path="/activities" element={<Activities />} />
+        <Route path="/ViewAllNotifications" element={<ViewAllNotifications />} />
+        <Route path="/barcode" element={<Barcode />} />
+        <Route path="/pos" element={<Pos />} />
+        
         {/* purchase */}
         <Route path="/purchase-list" element={<Purchase />} />
         <Route path="/purchase-order" element={<PurchaseOrder />} />
@@ -159,8 +225,15 @@ const AppRoutes = () => {
         <Route path="/low-stocks" element={<LowStock />} />
         <Route path="/hsn" element={<Hsn />} />
         <Route path="/warehouse" element={<Warehouse />} />
+
         <Route path="/invoice" element={<InvoiceTemplate />} />
         <Route path="/invoice7" element={<Invoice7 />} />
+
+        <Route path="/addwarehouse" element={<AddWarehouse />} />
+        <Route path="/WarehouseDetails" element={<WarehouseDetails/>} />
+        <Route path="/Godown" element={<Godown/>} />
+        <Route path="/selectpage" element={<SelectPage/>} />
+
 
         {/* customer */}
         <Route path="/customers" element={<AllCustomer />} />
@@ -171,6 +244,7 @@ const AppRoutes = () => {
         <Route path="/Purchase-settings" element={<PurchaseSettings />} />
         <Route path="/warehouse-settings" element={<RackSettings />} />
         <Route path="/sidebar-settings" element={<SidebarSettings />} />
+        <Route path="/stock-movement-log" element={<StockMovementLog />} />
 
 
 
@@ -187,8 +261,30 @@ const AppRoutes = () => {
           <Route path="spam" element={<Spam />} />
           <Route path="deleted" element={<Deleted />} />
         </Route>
+
         <Route path="/product/edit/:id" element={<ProductEdit />} />
+
+
+
+        {/* ------------------ Finance & Accounts ------------------ */}
+        <Route path="/balance-sheet" element={<BalanceSheet/>}/>
+        <Route path="/profit&loss" element={<ProfitLoss/>}/>
+        <Route path="/profit_lossdate_choose" element={<ProfitLossDateChoose/>}/>
+        <Route path="/profit_lossselect_date" element={<ProfitLossSelectDate/>}/>
+        <Route path="/overdue-report" element={<OverdueReport/>}/>
+        <Route path="/expense-report" element={<ExpenseReport/>}/>
+        <Route path="/add_expenses" element={<ExpenseForm/>}/>
+        <Route path="/expenseformedit" element={<ExpenseFormEdit/>}/>
+        <Route path="/bc" element={<BC/>}/>
+        <Route path="/payment-history" element={<PaymentHistory/>}/>
+        <Route path="/credit&debit-note" element={<CreditDebitNotes/>}/>
+        <Route path="/credit" element={<Credit/>}/>
+        <Route path="/debit" element={<Debit/>}/>
+
       </Route>
+
+       
+
 
     </Routes>
   );

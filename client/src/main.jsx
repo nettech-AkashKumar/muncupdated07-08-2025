@@ -16,6 +16,11 @@ import { Provider } from "react-redux";
 import store from './components/Redux/store';
 import { ViewProvider } from "./Context/ViewContax/viewType.jsx";
 import { SettingsProvider } from "./Context/purchase/PurchaseContext.jsx";
+import { SocketProvider } from './Context/SocketContext.jsx';
+
+import { AuthProvider } from './components/auth/AuthContext.jsx';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 
 createRoot(document.getElementById('root')).render(
@@ -25,7 +30,13 @@ createRoot(document.getElementById('root')).render(
       <Provider store={store}> {/* ✅ Wrap your App inside Provider */}
         <SettingsProvider>
           <ViewProvider>
-            <App />
+            <SocketProvider>
+              <AuthProvider>
+              <GoogleOAuthProvider clientId="1096176100360-e4a9a7o5mp9ghndmr5squt2gutj8ec7j.apps.googleusercontent.com">
+              <App />
+              </GoogleOAuthProvider>
+            </AuthProvider>
+            </SocketProvider>
           </ViewProvider>
         </SettingsProvider>
       </Provider>
