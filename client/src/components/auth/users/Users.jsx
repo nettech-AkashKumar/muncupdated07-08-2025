@@ -1151,20 +1151,12 @@ const Users = () => {
                                 control: (base) => ({
                                   ...base,
                                   backgroundColor: "#FBFBFB",
-<<<<<<< HEAD
-                                   border: "1px solid #C2C2C2",
-=======
                                   border: "1px solid #C2C2C2",
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
                                   borderRadius: "8px",
                                   fontSize: "14px",
                                   fontWeight: 400,
                                   color: "#676767",
-<<<<<<< HEAD
-                                  outline:none
-=======
                                   outline: "none",
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
                                 }),
                               }}
                             />
@@ -1340,31 +1332,6 @@ const Users = () => {
                               data-bs-toggle="dropdown"
                               aria-expanded="false"
                             >
-<<<<<<< HEAD
-                              {status ? "Active" : "Inactive"}<BiChevronDown/>
-                            </button>
-                             <ul
-                          className="dropdown-menu"
-                          aria-labelledby="statusDropdown"
-                        >
-                          <li>
-                            <a
-                              className="dropdown-item"
-                              onClick={() => setStatus(true)}
-                            >
-                              Active
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="dropdown-item"
-                              onClick={() => setStatus(false)}
-                            >
-                              Inactive
-                            </a>
-                          </li>
-                        </ul>
-=======
                               {status ? "Active" : "Inactive"}
                               <BiChevronDown />
                             </button>
@@ -1389,7 +1356,6 @@ const Users = () => {
                                 </a>
                               </li>
                             </ul>
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
                           </div>
                           {/* <input
                             type="checkbox"
@@ -1416,11 +1382,7 @@ const Users = () => {
                       }}
                     >
                       <button
-<<<<<<< HEAD
-                        // className="settingbtn"
-=======
                         data-bs-dismiss="modal"
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
                         style={{
                           border: "1px solid #E6E6E6",
                           borderRadius: "4px",
@@ -1499,60 +1461,6 @@ const Users = () => {
                       <span aria-hidden="true">×</span>
                     </button> */}
                   </div>
-<<<<<<< HEAD
-                  <form onSubmit={handleUpdate}>
-                    <div className="modal-body">
-                      <div className="row">
-                        <div className="col-lg-12">
-                          <div className="new-employee-field">
-                            <div className="profile-pic-upload image-field">
-                              <div className="profile-pic p-2">
-                                <img
-                                  src={
-                                    typeof editUserData.profileImage ===
-                                    "string"
-                                      ? editUserData.profileImage
-                                      : editUserData.profileImage
-                                      ? URL.createObjectURL(
-                                          editUserData.profileImage
-                                        ) //newly selected file
-                                      : "assets/img/users/user-49.png"
-                                  }
-                                  className="object-fit-cover h-100 rounded-1"
-                                  alt="user"
-                                  style={{
-                                    height: "120px",
-                                    width: "120px",
-                                    borderRadius: "13px",
-                                  }}
-                                />
-                              </div>
-                              <div className="mb-3">
-                                <div className="image-upload mb-0">
-                                  <input
-                                    type="file"
-                                    accept="image/*"
-                                    ref={editFileInputRef}
-                                    onChange={(e) =>
-                                      setEditUserData({
-                                        ...editUserData,
-                                        profileImage: e.target.files[0],
-                                      })
-                                    }
-                                  />
-                                  <div className="image-uploads">
-                                    <h4
-                                      style={{ cursor: "pointer" }}
-                                      onClick={editHandleIconClick}
-                                    >
-                                      Change Image
-                                    </h4>
-                                  </div>
-                                </div>
-                                <p className="mt-2">JPEG, PNG up to 2 MB</p>
-                              </div>
-                            </div>
-=======
                   <form onSubmit={handleUpdate} style={{ padding: "0px 20px" }}>
                     <div
                       style={{
@@ -1602,7 +1510,6 @@ const Users = () => {
                             >
                               Change Image
                             </h4>
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
                           </div>
                         </div>
                         <p className="mt-2">JPEG, PNG up to 2 MB</p>

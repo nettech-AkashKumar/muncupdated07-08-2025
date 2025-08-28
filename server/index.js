@@ -45,10 +45,6 @@ const companysettingrouter = require("./routes/settings/companysettingroute.js")
 const localizationrouter = require("./routes/settings/Localizationroute.js");
 const balanceSheetRoutes = require("./routes/balanceSheetRoutes.js");
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
 
 const http = require('http');
 const emailrouter = require('./routes/emailroutes.js');

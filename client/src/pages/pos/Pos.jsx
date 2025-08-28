@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-<<<<<<< HEAD
-=======
 import BASE_URL from "../../pages/config/config";
 import axios from "axios";
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
 import { IoSearch } from "react-icons/io5";
 import { SlHandbag } from "react-icons/sl";
 import { GoPersonAdd } from "react-icons/go";
@@ -34,8 +31,6 @@ function Pos() {
     };
   }, []);
 
-<<<<<<< HEAD
-=======
   const [products, setProducts] = useState([]);
   
   const [activeTabs, setActiveTabs] = useState({});
@@ -60,7 +55,6 @@ function Pos() {
     }, []);
   
 
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
   return (
     <div style={{marginLeft:'-21px',backgroundColor:'#fff'}}>
 
@@ -107,20 +101,11 @@ function Pos() {
       </div>
 
       {/* products & customer billing */}
-<<<<<<< HEAD
-      <div style={{display:'flex',justifyContent:'space-between',border:'1px solid white',height:'84vh'}}>
-=======
       <div style={{display:'flex',justifyContent:'space-between',border:'1px solid white',height:'83vh'}}>
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
         
         {/* products */}
         <div style={{width:'70%',display:'flex',borderRight:'1px solid #ccc',}}>
 
-<<<<<<< HEAD
-          <div style={{width:'100%',display:'flex',}}>
-
-=======
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
             {/* category */}
             <div style={{width:'20%',padding:'20px 50px 0px 20px',}}>
 
@@ -152,33 +137,6 @@ function Pos() {
             </div>
 
             {/* details */}
-<<<<<<< HEAD
-            <div style={{width:'80%',backgroundColor:'#F1F1F1',padding:'20px'}}>
-              <div className='row'>
-                <div className='col-2'>
-
-                  <div>
-                    <img src="" alt="Product img" />
-                  </div>
-
-                  <div>
-                    <span>Category</span>
-                    <br/>
-                    <span>Product Name</span>
-                  </div>
-
-                  <div style={{display:'flex',justifyContent:'space-between'}}>
-                    <span>Pcs</span>
-                    <span>Price</span>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-=======
             <div style={{width:'80%',backgroundColor:'#F1F1F1',height:'100%'}}>
               
               {/* products */}
@@ -231,7 +189,6 @@ function Pos() {
               </div>
             </div>
 
->>>>>>> 974f10dc687a15cf75407d7f8f98c9378e00220c
         </div>
       
         {/* billing */}
